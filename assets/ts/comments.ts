@@ -134,6 +134,10 @@ const requestArtalk = async (
 
 const normalizeArtalkRecords = async (records: ArtalkComment[]) => {
   const routes = runtimeConfig().routes || {};
+  // Artalk 的 page_key 是历史站点记录的 pathname，可能带或不带 .html 后缀；
+  // 本站文章 RelPermalink 恒为 /p/xxx.html，两种 key 都要能对上。
+  const matchRoute = (path: string) =>
+    routes[path] ?? routes[`${path}.html`];
   const normalized = await Promise.all(
     records.map(async (record) => {
       // API 返回的 page_url 是绝对地址，且可能是历史域名；统一转 pathname
@@ -144,7 +148,9 @@ const normalizeArtalkRecords = async (records: ArtalkComment[]) => {
       } catch {
         /* page_url 非法时退回 page_key */
       }
-      if (!routes[path]) return null;
+      const route = matchRoute(path);
+      if (!route) return null;
+      const url = routes[path] ? path : `${path}.html`;
       const nick =
         String(record.nick || "").trim() || commentText("anonymous", "Anonymous");
       return {
@@ -154,8 +160,8 @@ const normalizeArtalkRecords = async (records: ArtalkComment[]) => {
           ? `mail:${record.email_encrypted}`
           : `nick:${nick.toLocaleLowerCase()}`,
         content: summarize(record.content),
-        url: path,
-        title: routes[path],
+        url,
+        title: route,
         avatar: await artalkAvatarUrl(record.email_encrypted),
         date: String(record.date || "").replace(" ", "T"),
       } satisfies NormalizedComment;
