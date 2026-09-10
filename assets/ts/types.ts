@@ -50,6 +50,14 @@ export interface ValineConfiguration {
   option?: Record<string, unknown>;
 }
 
+export interface ArtalkConfiguration {
+  server?: string;
+  site?: string;
+  pv?: boolean;
+  placeholder?: string;
+  option?: Record<string, unknown>;
+}
+
 export interface AssetConfiguration {
   twikoo?: string;
   waline?: string;
@@ -81,6 +89,7 @@ export interface SolitudeSiteConfiguration {
   keyboard?: KeyboardConfiguration;
   comment: CommentConfiguration;
   valine?: ValineConfiguration;
+  artalk?: ArtalkConfiguration;
   cdn: AssetConfiguration;
   highlight?: HighlightConfiguration;
   lazyload: { enable: boolean; error?: string };

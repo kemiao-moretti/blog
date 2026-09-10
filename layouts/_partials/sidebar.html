@@ -6,7 +6,7 @@
       {{ range $item := slice (dict "name" (i18n "archives") "url" "/archives/" "count" (len (where site.RegularPages "Section" "posts"))) (dict "name" (i18n "categories") "url" "/categories/" "count" (len site.Taxonomies.categories)) (dict "name" (i18n "tags") "url" "/tags/" "count" (len site.Taxonomies.tags)) }}
         <div class="data-item is-center"><div class="data-item-link"><a href="{{ $item.url | relLangURL }}"><div class="headline">{{ $item.name }}</div><div class="length-num">{{ $item.count }}</div></a></div></div>
       {{ end }}
-      {{ if and $cfg.comment.sidebar (in (lower $cfg.comment.use) "valine") }}
+      {{ if and $cfg.comment.sidebar (or (in (lower $cfg.comment.use) "valine") (in (lower $cfg.comment.use) "artalk")) }}
         <div class="data-item is-center"><div class="data-item-link"><a href="{{ $cfg.recent_comments.page | relLangURL }}"><div class="headline">{{ i18n "comments" }}</div><div class="length-num" id="valine_allcount"><i class="solitude fas fa-spinner fa-spin"></i></div></a></div></div>
       {{ end }}
     </div>

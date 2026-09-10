@@ -1,0 +1,131 @@
+/* Artalk comment provider compatibility.
+   Unlayered like comments.css so the rules can win over the unlayered
+   vendor CSS that Artalk ships at runtime. All colors map onto the
+   solitude design tokens (--efu-*) so light/dark follow [data-theme]
+   without any hardcoded palette. */
+
+/* ---- token mapping (light follows the :root tokens) ---- */
+.artalk,
+.atk-layer-wrap {
+  --at-color-font: var(--efu-fontcolor);
+  --at-color-deep: var(--efu-fontcolor);
+  --at-color-sub: var(--efu-secondtext);
+  --at-color-grey: var(--efu-secondtext);
+  --at-color-meta: var(--efu-secondtext);
+  --at-color-border: var(--efu-card-border);
+  --at-color-light: var(--efu-lighttext);
+  --at-color-bg: var(--efu-card-bg);
+  --at-color-bg-transl: var(--efu-card-bg);
+  --at-color-bg-grey: var(--efu-secondbg);
+  --at-color-bg-grey-transl: var(--efu-secondbg);
+  --at-color-bg-light: var(--efu-main-op-light);
+  --at-color-main: var(--efu-main);
+  --at-color-red: var(--efu-red);
+  --at-color-pink: var(--efu-pink);
+  --at-color-yellow: var(--efu-yellow);
+  --at-color-green: var(--efu-green);
+  --at-color-gradient: linear-gradient(180deg, transparent, var(--efu-card-bg));
+}
+
+/* ---- dark mode: [data-theme] is the single source of truth.
+   The JS side mirrors it onto .atk-dark-mode so the vendor's own
+   dark rules stay in sync; the variables below keep our palette. ---- */
+[data-theme='dark'] .artalk,
+[data-theme='dark'] .atk-layer-wrap,
+.artalk.atk-dark-mode,
+.atk-layer-wrap.atk-dark-mode {
+  --at-color-font: var(--efu-fontcolor);
+  --at-color-deep: var(--efu-fontcolor);
+  --at-color-sub: var(--efu-secondtext);
+  --at-color-grey: var(--efu-secondtext);
+  --at-color-meta: var(--efu-secondtext);
+  --at-color-border: var(--efu-card-border);
+  --at-color-light: var(--efu-lighttext);
+  --at-color-bg: var(--efu-card-bg);
+  --at-color-bg-transl: var(--efu-card-bg);
+  --at-color-bg-grey: var(--efu-secondbg);
+  --at-color-bg-grey-transl: var(--efu-secondbg);
+  --at-color-bg-light: var(--efu-main-op-light);
+  --at-color-main: var(--efu-main);
+  --at-color-gradient: linear-gradient(180deg, transparent, var(--efu-card-bg));
+}
+
+/* ---- integration with the card layout ---- */
+#artalk-wrap {
+  background: var(--efu-card-bg);
+  border-radius: var(--radius);
+  transition: background 0.3s;
+}
+
+#artalk-wrap .atk-comment-wrap {
+  border-bottom-color: var(--efu-card-border);
+}
+
+#artalk-wrap .atk-avatar img {
+  border-radius: var(--efu-radius-sm);
+}
+
+/* editor panel follows the card surface */
+#artalk-wrap .atk-panel,
+#artalk-wrap .atk-editor,
+#artalk-wrap .atk-textarea-wrap textarea {
+  background: var(--efu-card-bg);
+  border-color: var(--efu-card-border);
+  color: var(--efu-fontcolor);
+}
+
+#artalk-wrap .atk-editor .atk-textarea-wrap textarea::placeholder,
+#artalk-wrap .atk-textarea-wrap textarea::placeholder {
+  color: var(--efu-secondtext);
+}
+
+#artalk-wrap .atk-btn {
+  border-color: var(--efu-card-border);
+}
+
+#artalk-wrap .atk-btn.atk-btn-cancel,
+#artalk-wrap .atk-btn.atk-btn-open {
+  background: var(--efu-secondbg);
+  color: var(--efu-fontcolor);
+}
+
+/* ---- multi-device layout ---- */
+@media (max-width: 768px) {
+  #artalk-wrap .atk-avatar img {
+    width: 40px;
+    height: 40px;
+  }
+
+  #artalk-wrap .atk-comment > .atk-main {
+    margin-left: 50px;
+  }
+
+  #artalk-wrap .atk-header .atk-nick,
+  #artalk-wrap .atk-header .atk-badge {
+    max-width: 40vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #artalk-wrap .atk-comment-actions,
+  #artalk-wrap .atk-meta {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  #artalk-wrap .atk-panel {
+    padding: 10px;
+  }
+
+  #artalk-wrap .atk-editor .atk-bottom {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  #artalk-wrap .atk-editor .atk-bottom .atk-status-block {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

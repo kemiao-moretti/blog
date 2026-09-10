@@ -32,7 +32,7 @@ interface CommentRuntimeConfiguration {
 const routeChunkSize = 40;
 const postCardPageSize = 1000;
 const postCardAvatarLimit = 5;
-const aggregateCacheVersion = 3;
+const aggregateCacheVersion = 4;
 let aggregateRequest: Promise<NormalizedComment[]> | null = null;
 let countRequest: Promise<number> | null = null;
 let md5Request: Promise<((value: string) => string) | undefined> | null = null;
@@ -52,12 +52,116 @@ const valineConfig = () => {
   return config;
 };
 
-const commentBarrageEnabled = () =>
-  Boolean(Solitude.config.comment?.commentBarrage);
+const artalkConfig = () =>
+  (Solitude.config.artalk || {}) as import("./types").ArtalkConfiguration;
 
 const valineReady = () => {
   const config = valineConfig();
   return Boolean(config.appId && config.appKey && config.serverURLs);
+};
+
+const artalkReady = () => {
+  const config = artalkConfig();
+  return Boolean(config.server && config.site);
+};
+
+/** 当前聚合功能使用的评论后端：use 列表中第一个“已就绪”的 provider，artalk 优先。 */
+const activeProvider = (): "valine" | "artalk" | null => {
+  const enabled = providers();
+  if (enabled.includes("artalk") && artalkReady()) return "artalk";
+  if (enabled.includes("valine") && valineReady()) return "valine";
+  return null;
+};
+
+const commentBarrageEnabled = () =>
+  Boolean(Solitude.config.comment?.commentBarrage);
+
+interface ArtalkComment {
+  id?: number;
+  nick?: string;
+  content?: string;
+  email_encrypted?: string;
+  date?: string;
+  page_key?: string;
+  page_url?: string;
+  is_pending?: boolean;
+  visible?: boolean;
+  rid?: number;
+}
+
+interface ArtalkConf {
+  frontend_conf?: {
+    gravatar?: { mirror?: string; params?: string };
+  };
+}
+
+let artalkConfRequest: Promise<ArtalkConf | undefined> | null = null;
+
+const requestArtalkConf = () => {
+  if (artalkConfRequest) return artalkConfRequest;
+  artalkConfRequest = requestArtalk("conf", {})
+    .catch(() => undefined);
+  return artalkConfRequest;
+};
+
+const artalkAvatarUrl = async (emailEncrypted = "") => {
+  const fallback = runtimeConfig().default_avatar || "/img/default_avatar.avif";
+  if (!emailEncrypted) return fallback;
+  const conf = await requestArtalkConf();
+  const mirror = String(
+    conf?.frontend_conf?.gravatar?.mirror || "https://cn.cravatar.com/avatar/"
+  ).replace(/\/$/, "");
+  const params = String(conf?.frontend_conf?.gravatar?.params || "d=mp&s=240");
+  return `${mirror}/${emailEncrypted}?${params}`;
+};
+
+const requestArtalk = async (
+  path: string,
+  parameters: Record<string, string | number | undefined>
+) => {
+  const config = artalkConfig();
+  const endpoint = new URL(
+    `${String(config.server).replace(/\/$/, "")}/api/v2/${path}`
+  );
+  Object.entries(parameters).forEach(([key, value]) => {
+    if (value === undefined || value === "") return;
+    endpoint.searchParams.set(key, String(value));
+  });
+  const response = await fetch(endpoint);
+  if (!response.ok) throw new Error(`Artalk request failed with ${response.status}`);
+  return response.json();
+};
+
+const normalizeArtalkRecords = async (records: ArtalkComment[]) => {
+  const routes = runtimeConfig().routes || {};
+  const normalized = await Promise.all(
+    records.map(async (record) => {
+      // API 返回的 page_url 是绝对地址，且可能是历史域名；统一转 pathname
+      // 再与站点 routes 匹配，跨域名漂移才不会丢数据。
+      let path = String(record.page_key || "");
+      try {
+        if (record.page_url) path = new URL(record.page_url).pathname;
+      } catch {
+        /* page_url 非法时退回 page_key */
+      }
+      if (!routes[path]) return null;
+      const nick =
+        String(record.nick || "").trim() || commentText("anonymous", "Anonymous");
+      return {
+        id: String(record.id || `${path}-${record.date || ""}`),
+        nick,
+        participantKey: record.email_encrypted
+          ? `mail:${record.email_encrypted}`
+          : `nick:${nick.toLocaleLowerCase()}`,
+        content: summarize(record.content),
+        url: path,
+        title: routes[path],
+        avatar: await artalkAvatarUrl(record.email_encrypted),
+        date: String(record.date || "").replace(" ", "T"),
+      } satisfies NormalizedComment;
+    })
+  );
+  return normalized.filter((item): item is NormalizedComment => Boolean(item));
 };
 
 const commentText = (key: string, fallback: string) =>
@@ -213,13 +317,13 @@ const routeCacheSignature = () => {
 };
 
 const aggregateCacheKey = () =>
-  `valine-hugo-comments:v${aggregateCacheVersion}:${location.host}:${routeCacheSignature()}`;
+  `${activeProvider()}-hugo-comments:v${aggregateCacheVersion}:${location.host}:${routeCacheSignature()}`;
 const countCacheKey = () =>
-  `valine-hugo-count:v${aggregateCacheVersion}:${location.host}:${routeCacheSignature()}`;
+  `${activeProvider()}-hugo-count:v${aggregateCacheVersion}:${location.host}:${routeCacheSignature()}`;
 const postCardCacheKey = (signature: string) =>
-  `valine-hugo-post-card:v${aggregateCacheVersion}:${location.host}:${signature}`;
+  `${activeProvider()}-hugo-post-card:v${aggregateCacheVersion}:${location.host}:${signature}`;
 
-const fetchAggregateComments = () => {
+const fetchValineAggregateComments = () => {
   if (aggregateRequest) return aggregateRequest;
   const routes = routeEntries();
   const allowed = new Set(routes.map(([path]) => path));
@@ -261,7 +365,43 @@ const fetchAggregateComments = () => {
   return aggregateRequest;
 };
 
-const fetchPostCardComments = (paths: string[]) => {
+const fetchArtalkAggregateComments = () => {
+  if (aggregateRequest) return aggregateRequest;
+  const routes = routeEntries();
+  const allowed = new Set(routes.map(([path]) => path));
+  const cached = Solitude.saveToLocal.get<NormalizedComment[]>(aggregateCacheKey());
+  if (cached) {
+    aggregateRequest = Promise.resolve(cached.filter((item) => allowed.has(item.url)));
+    return aggregateRequest;
+  }
+  aggregateRequest = (async () => {
+    if (!routes.length) return [];
+    const limit = aggregateLimit();
+    const response = await requestArtalk("stats/latest_comments", {
+      site_name: artalkConfig().site,
+      limit,
+    });
+    const items = (response.data || []) as ArtalkComment[];
+    const result = (await normalizeArtalkRecords(items))
+      .sort((left, right) => Date.parse(right.date) - Date.parse(left.date))
+      .slice(0, limit);
+    if (result.length) {
+      Solitude.saveToLocal.set(aggregateCacheKey(), result, cacheTtl());
+    }
+    return result;
+  })().catch((error) => {
+    aggregateRequest = null;
+    throw error;
+  });
+  return aggregateRequest;
+};
+
+const fetchAggregateComments = () =>
+  activeProvider() === "artalk"
+    ? fetchArtalkAggregateComments()
+    : fetchValineAggregateComments();
+
+const fetchValinePostCardComments = (paths: string[]) => {
   const availableRoutes = runtimeConfig().routes || {};
   const allowedPaths = [...new Set(paths)]
     .filter((path) => Boolean(availableRoutes[path]))
@@ -320,7 +460,32 @@ const fetchPostCardComments = (paths: string[]) => {
   return request;
 };
 
-const fetchAggregateCount = () => {
+const fetchArtalkPostCardComments = async (paths: string[]) => {
+  const routes = runtimeConfig().routes || {};
+  const allowedPaths = [...new Set(paths)]
+    .filter((path) => Boolean(routes[path]))
+    .sort();
+  if (!allowedPaths.length) return [];
+  const results = await Promise.all(
+    allowedPaths.map((path) =>
+      requestArtalk("comments", {
+        site_name: artalkConfig().site,
+        page_key: path,
+        limit: 200,
+      })
+        .then((response) => (response.comments || []) as ArtalkComment[])
+        .catch(() => [] as ArtalkComment[])
+    )
+  );
+  return normalizeArtalkRecords(results.flat());
+};
+
+const fetchPostCardComments = (paths: string[]) =>
+  activeProvider() === "artalk"
+    ? fetchArtalkPostCardComments(paths)
+    : fetchValinePostCardComments(paths);
+
+const fetchValineAggregateCount = () => {
   if (countRequest) return countRequest;
   const cached = Solitude.saveToLocal.get<number>(countCacheKey());
   if (typeof cached === "number") {
@@ -354,7 +519,19 @@ const fetchAggregateCount = () => {
   return countRequest;
 };
 
-const fetchPageComments = async (path: string) => {
+const fetchArtalkAggregateCount = async () => {
+  const response = await requestArtalk("stats/site_comment", {
+    site_name: artalkConfig().site,
+  });
+  return Number(response.data ?? 0);
+};
+
+const fetchAggregateCount = () =>
+  activeProvider() === "artalk"
+    ? fetchArtalkAggregateCount()
+    : fetchValineAggregateCount();
+
+const fetchValinePageComments = async (path: string) => {
   const response = await requestValine({
     where: JSON.stringify({ url: path }),
     order: "-createdAt",
@@ -362,6 +539,20 @@ const fetchPageComments = async (path: string) => {
   });
   return normalizeRecords(response.results || []);
 };
+
+const fetchArtalkPageComments = async (path: string) => {
+  const response = await requestArtalk("comments", {
+    site_name: artalkConfig().site,
+    page_key: path,
+    limit: 1000,
+  });
+  return normalizeArtalkRecords(response.comments || []);
+};
+
+const fetchPageComments = async (path: string) =>
+  activeProvider() === "artalk"
+    ? fetchArtalkPageComments(path)
+    : fetchValinePageComments(path);
 
 const setStatus = (container: Element, message: string, state: string) => {
   const status = document.createElement("div");
@@ -636,6 +827,9 @@ const initializePageBarrage = async (comments: NormalizedComment[]) => {
   ) {
     return;
   }
+  const container = document.querySelector(".comment-barrage");
+  if (container.getAttribute("data-barrage-init") === "true") return;
+  container.setAttribute("data-barrage-init", "true");
   const script = runtimeConfig().barrage_script;
   if (!script) return;
   await Solitude.loadScript(script);
@@ -665,6 +859,8 @@ const escapeHtml = (source: string) =>
 const initializeEnvelope = async (comments: NormalizedComment[]) => {
   const container = document.getElementById("barrage");
   if (!container) return;
+  if (container.dataset.envelopeInit === "true") return;
+  container.dataset.envelopeInit = "true";
   container.replaceChildren();
   if (!comments.length) return;
   const script = runtimeConfig().envelope_script;
@@ -704,6 +900,61 @@ const initializeValineEffects = async () => {
     const envelope = document.getElementById("barrage");
     if (envelope) envelope.replaceChildren();
   }
+};
+
+// Artalk 与 Valine 共用同一套弹幕/信封渲染管线，仅数据源不同。
+const initializeArtalkEffects = initializeValineEffects;
+
+// 文章页 meta 区的评论数与 PV：Valine 由 LeanCloud SDK 自动填充，
+// Artalk 则通过 stats 接口拉取后回填到相同的 DOM 位置。
+const initializeArtalkCounters = async () => {
+  const path = location.pathname;
+  const countTarget = document.querySelector(".post-meta-commentcount .comment-count");
+  const pvTarget = document.querySelector(".leancloud-visitors-count");
+  const requests: Promise<void>[] = [];
+  if (Solitude.config.comment?.count && countTarget) {
+    requests.push(
+      requestArtalk("stats/page_comment", {
+        site_name: artalkConfig().site,
+        page_keys: path,
+      })
+        .then((response) => {
+          countTarget.textContent = String(Number(response.data?.[path] ?? 0));
+        })
+        .catch(() => undefined)
+    );
+  }
+  if (Solitude.config.comment?.pv !== false && pvTarget && artalkConfig().pv !== false) {
+    requests.push(
+      requestArtalk("stats/page_pv", {
+        site_name: artalkConfig().site,
+        page_keys: path,
+      })
+        .then((response) => {
+          pvTarget.textContent = String(Number(response.data?.[path] ?? 0));
+        })
+        .catch(() => undefined)
+    );
+  }
+  await Promise.all(requests);
+};
+
+// Artalk 自身样式不感知主题的 data-theme 切换，用 class + CSS 变量映射两层联动。
+const applyArtalkDarkMode = () => {
+  const wrap = document.getElementById("artalk-wrap");
+  if (!wrap) return;
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  wrap.classList.toggle("atk-dark-mode", dark);
+};
+
+const watchArtalkDarkMode = () => {
+  applyArtalkDarkMode();
+  const observer = new MutationObserver(applyArtalkDarkMode);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  Solitude.onPageCleanup?.(() => observer.disconnect());
 };
 
 const mountValine = async (mount: HTMLElement) => {
@@ -777,17 +1028,30 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
   }
   if (enabled.includes("artalk") && document.getElementById("artalk-wrap")) {
     if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css);
+    applyArtalkDarkMode();
     await Solitude.loadScript(cdn.artalk);
+    const config = artalkConfig();
     (window as any).Artalk?.init?.({
       el: "#artalk-wrap",
-      ...Solitude.config.artalk,
+      server: config.server,
+      site: config.site,
+      placeholder: config.placeholder || undefined,
+      ...(config.option || {}),
     });
+    watchArtalkDarkMode();
+    void initializeArtalkEffects();
+    void initializeArtalkCounters();
   }
 };
 
 const initializeComments = () => {
   const enabled = providers();
   if (!enabled.length) return;
+  if (activeProvider() === "artalk") {
+    void renderPostCardParticipants();
+    void renderAggregateSurfaces();
+    void renderAggregateCount();
+  }
   if (enabled.includes("valine")) {
     if (valineReady()) {
       void renderPostCardParticipants();

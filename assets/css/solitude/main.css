@@ -37,6 +37,7 @@
 /* Comment providers ship unlayered vendor CSS at runtime. Keep our scoped
    compatibility rules unlayered as well so the Hexo theme styles can win. */
 @import "./integrations/comments.css";
+@import "./integrations/artalk.css";
 /* APlayer ships unlayered vendor CSS, so the scoped capsule compatibility
    rules must also remain unlayered to override its fixed player geometry. */
 @import "./integrations/music-dock.css";
