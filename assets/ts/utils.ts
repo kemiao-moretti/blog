@@ -1,3 +1,5 @@
+import { Solitude } from "./core/api";
+
 (() => {
   const utilsFn = {
     throttle: (func, wait, { leading = true, trailing = true } = {}) => {
@@ -71,7 +73,9 @@
       }
 
       const distance = pos - currentPos;
-      const step = (currentTime) => {
+      let start: number | null = null;
+      const step = (currentTime: number) => {
+        start ??= currentTime;
         const progress = currentTime - (start || currentTime);
         if (progress < time) {
           window.scrollTo(0, currentPos + (distance * progress) / time);
@@ -116,9 +120,9 @@
         callback_error: (img) => (img.src = Solitude.config.lazyload.error),
       });
     },
-    lightbox: function (selector) {
+    lightbox: function (selector: any) {
       const lightboxType = Solitude.config.lightbox;
-      const options = {
+      const options: Record<string, string> = {
         class: "fancybox",
         "data-fancybox": "gallery",
         "data-no-pjax": "",
@@ -178,7 +182,7 @@
     diffDate: (d, more = false) => {
       const dateNow = new Date();
       const datePost = new Date(d);
-      const dateDiff = dateNow - datePost;
+      const dateDiff = dateNow.getTime() - datePost.getTime();
       const minute = 60000;
       const hour = 3600000;
       const day = 86400000;

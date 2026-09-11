@@ -2,6 +2,21 @@ import { Solitude } from "../core/api";
 
 (() => {
 class LocalSearch {
+    // 动态实例字段的显式声明（TS 严格模式要求）
+    store: any[] = [];
+    currentQuery = '';
+    currentPage = 0;
+    resultsPerPage = 10;
+    currentResults: any[] = [];
+    lastSearchTime: number | null = null;
+    isLoading = false;
+    searchTimeout: ReturnType<typeof setTimeout> | null = null;
+    boundElements = new WeakSet<HTMLElement>();
+    keyboardBound = false;
+    pjaxBound = false;
+    handleSearchInputDebounced: (event: Event) => void = () => {};
+    elements: Record<string, any> = {};
+
     constructor() {
         this.store = [];
         this.currentQuery = '';
@@ -24,7 +39,7 @@ class LocalSearch {
         this.init();
     }
 
-    cacheElements() {
+    cacheElements(): Record<string, any> {
         return {
             searchMask: document.getElementById('search-mask'),
             searchDialog: document.querySelector('#local-search .search-dialog'),
@@ -111,7 +126,7 @@ class LocalSearch {
         this.bindOnce(this.elements.closeButton, 'click', () => this.closeSearch());
         this.bindOnce(this.elements.searchMask, 'click', () => this.closeSearch());
 
-        document.querySelectorAll('#local-search .tag-list').forEach(button => {
+        document.querySelectorAll<HTMLElement>('#local-search .tag-list').forEach(button => {
             this.bindOnce(button, 'click', () => {
                 const query = button.dataset.query?.trim();
                 if (!query || !this.elements.searchInput) return;
@@ -231,7 +246,7 @@ class LocalSearch {
         try {
             const startTime = performance.now();
             this.currentResults = this.performSearch(query);
-            this.lastSearchTime = (performance.now() - startTime).toFixed(2);
+            this.lastSearchTime = Number((performance.now() - startTime).toFixed(2));
             this.renderResults(this.currentResults, this.currentPage, this.lastSearchTime);
             this.renderPagination(this.currentResults.length);
         } catch (error) {

@@ -36,9 +36,15 @@ export const cacheColor = (source, color) => {
 
 export const getCoverSource = (music = false) => {
   if (!music) {
-    return Solitude.page.color || document.getElementById("post-cover")?.src || "";
+    return (
+      Solitude.page.color ||
+      (document.getElementById("post-cover") as HTMLImageElement | null)?.src ||
+      ""
+    );
   }
-  const background = document.querySelector("#nav-music .aplayer-pic")?.style.backgroundImage || "";
+  const background =
+    (document.querySelector("#nav-music .aplayer-pic") as HTMLElement | null)
+      ?.style.backgroundImage || "";
   return /url\(["']?([^"')]+)["']?\)/.exec(background)?.[1] || "";
 };
 

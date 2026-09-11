@@ -1,6 +1,15 @@
 import { Solitude } from "../core/api";
 
+declare const instantsearch: any;
+declare const algoliasearch: any;
+
 class AlgoliaSearch {
+    // 动态实例字段的显式声明（TS 严格模式要求）
+    searchInstance: any = null;
+    isInitialized = false;
+    elements: Record<string, HTMLElement | null> = {};
+    config: any = null;
+
     constructor() {
         this.searchInstance = null;
         this.isInitialized = false;
@@ -18,7 +27,7 @@ class AlgoliaSearch {
     /**
      * 缓存常用的DOM元素
      */
-    cacheElements() {
+    cacheElements(): Record<string, any> {
         return {
             searchMask: document.getElementById("search-mask"),
             searchDialog: document.querySelector("#algolia-search .search-dialog"),
@@ -226,7 +235,7 @@ class AlgoliaSearch {
      * 隐藏加载指示器
      */
     hideLoadingIndicator() {
-        const loadingElement = document.querySelector("#algolia-hits .loading");
+        const loadingElement = document.querySelector<HTMLElement>("#algolia-hits .loading");
         if (loadingElement) {
             loadingElement.style.display = "none";
         }
@@ -237,7 +246,7 @@ class AlgoliaSearch {
      */
     delayedFocus() {
         setTimeout(() => {
-            const searchInput = document.querySelector("#algolia-search .ais-SearchBox-input");
+            const searchInput = document.querySelector<HTMLInputElement>("#algolia-search .ais-SearchBox-input");
             searchInput?.focus();
         }, 200);
     }
@@ -320,7 +329,7 @@ class AlgoliaSearch {
                 
                 // 设置选中文本
                 if (Solitude.selectedText) {
-                    const searchInput = document.querySelector('.ais-SearchBox-input');
+                    const searchInput = document.querySelector<HTMLInputElement>('.ais-SearchBox-input');
                     if (searchInput) {
                         searchInput.value = Solitude.selectedText;
                         const event = new Event('input', { bubbles: true });
@@ -386,7 +395,7 @@ class AlgoliaSearch {
         
         // 延迟聚焦以确保动画完成
         setTimeout(() => {
-            const searchInput = document.querySelector("#algolia-search .ais-SearchBox-input");
+            const searchInput = document.querySelector<HTMLInputElement>("#algolia-search .ais-SearchBox-input");
             searchInput?.focus();
         }, 100);
 

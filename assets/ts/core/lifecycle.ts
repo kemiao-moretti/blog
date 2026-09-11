@@ -1,22 +1,24 @@
 const EVENT_PREFIX = "solitude:";
 
+type Disposer = () => void;
+
 class Lifecycle {
   #pageController = new AbortController();
-  #disposers = new Set();
+  #disposers = new Set<Disposer>();
 
   get signal() {
     return this.#pageController.signal;
   }
 
-  add(disposer) {
+  add(disposer: Disposer): Disposer {
     if (typeof disposer !== "function") return () => {};
     this.#disposers.add(disposer);
     return () => this.#disposers.delete(disposer);
   }
 
-  listen(target, type, handler, options = {}) {
-    if (!target?.addEventListener) return () => {};
-    const normalized =
+  listen(target: EventTarget, type: string, handler: EventListener, options: AddEventListenerOptions | boolean = {}): Disposer {
+    if (!("addEventListener" in target)) return () => {};
+    const normalized: AddEventListenerOptions & { signal?: AbortSignal } =
       typeof options === "boolean" ? { capture: options } : { ...options };
     normalized.signal ??= this.signal;
     target.addEventListener(type, handler, normalized);
@@ -36,13 +38,13 @@ class Lifecycle {
     this.#pageController = new AbortController();
   }
 
-  emit(type, detail) {
+  emit(type: string, detail?: unknown) {
     document.dispatchEvent(
       new CustomEvent(`${EVENT_PREFIX}${type}`, { detail })
     );
   }
 
-  on(type, handler) {
+  on(type: string, handler: EventListener): Disposer {
     const eventName = `${EVENT_PREFIX}${type}`;
     document.addEventListener(eventName, handler);
     return () => document.removeEventListener(eventName, handler);

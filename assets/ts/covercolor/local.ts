@@ -1,4 +1,5 @@
 import { applyThemeColor, getCoverSource, resolveColor, rgbToHex } from "./shared";
+import { Solitude } from "../core/api";
 
 const extractLocalColor = (source) => new Promise((resolve, reject) => {
   const image = new Image();

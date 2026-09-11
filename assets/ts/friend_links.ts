@@ -4,7 +4,7 @@ import { Solitude } from "./core/api";
   const config = Solitude.config.friend_links;
   let request = null;
 
-  const createElement = (tag, className, text) => {
+  const createElement = (tag, className?, text?) => {
     const element = document.createElement(tag);
     if (className) element.className = className;
     if (text !== undefined && text !== null) {
@@ -25,7 +25,7 @@ import { Solitude } from "./core/api";
     return `${root}${url}`;
   };
 
-  const createImage = (src, alt, className) => {
+  const createImage = (src, alt, className?) => {
     const image = createElement("img", className);
     image.alt = alt || "";
     image.loading = "lazy";
@@ -210,7 +210,7 @@ import { Solitude } from "./core/api";
       button.addEventListener("click", () => {
         const list = document.getElementById(button.dataset.target);
         if (!list) return;
-        const items = Array.from(list.children);
+        const items = Array.from(list.children) as HTMLElement[];
         const nextMode =
           button.dataset.sortMode === "default" ? "random" : "default";
         const orderedItems =

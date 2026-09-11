@@ -25,7 +25,8 @@
       : new Promise((resolve, reject) => {
         const absoluteUrl = new URL(url, document.baseURI).href;
         const found = [...document.scripts].find(item => item.src === absoluteUrl);
-        if (found?.dataset.loaded === 'true' || found?.readyState === 'complete') {
+        const legacyReady = found && (found as HTMLScriptElement & { readyState?: string }).readyState === 'complete';
+        if (found?.dataset.loaded === 'true' || legacyReady) {
           resolve(found);
           return;
         }
@@ -59,7 +60,7 @@
   };
 
   const renderCharts = async () => {
-    const containers = [...document.querySelectorAll('.chartjs-container')];
+    const containers = [...document.querySelectorAll<HTMLElement>('.chartjs-container')];
     if (!containers.length) return;
     try {
       if (typeof window.Chart !== 'function') await loadScript(config.chartjs);
@@ -69,11 +70,11 @@
       window.Chart.defaults.color = styles.getPropertyValue('--efu-fontcolor').trim() || (dark ? '#f5f5f5' : '#363636');
       window.Chart.defaults.borderColor = dark ? 'rgba(255,255,255,.16)' : 'rgba(0,0,0,.1)';
 
-      containers.forEach((container, index) => {
+      containers.forEach((container: HTMLElement, index) => {
         try {
-          const source = container.querySelector('.chartjs-src');
+          const source = container.querySelector<HTMLElement>('.chartjs-src');
           if (!source) return;
-          const previous = container.querySelector('canvas');
+          const previous = container.querySelector<HTMLCanvasElement>('canvas');
           if (previous) window.Chart.getChart(previous)?.destroy();
           container.querySelector('.chartjs-wrap')?.remove();
           const wrap = document.createElement('div');
@@ -98,11 +99,11 @@
   };
 
   const renderScores = async () => {
-    const sheets = [...document.querySelectorAll('.abc-music-sheet:not([data-rendered="true"])')];
+    const sheets = [...document.querySelectorAll<HTMLElement>('.abc-music-sheet:not([data-rendered="true"])')];
     if (!sheets.length) return;
     try {
       if (!window.ABCJS) await loadScript(config.abcjs);
-      sheets.forEach(sheet => {
+      sheets.forEach((sheet: HTMLElement) => {
         let params = {};
         try {
           params = JSON.parse(sheet.dataset.params || '{}');
@@ -129,11 +130,11 @@
   };
 
   const renderMermaid = async (force = false) => {
-    const diagrams = [...document.querySelectorAll(force ? '.mermaid' : '.mermaid:not([data-processed="true"])')];
+    const diagrams = [...document.querySelectorAll<HTMLElement>(force ? '.mermaid' : '.mermaid:not([data-processed="true"])')];
     if (!diagrams.length || !window.mermaid) return;
     try {
       const dark = document.documentElement.dataset.theme === 'dark';
-      diagrams.forEach(diagram => {
+      diagrams.forEach((diagram: HTMLElement) => {
         if (!diagram.dataset.mermaidSource) diagram.dataset.mermaidSource = diagram.textContent || '';
         if (force) {
           diagram.textContent = diagram.dataset.mermaidSource;
@@ -285,12 +286,12 @@
   };
 
   const renderTypeit = () => {
-    document.querySelectorAll('[data-typeit]:not([data-typeit-ready="true"])').forEach(element => {
+    document.querySelectorAll<HTMLElement>('[data-typeit]:not([data-typeit-ready="true"])').forEach(element => {
       const TypeIt = window.TypeIt;
       if (typeof TypeIt !== 'function') return;
       const text = element.textContent || '';
       element.textContent = '';
-      Reflect.construct(TypeIt, [element, { strings: [text], speed: Number(element.dataset.speed) || 80 }]).go();
+      (Reflect.construct(TypeIt, [element, { strings: [text], speed: Number(element.dataset.speed) || 80 }]) as any).go();
       element.dataset.typeitReady = 'true';
     });
   };

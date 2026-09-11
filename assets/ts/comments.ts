@@ -827,13 +827,10 @@ const renderAggregateCount = async () => {
 };
 
 const initializePageBarrage = async (comments: NormalizedComment[]) => {
-  if (
-    !commentBarrageEnabled() ||
-    !document.querySelector(".comment-barrage")
-  ) {
+  const container = document.querySelector(".comment-barrage");
+  if (!commentBarrageEnabled() || !container) {
     return;
   }
-  const container = document.querySelector(".comment-barrage");
   if (container.getAttribute("data-barrage-init") === "true") return;
   container.setAttribute("data-barrage-init", "true");
   const script = runtimeConfig().barrage_script;

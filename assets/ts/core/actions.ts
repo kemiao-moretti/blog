@@ -25,18 +25,18 @@ export const initActionDelegation = (api) => {
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     if (!(event.target instanceof Element)) return;
-    const element = event.target.closest("[data-solitude-action]");
+    const element = (event.target as HTMLElement).closest<HTMLElement>("[data-solitude-action]");
     if (!element || /^(A|BUTTON|INPUT)$/.test(element.tagName)) return;
     event.preventDefault();
     element.click();
   });
 
   document.addEventListener("error", (event) => {
-    const element = event.target;
-    if (!(element instanceof Element)) return;
+    const element = event.target instanceof HTMLElement ? event.target : null;
+    if (!element) return;
     if (element.matches("[data-solitude-hide-ads]")) {
       document
-        .querySelectorAll(".google-ads-warp")
+        .querySelectorAll<HTMLElement>(".google-ads-warp")
         .forEach((item) => { item.style.display = "none"; });
     }
     const fallback = element.dataset.solitudeFallback;

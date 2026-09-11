@@ -1,8 +1,30 @@
 import { Solitude } from "./core/api";
 
-const MEDIA_SESSION_ACTIONS = ["play", "pause", "previoustrack", "nexttrack", "seekto"];
+const MEDIA_SESSION_ACTIONS: MediaSessionAction[] = ["play", "pause", "previoustrack", "nexttrack", "seekto"];
 
 class MusicPlayer {
+    // 动态实例字段的显式声明（TS 严格模式要求）
+    loadingTimer: ReturnType<typeof setTimeout> | null = null;
+    manualScrollTimer: ReturnType<typeof setTimeout> | null = null;
+    lyricAnimationFrame: number | null = null;
+    currentLyricIndex = -1;
+    lastMediaPosition = -1;
+    isManualScrolling = false;
+    isPrepared = false;
+    wasMobile = false;
+    aplayer: any = null;
+    audio: HTMLAudioElement | null = null;
+    lyricViewport: HTMLElement | null = null;
+    playerRoot: HTMLElement | null = null;
+    boundKeydown: (event: KeyboardEvent) => void = () => {};
+    boundResize: () => void = () => {};
+    boundPlay: () => void = () => {};
+    boundPause: () => void = () => {};
+    boundLoadedData: () => void = () => {};
+    boundTimeUpdate: () => void = () => {};
+    boundLyricClick: (event: MouseEvent) => void = () => {};
+    boundManualScroll: () => void = () => {};
+
     constructor() {
         this.loadingTimer = null;
         this.manualScrollTimer = null;
@@ -48,17 +70,17 @@ class MusicPlayer {
     }
 
     waitForAPlayer() {
-        const loadingElement = document.querySelector(".Music-loading");
-        const backgroundElement = document.getElementById("Music-bg");
+        const loadingElement = document.querySelector<HTMLElement>(".Music-loading");
+        const backgroundElement = document.getElementById("Music-bg") as HTMLElement | null;
 
         clearInterval(this.loadingTimer);
         this.loadingTimer = window.setInterval(() => {
             const meting = document.querySelector("#Music-page meting-js");
-            const aplayer = meting?.aplayer;
-            const root = document.querySelector("#Music-page .aplayer");
-            const body = root?.querySelector(".aplayer-body");
-            const cover = root?.querySelector(".aplayer-pic");
-            const list = root?.querySelector(".aplayer-list");
+            const aplayer = (meting as unknown as { aplayer?: any })?.aplayer;
+            const root = document.querySelector<HTMLElement>("#Music-page .aplayer");
+            const body = root?.querySelector<HTMLElement>(".aplayer-body");
+            const cover = root?.querySelector<HTMLElement>(".aplayer-pic");
+            const list = root?.querySelector<HTMLElement>(".aplayer-list");
 
             if (!aplayer || !root || !body || !cover || !list) return;
 
@@ -126,7 +148,7 @@ class MusicPlayer {
         ];
 
         labels.forEach(([selector, label]) => {
-            this.playerRoot.querySelectorAll(selector).forEach((control) => {
+            this.playerRoot.querySelectorAll<HTMLElement>(selector).forEach((control) => {
                 control.setAttribute("aria-label", label);
                 control.setAttribute("title", label);
                 if (!control.matches("button, a, input")) {
@@ -136,7 +158,7 @@ class MusicPlayer {
             });
         });
 
-        this.playerRoot.querySelectorAll(".aplayer-list li").forEach((item, index) => {
+        this.playerRoot.querySelectorAll<HTMLElement>(".aplayer-list li").forEach((item, index) => {
             item.setAttribute("role", "button");
             item.tabIndex = 0;
             const title = item.querySelector(".aplayer-list-title")?.textContent?.trim();
@@ -150,7 +172,7 @@ class MusicPlayer {
     }
 
     getCurrentCoverUrl() {
-        const cover = this.playerRoot?.querySelector(".aplayer-pic");
+        const cover = this.playerRoot?.querySelector<HTMLElement>(".aplayer-pic");
         if (!cover) return "";
         return this.extractCoverUrl(cover.style.backgroundImage || getComputedStyle(cover).backgroundImage);
     }
@@ -163,7 +185,7 @@ class MusicPlayer {
         const image = new Image();
         image.src = coverUrl;
         image.onload = () => {
-            backgroundElement.style.backgroundImage = `url("${coverUrl.replaceAll('"', '\\"')}")`;
+            backgroundElement.style.backgroundImage = `url("${coverUrl.split('"').join('\\"')}")`;
             backgroundElement.classList.add("show");
         };
     }
@@ -293,7 +315,7 @@ class MusicPlayer {
         if (!song) return;
 
         const cover = song.cover || song.pic || this.getCurrentCoverUrl();
-        const metadata = {
+        const metadata: MediaMetadataInit = {
             title: song.name || song.title || "音乐馆",
             artist: song.artist || "未知歌手",
             album: song.album || "音乐馆"

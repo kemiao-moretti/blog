@@ -3,7 +3,7 @@ import { initActionDelegation } from "./core/actions";
 import { lifecycle } from "./core/lifecycle";
 import { initPreloader } from "./core/preloader";
 
-let coverColor = () => {};
+let coverColor: (music?: boolean) => void = () => {};
 let initializeMusicPlayer = () => {};
 
 const loadFeatureModules = async () => {
@@ -210,6 +210,7 @@ const percent = () => {
 const showTodayCard = () => {
   const el = document.getElementById("todayCard");
   const topGroup = document.querySelector(".topGroup");
+  if (!topGroup) return;
   lifecycle.listen(topGroup, "mouseleave", () => el?.classList.remove("hide"));
 };
 
@@ -218,13 +219,13 @@ const initHomeCenter = () => {
   if (!container || container.dataset.initialized === "true") return;
   container.dataset.initialized = "true";
 
-  const banners = [...container.querySelectorAll(".home-center-banner-item")];
-  const items = [...container.querySelectorAll(".home-center-item")];
+  const banners = [...container.querySelectorAll<HTMLElement>(".home-center-banner-item")];
+  const items = [...container.querySelectorAll<HTMLElement>(".home-center-item")];
   const indicators = [
-    ...container.querySelectorAll(".home-center-indicator"),
+    ...container.querySelectorAll<HTMLElement>(".home-center-indicator"),
   ];
   const banner = container.querySelector(".home-center-banner");
-  const titleLink = container.querySelector(".home-center-title-link");
+  const titleLink = container.querySelector<HTMLElement>(".home-center-title-link");
   const titleTag = container.querySelector(".home-center-title-tag span");
   const categoryBar = document.getElementById("category-bar");
   const profileCard = document.querySelector<HTMLElement>(
@@ -408,7 +409,7 @@ const initHomeCenter = () => {
       .getPropertyValue("--home-center-theme-op-deep")
       .trim();
     titleLink.textContent = selected.dataset.title;
-    titleLink.href = selected.dataset.link;
+    titleLink.setAttribute("href", selected.dataset.link || "");
     titleTag.textContent = selected.dataset.label;
     container.style.setProperty("--current-theme", color);
     container.style.setProperty("--current-theme-op", colorOp);
@@ -447,7 +448,7 @@ const initHomeCenter = () => {
       }
       pointerType = "";
     });
-    item.addEventListener("keydown", (event) => {
+    item.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         navigate(item.dataset.link, event);
@@ -475,7 +476,7 @@ const initHomeCenter = () => {
       applyItemColor(index, configuredColor);
       return;
     }
-    const image = item.querySelector(".home-center-cover-img");
+    const image = item.querySelector<HTMLImageElement>(".home-center-cover-img");
     if (!image) return;
     if (image.complete && image.naturalWidth) {
       extractItemColor(index, image);
@@ -489,7 +490,7 @@ const initHomeCenter = () => {
 
 const initTooltip = () => {
   const tooltip =
-    document.querySelector(".custom-tooltip") ||
+    document.querySelector<HTMLElement>(".custom-tooltip") ||
     document.body.appendChild(
       Object.assign(document.createElement("div"), {
         className: "custom-tooltip",
@@ -504,7 +505,7 @@ const initTooltip = () => {
     getComputedStyle(document.documentElement).fontSize
   );
 
-  document.querySelectorAll("[heotip]").forEach((element) => {
+  document.querySelectorAll<HTMLElement>("[heotip]").forEach((element) => {
     if (element.dataset.tooltipInitialized === "true") return;
     element.dataset.tooltipInitialized = "true";
 
@@ -543,7 +544,7 @@ const initTooltip = () => {
 const initObserver = () => {
   const commentElement = document.getElementById("post-comment");
   const paginationElement = document.getElementById("pagination");
-  const commentBarrageElement = document.querySelector(".comment-barrage");
+  const commentBarrageElement = document.querySelector<HTMLElement>(".comment-barrage");
 
   if (commentElement && paginationElement) {
     const observer = new IntersectionObserver((entries) => {
@@ -609,7 +610,7 @@ function applyThemeColor(color) {
 }
 
 const handleThemeChange = (mode) => {
-  const themeChange = window.globalFn?.themeChange || {};
+  const themeChange: Record<string, (mode: string) => void> = window.globalFn?.themeChange || {};
   Object.values(themeChange).forEach((fn) => fn(mode));
   lifecycle.emit("themeChange", { theme: mode });
 };
@@ -736,7 +737,7 @@ const actions = {
     let feedbackTimer = 0;
 
     const getAPlayer = () =>
-      $music.querySelector("meting-js")?.aplayer || null;
+      (($music.querySelector("meting-js") as unknown as { aplayer?: any })?.aplayer) || null;
     const getDuration = (aplayer) => {
       const duration = Number(aplayer?.audio?.duration);
       return Number.isFinite(duration) && duration > 0 ? duration : 0;
@@ -813,7 +814,7 @@ const actions = {
       }, 900);
     };
 
-    $hitarea.addEventListener("pointerdown", (event) => {
+    $hitarea.addEventListener("pointerdown", (event: PointerEvent) => {
       if (
         !event.isPrimary ||
         (event.pointerType === "mouse" && event.button !== 0)
@@ -830,7 +831,7 @@ const actions = {
       previewSource = String(aplayer.audio?.currentSrc || aplayer.audio?.src || "");
       isScrubbing = false;
     });
-    document.addEventListener("pointermove", (event) => {
+    document.addEventListener("pointermove", (event: PointerEvent) => {
       if (event.pointerId !== activePointerId) return;
       const deltaX = Math.abs(event.clientX - startX);
       const deltaY = Math.abs(event.clientY - startY);
@@ -878,12 +879,12 @@ const actions = {
     });
     document.addEventListener("pointercancel", cancelScrub);
     document.addEventListener("click", (event) => {
-      if (!suppressClick || !event.target?.closest?.("#nav-music")) return;
+      if (!suppressClick || !(event.target as HTMLElement | null)?.closest?.("#nav-music")) return;
       suppressClick = false;
       event.preventDefault();
       event.stopPropagation();
     }, true);
-    $hitarea.addEventListener("keydown", (event) => {
+    $hitarea.addEventListener("keydown", (event: KeyboardEvent) => {
       const aplayer = getAPlayer();
       const duration = getDuration(aplayer);
       if (!duration) return;
@@ -908,7 +909,7 @@ const actions = {
   },
   musicBind() {
     const $meting = document.querySelector("#nav-music meting-js");
-    const aplayer = $meting?.aplayer;
+    const aplayer = ($meting as unknown as { aplayer?: any })?.aplayer;
     if (!aplayer) {
       this.isMusicBind = false;
       return null;
@@ -946,13 +947,13 @@ const actions = {
     shouldPlay ? aplayer.play() : aplayer.pause();
   },
   musicSkipBack() {
-    document.querySelector("#nav-music meting-js")?.aplayer?.skipBack();
+    (document.querySelector("#nav-music meting-js") as unknown as { aplayer?: any })?.aplayer?.skipBack();
   },
   musicSkipForward() {
-    document.querySelector("#nav-music meting-js")?.aplayer?.skipForward();
+    (document.querySelector("#nav-music meting-js") as unknown as { aplayer?: any })?.aplayer?.skipForward();
   },
   switchCommentBarrage() {
-    const commentBarrageElement = document.querySelector(".comment-barrage");
+    const commentBarrageElement = document.querySelector<HTMLElement>(".comment-barrage");
     const consoleCommentBarrage = document.querySelector(
       "#consoleCommentBarrage"
     );
@@ -1079,7 +1080,7 @@ const actions = {
     this.hideConsole();
   },
   refreshWaterFall() {
-    const allElements = [...document.querySelectorAll(".waterfall")];
+    const allElements = [...document.querySelectorAll<HTMLElement>(".waterfall")];
     const elements = allElements.filter(
       (element) => element.dataset.solitudeWaterfall !== "true"
     );
@@ -1127,10 +1128,10 @@ const actions = {
       ".atk-textarea",
     ];
     inputs.forEach((selector) => {
-      const el = document.querySelector(selector);
+      const el = document.querySelector<HTMLTextAreaElement>(selector);
       if (el) {
         el.dispatchEvent(
-          new Event("input", { bubble: true, cancelable: true })
+          new Event("input", { bubbles: true, cancelable: true })
         );
         el.value = "> " + txt.replace(/\n/g, "\n> ") + "\n\n";
         Solitude.scrollToDest(
@@ -1296,17 +1297,17 @@ const actions = {
     document.getElementById("more-tags-btn")?.remove();
   },
   listenToPageInputPress() {
-    const toGroup = document.querySelector(".toPageGroup");
-    const pageText = document.getElementById("toPageText");
+    const toGroup = document.querySelector<HTMLElement>(".toPageGroup");
+    const pageText = document.getElementById("toPageText") as HTMLInputElement;
     if (!pageText) return;
-    const pageButton = document.getElementById("toPageButton");
+    const pageButton = document.getElementById("toPageButton") as HTMLAnchorElement;
     const pageNumbers = document.querySelectorAll(".page-number");
     const lastPageNumber = +(pageNumbers[pageNumbers.length - 1]?.textContent || 1);
     if (lastPageNumber === 1) {
       if (toGroup) toGroup.style.display = "none";
       return;
     }
-    lifecycle.listen(pageText, "keydown", (event) => {
+    lifecycle.listen(pageText, "keydown", (event: KeyboardEvent) => {
       if (event.key === "Enter") {
         Solitude.toPage();
         Solitude.navigate(pageButton.href);
@@ -1320,7 +1321,7 @@ const actions = {
         pageText.value !== "" && pageText.value !== "0"
       );
       if (+pageText.value > lastPageNumber) {
-        pageText.value = lastPageNumber;
+        pageText.value = String(lastPageNumber);
       }
     });
   },
@@ -1337,9 +1338,9 @@ const actions = {
     const maxPageNumber = parseInt(
       pageNumbers[pageNumbers.length - 1].innerHTML
     );
-    const inputElement = document.getElementById("toPageText");
+    const inputElement = document.getElementById("toPageText") as HTMLInputElement;
     const inputPageNumber = parseInt(inputElement.value);
-    document.getElementById("toPageButton").href =
+    (document.getElementById("toPageButton") as HTMLAnchorElement).href =
       !isNaN(inputPageNumber) &&
       inputPageNumber <= maxPageNumber &&
       inputPageNumber > 1
@@ -1407,7 +1408,7 @@ const actions = {
   },
   homeTypeit() {
     if (typeof home_subtitle === "undefined") return;
-    const ty = new TypeIt(".banners-title-small", {
+    const ty = new (window.TypeIt as any)(".banners-title-small", {
       speed: 200,
       waitUntilVisible: true,
       loop: true,
@@ -1436,16 +1437,13 @@ class toc {
     el.forEach((e) => {
       e.addEventListener("click", (event) => {
         event.preventDefault();
+        const tocTarget =
+          (event.target as HTMLElement).className === "toc-text"
+            ? (event.target as HTMLElement).parentElement?.getAttribute("href")
+            : (event.target as HTMLAnchorElement).hash;
         Solitude.scrollToDest(
           Solitude.getEleTop(
-            document.getElementById(
-              decodeURI(
-                (event.target.className === "toc-text"
-                  ? event.target.parentNode.hash
-                  : event.target.hash
-                ).replace("#", "")
-              )
-            )
+            document.getElementById(decodeURI(tocTarget || "").replace("#", ""))
           ),
           300
         );
@@ -1473,7 +1471,7 @@ class toc {
 
     const findHeadPosition = (top) => {
       if (top === 0) return false;
-      let currentIndex = "";
+      let currentIndex: number | string = "";
       list.forEach((ele, index) => {
         if (top > Solitude.getEleTop(ele) - 80) {
           currentIndex = index;
@@ -1596,7 +1594,7 @@ const forPostFn = () => {
 };
 
 const initPostCoverTilt = () => {
-  const cover = document.querySelector(".post-cover-aside");
+  const cover = document.querySelector<HTMLElement>(".post-cover-aside");
   const canTilt = window.matchMedia(
     "(hover: hover) and (pointer: fine)"
   ).matches;
@@ -1681,10 +1679,10 @@ const initAboutPage = () => {
       }
       card.classList.add("about-glow-host");
 
-      const updateGlowPosition = (event) => {
+      const updateGlowPosition = (event: PointerEvent) => {
         const rect = card.getBoundingClientRect();
-        glow.style.left = `${event.clientX - rect.left}px`;
-        glow.style.top = `${event.clientY - rect.top}px`;
+        (glow as HTMLElement).style.left = `${event.clientX - rect.left}px`;
+        (glow as HTMLElement).style.top = `${event.clientY - rect.top}px`;
       };
 
       lifecycle.listen(card, "pointerenter", updateGlowPosition);
@@ -1729,7 +1727,7 @@ const initAboutPage = () => {
         const rawValue = getAboutValue(data, metric.field);
         const value = typeof rawValue === "number" ? rawValue : Number(rawValue);
         if (!Number.isFinite(value)) return;
-        const output = Array.from(host.querySelectorAll("[data-about-metric]"))
+        const output = Array.from(host.querySelectorAll<HTMLElement>("[data-about-metric]"))
           .find((node) => node.dataset.aboutMetric === metric.field);
         if (output) output.textContent = value.toLocaleString();
       });
@@ -1752,7 +1750,7 @@ const initGalleryMasonry = () => {
   const observers = [];
 
   galleries.forEach((gallery) => {
-    const items = [...gallery.children].filter((item) =>
+    const items = Array.from(gallery.children).filter((item): item is HTMLElement =>
       item.classList.contains("gallery-item")
     );
     if (!items.length) return;

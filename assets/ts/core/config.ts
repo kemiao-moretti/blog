@@ -1,7 +1,7 @@
 import type { SolitudePageConfiguration, SolitudeSiteConfiguration } from "../types";
 
 const parseConfig = <T>(id: string, fallback: T): T => {
-  const element = document.getElementById(id);
+  const element = document.getElementById(id) as HTMLTemplateElement | null;
   if (!element) return fallback;
   try {
     return JSON.parse(element.content?.textContent || element.textContent || "{}");

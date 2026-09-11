@@ -4,7 +4,7 @@ let selectTextNow = "";
 let firstShowRightMenu = true;
 
 const selectText = () => {
-    selectTextNow = document.selection ? document.selection.createRange().text : window.getSelection().toString() || "";
+    selectTextNow = window.getSelection()?.toString() || "";
     Solitude.selectedText = selectTextNow;
 };
 
@@ -149,13 +149,13 @@ document.addEventListener("contextmenu", (ele) => {
 
     let x = ele.clientX + 10;
     let y = ele.clientY;
-    Array.from(rm.menuItems.other).forEach(item => item.style.display = "flex");
+    Array.from(rm.menuItems.other as unknown as HTMLElement[]).forEach(item => item.style.display = "flex");
     rm.globalEvent = ele;
 
-    const link = ele.target.href;
-    const src = ele.target.currentSrc;
-    const tagName = ele.target.tagName.toLowerCase();
-    const cls = ele.target.className.toLowerCase();
+    const link = (ele.target as HTMLAnchorElement).href;
+    const src = (ele.target as HTMLImageElement).currentSrc;
+    const tagName = (ele.target as HTMLElement).tagName.toLowerCase();
+    const cls = ((ele.target as HTMLElement).className || "").toLowerCase();
 
     const display = !!(selectTextNow && window.getSelection()) || !!link || !!src || (tagName === "input" || tagName === "textarea") || cls.match(/aplayer/);
 
@@ -181,8 +181,8 @@ document.addEventListener("contextmenu", (ele) => {
         }
     }
 
-    Array.from(display ? rm.menuItems.other : rm.menuItems.plugin).forEach(item => item.style.display = "none");
-    Array.from(display ? rm.menuItems.plugin : rm.menuItems.other).forEach(item => item.style.display = "block");
+    Array.from((display ? rm.menuItems.other : rm.menuItems.plugin) as unknown as HTMLElement[]).forEach(item => item.style.display = "none");
+    Array.from((display ? rm.menuItems.plugin : rm.menuItems.other) as unknown as HTMLElement[]).forEach(item => item.style.display = "block");
 
     rm.reLoadSize();
     x = (x + rm.width > window.innerWidth) ? x - (rm.width + 10) : x;
@@ -195,10 +195,10 @@ document.addEventListener("contextmenu", (ele) => {
 (function () {
     const addEventListener = (element, event, handler) => element?.addEventListener(event, handler);
 
-    addEventListener(rm.menuItems.back, "click", () => window.history.back() || rm.hideRightMenu());
-    addEventListener(rm.menuItems.forward, "click", () => window.history.forward() || rm.hideRightMenu());
+    addEventListener(rm.menuItems.back, "click", () => { window.history.back(); rm.hideRightMenu(); });
+    addEventListener(rm.menuItems.forward, "click", () => { window.history.forward(); rm.hideRightMenu(); });
     addEventListener(rm.menuItems.refresh, "click", () => window.location.reload());
-    addEventListener(rm.menuItems.top, "click", () => Solitude.toTop() || rm.hideRightMenu());
+    addEventListener(rm.menuItems.top, "click", () => { Solitude.toTop(); rm.hideRightMenu(); });
 
     if (Solitude.config.right_menu.music) {
         addEventListener(rm.menuItems.music[0], "click", () => {
@@ -206,15 +206,15 @@ document.addEventListener("contextmenu", (ele) => {
             rm.hideRightMenu();
         });
         addEventListener(rm.menuItems.music[1], "click", () => {
-            document.querySelector("meting-js").aplayer.skipBack();
+            (document.querySelector("meting-js") as unknown as { aplayer: any }).aplayer.skipBack();
             rm.hideRightMenu();
         });
         addEventListener(rm.menuItems.music[2], "click", () => {
-            document.querySelector("meting-js").aplayer.skipForward();
+            (document.querySelector("meting-js") as unknown as { aplayer: any }).aplayer.skipForward();
             rm.hideRightMenu();
         });
         addEventListener(rm.menuItems.music[3], "click", () => {
-            const title = Array.from(document.querySelectorAll(".aplayer-title")).map(e => e.innerText)[0];
+            const title = Array.from(document.querySelectorAll<HTMLElement>(".aplayer-title")).map(e => e.innerText)[0];
             rm.copyText(title);
         });
     }
@@ -230,10 +230,10 @@ document.addEventListener("contextmenu", (ele) => {
         rm.menuItems.barrage && rm.barrage(!Solitude.saveToLocal.get("commentBarrageSwitch"));
     }
 
-    addEventListener(rm.menuItems.paste, "click", () => rm.pasteText() && rm.hideRightMenu());
-    addEventListener(rm.menuItems.comment, "click", () => rm.hideRightMenu() || Solitude.toTalk(selectTextNow));
-    addEventListener(rm.menuItems.new, "click", () => window.open(rm.domhref) && rm.hideRightMenu());
-    addEventListener(rm.menuItems.downloadImg, "click", () => rm.downloadImage() && rm.hideRightMenu());
-    addEventListener(rm.menuItems.copyImg, "click", () => rm.copyImage() && rm.hideRightMenu());
-    addEventListener(rm.menuItems.copyLink, "click", () => rm.copyText(rm.domhref) && rm.hideRightMenu());
+    addEventListener(rm.menuItems.paste, "click", () => { rm.pasteText(); rm.hideRightMenu(); });
+    addEventListener(rm.menuItems.comment, "click", () => { rm.hideRightMenu(); Solitude.toTalk(selectTextNow); });
+    addEventListener(rm.menuItems.new, "click", () => { window.open(rm.domhref); rm.hideRightMenu(); });
+    addEventListener(rm.menuItems.downloadImg, "click", () => { rm.downloadImage(); rm.hideRightMenu(); });
+    addEventListener(rm.menuItems.copyImg, "click", () => { rm.copyImage(); rm.hideRightMenu(); });
+    addEventListener(rm.menuItems.copyLink, "click", () => { rm.copyText(rm.domhref); rm.hideRightMenu(); });
 })();

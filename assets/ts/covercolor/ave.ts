@@ -1,4 +1,5 @@
 import { applyThemeColor, getCoverSource, resolveColor } from "./shared";
+import { Solitude } from "../core/api";
 
 const fetchAveColor = async (source) => {
   const response = await fetch(`${source}?imageAve`);

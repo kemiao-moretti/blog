@@ -1,12 +1,28 @@
-const scriptRequests = new Map();
-const styleRequests = new Map();
+type ElementCache = Map<string, Promise<HTMLElement>>;
+export type LoadElementOptions = {
+  async?: boolean;
+  id?: string;
+  attributes?: Record<string, string>;
+};
 
-const loadElement = (cache, selector, create, url) => {
+const scriptRequests: ElementCache = new Map();
+const styleRequests: ElementCache = new Map();
+
+const loadElement = (
+  cache: ElementCache,
+  selector: string,
+  create: (url: string) => HTMLElement,
+  url: string
+): Promise<HTMLElement> => {
   const absoluteUrl = new URL(url, document.baseURI).href;
-  if (cache.has(absoluteUrl)) return cache.get(absoluteUrl);
+  if (cache.has(absoluteUrl)) return cache.get(absoluteUrl)!;
 
-  const existing = [...document.querySelectorAll(selector)].find(
-    (element) => element.href === absoluteUrl || element.src === absoluteUrl
+  const existing = (
+    [...document.querySelectorAll<HTMLElement>(selector)].find(
+      (element) =>
+        (element as HTMLLinkElement).href === absoluteUrl ||
+        (element as HTMLScriptElement).src === absoluteUrl
+    )
   );
   if (existing) {
     const resolved = Promise.resolve(existing);
@@ -14,7 +30,7 @@ const loadElement = (cache, selector, create, url) => {
     return resolved;
   }
 
-  const request = new Promise((resolve, reject) => {
+  const request = new Promise<HTMLElement>((resolve, reject) => {
     const element = existing || create(absoluteUrl);
     const complete = () => {
       element.dataset.loaded = "true";
@@ -34,11 +50,11 @@ const loadElement = (cache, selector, create, url) => {
   return request;
 };
 
-export const loadScript = (url, options = {}) =>
+export const loadScript = (url: string, options: LoadElementOptions = {}) =>
   loadElement(
     scriptRequests,
     "script",
-    (src) => {
+    (src: string) => {
       const script = document.createElement("script");
       script.src = src;
       script.async = options.async ?? true;
@@ -50,11 +66,11 @@ export const loadScript = (url, options = {}) =>
     url
   );
 
-export const loadStyle = (url, options = {}) =>
+export const loadStyle = (url: string, options: LoadElementOptions = {}) =>
   loadElement(
     styleRequests,
     "link",
-    (href) => {
+    (href: string) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;

@@ -12,7 +12,7 @@ const resolveArchivePostUrl = (value) => {
 }
 
 export const archivePageController = (() => {
-  const createElement = (tag, className, text) => {
+  const createElement = (tag, className?, text?) => {
     const element = document.createElement(tag)
     if (className) element.className = className
     if (text !== undefined) element.textContent = text
@@ -41,7 +41,8 @@ export const archivePageController = (() => {
 
       let posts
       try {
-        posts = JSON.parse(dataElement.content?.textContent || dataElement.textContent || '[]')
+        const template = dataElement as HTMLTemplateElement
+        posts = JSON.parse(template.content?.textContent || dataElement.textContent || '[]')
       } catch (error) {
         this.renderState(shell, this.labels.error)
         console.error('Failed to parse archive data:', error)
