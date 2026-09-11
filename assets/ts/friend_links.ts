@@ -92,7 +92,7 @@ import { Solitude } from "./core/api";
     if (tag && !normal) wrapper.append(tag);
 
     const anchor = createElement("a", "cf-friends-link");
-    anchor.href = disconnected ? "javascript:void(0);" : resolveSiteUrl(item.link);
+    anchor.href = disconnected ? "javascript:void(0);" : resolveSiteUrl(item.linkpage || item.link);
     anchor.title = item.name || "";
     if (!disconnected) {
       anchor.target = "_blank";
@@ -252,7 +252,7 @@ import { Solitude } from "./core/api";
     if (tag) card.append(tag);
 
     const imageLink = createElement("a", "img");
-    imageLink.href = resolveSiteUrl(item.link);
+    imageLink.href = resolveSiteUrl(item.linkpage || item.link);
     imageLink.title = item.name || "";
     imageLink.target = "_blank";
     imageLink.rel = "noopener noreferrer nofollow";
@@ -261,7 +261,7 @@ import { Solitude } from "./core/api";
     );
 
     const infoLink = createElement("a", "info cf-friends-link");
-    infoLink.href = resolveSiteUrl(item.link);
+    infoLink.href = resolveSiteUrl(item.linkpage || item.link);
     infoLink.title = item.name || "";
     infoLink.target = "_blank";
     infoLink.rel = "noopener noreferrer nofollow";

@@ -68,10 +68,10 @@
         {{ range .link_list }}
           <div class="site-card">
             {{ with .tag }}<span class="site-card-tag">{{ . }}</span>{{ end }}
-            <a class="img" href="{{ .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
+            <a class="img" href="{{ .linkpage | default .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
               <img class="flink-avatar no-lightbox" src="{{ .topimg | default .avatar }}" alt="{{ .name }}">
             </a>
-            <a class="info cf-friends-link" href="{{ .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
+            <a class="info cf-friends-link" href="{{ .linkpage | default .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
               <div class="site-card-avatar">
                 <img class="flink-avatar cf-friends-avatar no-lightbox" src="{{ .avatar | default "/img/default_avatar.avif" }}" alt="">
                 <div class="img-alt is-center">{{ .name }}</div>
@@ -88,7 +88,7 @@
       <div class="flink-list">
         {{ range .link_list }}
           <div class="flink-list-item">
-            <a class="cf-friends-link" href="{{ .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
+            <a class="cf-friends-link" href="{{ .linkpage | default .link }}" target="_blank" rel="noopener noreferrer" title="{{ .name }}">
               <img class="flink-avatar cf-friends-avatar no-lightbox" src="{{ .avatar | default "/img/default_avatar.avif" }}" alt="">
               <div class="flink-item-info">
                 <span class="flink-item-name cf-friends-name">{{ .name }}</span>
