@@ -22,7 +22,7 @@
 
 /* ---- waterfall list ---- */
 .shuoshuo-list {
-  column-count: 2;
+  column-count: 3;
   column-gap: var(--efu-space-4, 16px);
 }
 
@@ -380,13 +380,20 @@
 }
 
 /* ---- responsive ---- */
-@media (max-width: 768px) {
+/* 列数与参考站一致：桌面 3 列 → 900px 以下 2 列 → 450px 以下 1 列 */
+@media (max-width: 900px) {
   .shuoshuo-list {
-    column-count: 1;
+    column-count: 2;
   }
 
   .shuoshuo-card {
     padding: var(--efu-space-3, 12px);
+  }
+}
+
+@media (max-width: 450px) {
+  .shuoshuo-list {
+    column-count: 1;
   }
 
   .shuoshuo-gallery {
