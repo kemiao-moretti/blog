@@ -1,0 +1,395 @@
+/* Shuoshuo (Ech0-driven) page. All colors come from the --efu-* token set so
+   light/dark follow [data-theme]. Layout: CSS multi-column waterfall. */
+
+.shuoshuo-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-4, 16px);
+}
+
+.shuoshuo-desc {
+  margin: 0;
+  color: var(--efu-secondtext);
+  line-height: 1.7;
+}
+
+/* ---- tag filter ---- */
+.shuoshuo-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---- waterfall list ---- */
+.shuoshuo-list {
+  column-count: 2;
+  column-gap: var(--efu-space-4, 16px);
+}
+
+.shuoshuo-card {
+  break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-3, 12px);
+  margin-bottom: var(--efu-space-4, 16px);
+  padding: var(--efu-space-4, 16px);
+  border-radius: var(--radius);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+  transition: transform var(--efu-motion-fast, 180ms), border-color 0.3s;
+}
+
+.shuoshuo-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--efu-main);
+}
+
+/* ---- card header ---- */
+.shuoshuo-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--efu-space-3, 12px);
+}
+
+.shuoshuo-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  border: 2px solid var(--efu-card-border);
+}
+
+.shuoshuo-author {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shuoshuo-name {
+  font-weight: 700;
+  color: var(--efu-fontcolor);
+  font-size: 15px;
+}
+
+.shuoshuo-time {
+  font-size: 12px;
+  color: var(--efu-secondtext);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- card body (markdown) ---- */
+.shuoshuo-card-body {
+  color: var(--efu-fontcolor);
+  line-height: 1.75;
+  word-break: break-word;
+}
+
+.shuoshuo-card-body p {
+  margin: 0 0 8px;
+}
+
+.shuoshuo-card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.shuoshuo-card-body a {
+  color: var(--efu-main);
+  text-decoration: none;
+}
+
+.shuoshuo-card-body a:hover {
+  text-decoration: underline;
+}
+
+.shuoshuo-card-body img {
+  max-width: 100%;
+  border-radius: var(--efu-radius-sm, 8px);
+  cursor: zoom-in;
+}
+
+.shuoshuo-image-broken {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 12px;
+  border-radius: var(--efu-radius-sm, 8px);
+  border: 1px dashed var(--efu-card-border);
+  background: var(--efu-secondbg);
+  color: var(--efu-secondtext);
+  font-size: 13px;
+}
+
+.shuoshuo-card-body blockquote {
+  margin: 8px 0;
+  padding: 6px 12px;
+  border-left: 3px solid var(--efu-main);
+  background: var(--efu-secondbg);
+  color: var(--efu-secondtext);
+}
+
+.shuoshuo-card-body code {
+  font-family: var(--efu-code-font-family);
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--efu-secondbg);
+}
+
+.shuoshuo-card-body pre {
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: var(--efu-radius-sm, 8px);
+  background: var(--efu-hl-bg, var(--efu-secondbg));
+  overflow-x: auto;
+}
+
+.shuoshuo-card-body pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* ---- gallery ---- */
+.shuoshuo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+}
+
+.shuoshuo-image {
+  display: block;
+  border-radius: var(--efu-radius-sm, 8px);
+  overflow: hidden;
+}
+
+.shuoshuo-image img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--efu-motion-fast, 180ms);
+}
+
+.shuoshuo-image:hover img {
+  transform: scale(1.04);
+}
+
+.shuoshuo-image.is-broken img,
+.shuoshuo-inline-image.is-broken img {
+  display: none;
+}
+
+/* ---- extension cards ---- */
+.shuoshuo-ext-wrap {
+  display: block;
+}
+
+.shuoshuo-ext {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--efu-radius-md, 12px);
+  background: var(--efu-secondbg);
+  border: 1px solid var(--efu-card-border);
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  text-decoration: none;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.shuoshuo-ext:hover {
+  border-color: var(--efu-main);
+  color: var(--efu-main);
+}
+
+.shuoshuo-ext i {
+  color: var(--efu-main);
+  flex: none;
+}
+
+.ext-github-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ext-github-hint,
+.ext-website-domain {
+  flex: none;
+  font-size: 12px;
+  color: var(--efu-secondtext);
+}
+
+.ext-website-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.shuoshuo-ext.ext-video {
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  display: block;
+}
+
+.shuoshuo-ext.ext-video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--efu-radius-md, 12px);
+  display: block;
+}
+
+/* ---- card footer ---- */
+.shuoshuo-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shuoshuo-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shuoshuo-tag {
+  padding: 2px 10px;
+  border-radius: var(--efu-radius-pill, 999px);
+  border: 1px solid var(--efu-card-border);
+  background: transparent;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+
+.shuoshuo-tag:hover,
+.shuoshuo-tag.active {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+.shuoshuo-tag.active {
+  background: var(--efu-main-op-light);
+}
+
+.shuoshuo-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.shuoshuo-like,
+.shuoshuo-quote {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: var(--efu-radius-sm, 8px);
+  background: transparent;
+  color: var(--efu-secondtext);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.3s, background 0.3s;
+}
+
+.shuoshuo-like:hover,
+.shuoshuo-quote:hover {
+  color: var(--efu-main);
+  background: var(--efu-main-op-light);
+}
+
+.shuoshuo-like.liked {
+  color: var(--efu-red);
+}
+
+.shuoshuo-like.liked i {
+  animation: shuoshuo-like-pop 0.35s ease;
+}
+
+@keyframes shuoshuo-like-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* ---- status / pagination ---- */
+.shuoshuo-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: var(--efu-space-5, 24px);
+  color: var(--efu-secondtext);
+  column-span: all;
+}
+
+.shuoshuo-loading.is-empty,
+.shuoshuo-loading.is-error {
+  color: var(--efu-secondtext);
+}
+
+.shuoshuo-loading.is-error {
+  color: var(--efu-red);
+}
+
+.shuoshuo-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.shuoshuo-page-btn {
+  min-width: 34px;
+  padding: 6px 10px;
+  border-radius: var(--efu-radius-sm, 8px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+
+.shuoshuo-page-btn:hover {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+.shuoshuo-page-btn.active {
+  background: var(--efu-main);
+  border-color: var(--efu-main);
+  color: var(--efu-white);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 768px) {
+  .shuoshuo-list {
+    column-count: 1;
+  }
+
+  .shuoshuo-card {
+    padding: var(--efu-space-3, 12px);
+  }
+
+  .shuoshuo-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  }
+}

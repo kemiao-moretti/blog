@@ -1,0 +1,35 @@
+{{ $cfg := site.Params.solitude.shuoshuo }}
+{{ if $cfg.enable }}
+<div class="shuoshuo-page" id="shuoshuo"
+  data-api="{{ $cfg.api }}"
+  data-page-size="{{ $cfg.page_size | default 30 }}"
+  data-cache-minutes="{{ $cfg.cache_minutes | default 30 }}"
+  data-author-name="{{ site.Params.author.name | default site.Title }}"
+  data-author-avatar="{{ $cfg.author.avatar | default (site.Params.solitude.aside.my_card.author.img) | relURL }}"
+  data-like="{{ cond $cfg.like true false }}"
+  data-tags="{{ cond $cfg.tags.enable true false }}"
+  data-ext-github="{{ cond $cfg.extensions.github true false }}"
+  data-ext-website="{{ cond $cfg.extensions.website true false }}"
+  data-ext-music="{{ cond $cfg.extensions.music true false }}"
+  data-ext-video="{{ cond $cfg.extensions.video true false }}"
+  data-ext-tweet="{{ cond $cfg.extensions.tweet true false }}"
+  data-ext-location="{{ cond $cfg.extensions.location true false }}"
+  data-marked="{{ $cfg.marked | default site.Params.solitude.cdn.marked }}"
+  data-dompurify="{{ $cfg.dompurify | default site.Params.solitude.cdn.dompurify }}">
+  {{ with .Params.description }}<p class="shuoshuo-desc">{{ . }}</p>{{ end }}
+
+  {{ if $cfg.tags.enable }}
+    <div class="shuoshuo-tags" id="shuoshuo-tags" hidden></div>
+  {{ end }}
+
+  <div class="shuoshuo-list" id="shuoshuo-list">
+    <div class="shuoshuo-loading" id="shuoshuo-loading">
+      <i class="solitude fas fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>{{ i18n "commentsLoading" | default "加载中" }}</span>
+    </div>
+  </div>
+
+  <nav class="shuoshuo-pagination" id="shuoshuo-pagination" aria-label="分页" hidden></nav>
+</div>
+{{ partial "comments.html" . }}
+{{ end }}
