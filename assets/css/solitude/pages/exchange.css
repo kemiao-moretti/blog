@@ -1,0 +1,282 @@
+/* Exchange page: friend-link application. Colors come from the --efu-*
+   token set so light/dark follow [data-theme] without hardcoded values. */
+
+.exchange-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-5, 24px);
+}
+
+/* ---- hero ---- */
+.exchange-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-3, 12px);
+  padding: var(--efu-space-6, 32px);
+  border-radius: var(--radius);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.exchange-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--efu-main), var(--efu-main-op-deep));
+}
+
+.exchange-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--efu-main);
+}
+
+.exchange-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--efu-fontcolor);
+}
+
+.exchange-subtitle {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--efu-secondtext);
+  line-height: 1.7;
+}
+
+.exchange-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--efu-space-3, 12px);
+  margin-top: var(--efu-space-2, 8px);
+}
+
+.exchange-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--efu-radius-pill, 999px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+  color: var(--efu-fontcolor);
+  font-size: 15px;
+  transition: transform var(--efu-motion-fast, 180ms), background 0.3s, color 0.3s;
+}
+
+.exchange-btn:hover {
+  transform: translateY(-2px);
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+.exchange-btn-primary {
+  background: var(--efu-main);
+  border-color: var(--efu-main);
+  color: var(--efu-white);
+}
+
+.exchange-btn-primary:hover {
+  color: var(--efu-white);
+  background: var(--efu-main);
+  filter: brightness(1.08);
+}
+
+/* ---- section shell ---- */
+.exchange-section {
+  padding: var(--efu-space-5, 24px);
+  border-radius: var(--radius);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+}
+
+.exchange-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 var(--efu-space-4, 16px);
+  font-size: 20px;
+  color: var(--efu-fontcolor);
+}
+
+.exchange-kicker {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--efu-main);
+  opacity: 0.85;
+}
+
+/* ---- flow ---- */
+.exchange-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-3, 12px);
+}
+
+.exchange-flow-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--efu-space-3, 12px);
+  padding: var(--efu-space-3, 12px) var(--efu-space-4, 16px);
+  border-radius: var(--efu-radius-md, 12px);
+  background: var(--efu-secondbg);
+}
+
+.exchange-flow-index {
+  flex: none;
+  font-weight: 700;
+  color: var(--efu-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.exchange-flow-text {
+  color: var(--efu-fontcolor);
+  line-height: 1.7;
+}
+
+/* ---- requirement cards ---- */
+.exchange-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--efu-space-3, 12px);
+}
+
+.exchange-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--efu-space-4, 16px);
+  border-radius: var(--efu-radius-md, 12px);
+  background: var(--efu-secondbg);
+  border: 1px solid transparent;
+  transition: border-color 0.3s, transform var(--efu-motion-fast, 180ms);
+}
+
+.exchange-card:hover {
+  border-color: var(--efu-main);
+  transform: translateY(-2px);
+}
+
+.exchange-card-icon {
+  font-size: 18px;
+  color: var(--efu-main);
+}
+
+.exchange-card-title {
+  margin: 0;
+  font-size: 16px;
+  color: var(--efu-fontcolor);
+}
+
+.exchange-card-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--efu-secondtext);
+}
+
+/* ---- domains ---- */
+.exchange-domain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-2, 8px);
+}
+
+.exchange-domain-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  line-height: 1.7;
+  color: var(--efu-secondtext);
+}
+
+.exchange-domain-item.accepted i {
+  color: var(--efu-green);
+}
+
+.exchange-domain-item.rejected i {
+  color: var(--efu-red);
+}
+
+/* ---- site snippet ---- */
+.exchange-note {
+  margin: 0 0 var(--efu-space-3, 12px);
+  color: var(--efu-secondtext);
+  line-height: 1.7;
+}
+
+.exchange-snippet {
+  position: relative;
+}
+
+.exchange-snippet pre {
+  margin: 0;
+  padding: var(--efu-space-4, 16px);
+  border-radius: var(--efu-radius-md, 12px);
+  background: var(--efu-hl-bg, var(--efu-secondbg));
+  overflow-x: auto;
+}
+
+.exchange-snippet code {
+  font-family: var(--efu-code-font-family);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--efu-fontcolor);
+  white-space: pre;
+}
+
+.exchange-copy {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--efu-radius-sm, 8px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-card-bg);
+  color: var(--efu-secondtext);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.exchange-copy:hover {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 768px) {
+  .exchange-hero,
+  .exchange-section {
+    padding: var(--efu-space-4, 16px);
+  }
+
+  .exchange-title {
+    font-size: 24px;
+  }
+
+  .exchange-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exchange-flow-item {
+    padding: var(--efu-space-2, 8px) var(--efu-space-3, 12px);
+  }
+}

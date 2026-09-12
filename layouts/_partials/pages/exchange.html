@@ -1,0 +1,93 @@
+{{ $cfg := site.Params.solitude.page.exchange }}
+{{ $submit := $cfg.submit }}
+<div class="exchange-page" id="exchange">
+  <section class="exchange-hero">
+    <div class="exchange-hero-kicker"><i class="solitude fas fa-handshake" aria-hidden="true"></i>Exchange</div>
+    <h1 class="exchange-title">{{ $cfg.title | default .Title }}</h1>
+    {{ with $cfg.subtitle }}<p class="exchange-subtitle">{{ . }}</p>{{ end }}
+    <div class="exchange-actions">
+      {{ with $submit }}
+        <a class="exchange-btn exchange-btn-primary" href="{{ .url }}" target="_blank" rel="noopener noreferrer">
+          <i class="solitude {{ .icon | default "fas fa-paper-plane" }}" aria-hidden="true"></i>
+          <span>{{ .text }}</span>
+        </a>
+      {{ end }}
+      {{ range $cfg.links }}
+        <a class="exchange-btn" href="{{ .url | relLangURL }}">
+          {{ with .icon }}<i class="solitude {{ . }}" aria-hidden="true"></i>{{ end }}
+          <span>{{ .name }}</span>
+        </a>
+      {{ end }}
+    </div>
+  </section>
+
+  {{ with $cfg.flow }}
+    <section class="exchange-section">
+      <h2 class="exchange-section-title"><span class="exchange-kicker">Flow</span>申请流程</h2>
+      <ol class="exchange-flow">
+        {{ range $index, $step := . }}
+          <li class="exchange-flow-item">
+            <span class="exchange-flow-index">{{ printf "%02d" (add $index 1) }}</span>
+            <span class="exchange-flow-text">{{ $step }}</span>
+          </li>
+        {{ end }}
+      </ol>
+    </section>
+  {{ end }}
+
+  {{ with $cfg.requirements }}
+    <section class="exchange-section">
+      <h2 class="exchange-section-title"><span class="exchange-kicker">Requirements</span>友链要求</h2>
+      <div class="exchange-grid">
+        {{ range . }}
+          <article class="exchange-card">
+            {{ with .icon }}<i class="solitude {{ . }} exchange-card-icon" aria-hidden="true"></i>{{ end }}
+            <h3 class="exchange-card-title">{{ .title }}</h3>
+            <p class="exchange-card-desc">{{ .desc }}</p>
+          </article>
+        {{ end }}
+      </div>
+    </section>
+  {{ end }}
+
+  {{ with $cfg.domains }}
+    <section class="exchange-section">
+      <h2 class="exchange-section-title"><span class="exchange-kicker">Domain</span>{{ .title }}</h2>
+      <div class="exchange-domain">
+        <p class="exchange-domain-item accepted">
+          <i class="solitude fas fa-circle-check" aria-hidden="true"></i><span>{{ .accepted }}</span>
+        </p>
+        <p class="exchange-domain-item rejected">
+          <i class="solitude fas fa-circle-xmark" aria-hidden="true"></i><span>{{ .rejected }}</span>
+        </p>
+      </div>
+    </section>
+  {{ end }}
+
+  {{ with $cfg.site }}
+    <section class="exchange-section">
+      <h2 class="exchange-section-title"><span class="exchange-kicker">My Site</span>{{ .title }}</h2>
+      {{ with .note }}<p class="exchange-note">{{ . }}</p>{{ end }}
+      {{ $snippetLines := slice }}
+      {{ range $key, $value := .items }}
+        {{ $snippetLines = $snippetLines | append (printf "%s: %s" $key $value) }}
+      {{ end }}
+      {{ $snippet := delimit $snippetLines "\n" }}
+      <div class="exchange-snippet">
+        <pre><code id="exchange-snippet-code">{{ $snippet }}</code></pre>
+        <button class="exchange-copy" type="button"
+          data-solitude-action="copy" data-solitude-value="{{ $snippet }}"
+          title="{{ i18n "copyLink" }}" aria-label="{{ i18n "copyLink" }}">
+          <i class="solitude fas fa-copy" aria-hidden="true"></i><span>复制</span>
+        </button>
+      </div>
+    </section>
+  {{ end }}
+
+  {{ with $cfg.format }}
+    <section class="exchange-section">
+      <h2 class="exchange-section-title"><span class="exchange-kicker">Format</span>{{ .title }}</h2>
+      <p class="exchange-note">{{ .desc }}</p>
+    </section>
+  {{ end }}
+</div>
