@@ -92,7 +92,7 @@ import { Solitude } from "./core/api";
     if (tag && !normal) wrapper.append(tag);
 
     const anchor = createElement("a", "cf-friends-link");
-    anchor.href = disconnected ? "javascript:void(0);" : resolveSiteUrl(item.linkpage || item.link);
+    anchor.href = disconnected ? "javascript:void(0);" : resolveSiteUrl(item.link);
     anchor.title = item.name || "";
     if (!disconnected) {
       anchor.target = "_blank";
@@ -252,7 +252,7 @@ import { Solitude } from "./core/api";
     if (tag) card.append(tag);
 
     const imageLink = createElement("a", "img");
-    imageLink.href = resolveSiteUrl(item.linkpage || item.link);
+    imageLink.href = resolveSiteUrl(item.link);
     imageLink.title = item.name || "";
     imageLink.target = "_blank";
     imageLink.rel = "noopener noreferrer nofollow";
@@ -261,7 +261,7 @@ import { Solitude } from "./core/api";
     );
 
     const infoLink = createElement("a", "info cf-friends-link");
-    infoLink.href = resolveSiteUrl(item.linkpage || item.link);
+    infoLink.href = resolveSiteUrl(item.link);
     infoLink.title = item.name || "";
     infoLink.target = "_blank";
     infoLink.rel = "noopener noreferrer nofollow";
@@ -336,14 +336,79 @@ import { Solitude } from "./core/api";
     if (window.lazyLoadInstance) window.lazyLoadInstance.update();
   };
 
+  const tombstoneInitial = (name) => {
+    const text = String(name || "").trim();
+    if (!text) return "?";
+    return Array.from(text)[0].toUpperCase();
+  };
+
+  const createTombstoneAvatar = (src, name) => {
+    const wrapper = createElement("span", "tombstone-avatar");
+    wrapper.setAttribute("aria-hidden", "true");
+    wrapper.append(createElement("span", "tombstone-avatar-initial", tombstoneInitial(name)));
+    if (!src) return wrapper;
+
+    const image = createElement("img", "no-lightbox");
+    image.alt = "";
+    image.loading = "lazy";
+    image.src = resolveSiteUrl(src);
+    image.addEventListener("error", () => image.remove(), { once: true });
+    wrapper.prepend(image);
+    return wrapper;
+  };
+
+  const createTombstone = (items) => {
+    const section = createElement("section", "tombstone-section");
+    section.append(
+      createElement("h2", "tombstone-title", config.tombstone_title)
+    );
+    const desc = createElement("div", "tombstone-desc");
+    desc.innerHTML = config.tombstone_desc || "";
+    section.append(desc);
+
+    const list = createElement("div", "tombstone-list");
+    items.forEach((item, index) => {
+      const reasonId = `tombstone-reason-${index}`;
+      const node = createElement("span", "tombstone-item");
+      node.tabIndex = 0;
+      node.setAttribute("aria-describedby", reasonId);
+
+      const name =
+        String(item.name || "").trim() || config.tombstone_unknown_name;
+      const avatar = createTombstoneAvatar(item.avatar, name);
+
+      const reason = createElement(
+        "span",
+        "tombstone-reason",
+        item.lost_reason || config.tombstone_reason_default
+      );
+      reason.id = reasonId;
+      reason.setAttribute("role", "tooltip");
+
+      node.append(
+        avatar,
+        createElement("span", "tombstone-name", name),
+        reason
+      );
+      list.append(node);
+    });
+    section.append(list);
+    return section;
+  };
+
   const renderList = async (target) => {
     try {
       const data = await load();
       if (!target.isConnected || target.dataset.friendLinksLoaded === "true") return;
       const fragment = document.createDocumentFragment();
+      const tombstones = [];
       let normalIndex = 0;
       data.links.forEach((group) => {
         const links = Array.isArray(group.link_list) ? group.link_list : [];
+        if (group.type === "lost") {
+          tombstones.push(...links);
+          return;
+        }
         const normalizedGroup = { ...group, link_list: links };
         if (group.type === "card") {
           fragment.append(
@@ -372,6 +437,7 @@ import { Solitude } from "./core/api";
           );
         }
       });
+      if (tombstones.length) fragment.append(createTombstone(tombstones));
       target.replaceChildren(fragment);
       target.dataset.friendLinksLoaded = "true";
       bindNormalControls(target);
@@ -388,7 +454,7 @@ import { Solitude } from "./core/api";
       const data = await load();
       if (!target.isConnected || target.dataset.friendLinksLoaded === "true") return;
       const links = data.links
-        .filter((group) => group.type !== "discn")
+        .filter((group) => group.type !== "discn" && group.type !== "lost")
         .flatMap((group) => (Array.isArray(group.link_list) ? group.link_list : []))
         .slice(0, 30);
       const wrapper = createElement("div", "tags-group-wrapper");

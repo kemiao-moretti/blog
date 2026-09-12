@@ -127,3 +127,10 @@ randomSort: {other: Orden aleatorio}
 sortLinks: {other: Cambiar orden}
 scrollLeft: {other: Desplazar a la izquierda}
 scrollRight: {other: Desplazar a la derecha}
+
+# Lápida de enlaces de amigos (enlaces inaccesibles)
+tombstoneTitle: {other: 🪵 Lápida de amigos · Amigos que ya no están}
+tombstoneDesc: {other: '<blockquote><p>💡 <strong>Nota</strong>: estos sitios llevan varios días sin ser accesibles, han cerrado o ya no se mantienen. El comprobador de enlaces los movió aquí automáticamente; no es un juicio sobre tu sitio.</p><p>Si solo fue un problema técnico, su autor puede {recover} cuando vuelva a estar en línea. Los sitios sin mantenimiento podrían no restaurarse.</p></blockquote>'}
+tombstoneRecoverLink: {other: solicitar la restauración vía GitHub Issues}
+tombstoneReasonDefault: {other: Sitio inaccesible}
+tombstoneUnknownName: {other: Sitio desconocido}

@@ -127,3 +127,10 @@ randomSort: {other: Random order}
 sortLinks: {other: Change link order}
 scrollLeft: {other: Scroll left}
 scrollRight: {other: Scroll right}
+
+# Friend tombstone (unreachable friend links)
+tombstoneTitle: {other: 🪵 Friend Tombstone · Gone but Remembered}
+tombstoneDesc: {other: '<blockquote><p>💡 <strong>Note</strong>: these sites have been unreachable for several days in a row, have shut down, or are no longer maintained. They were moved here automatically by the link checker — this is not a judgement on your site.</p><p>If the downtime was only a technical problem, the owner is welcome to {recover} once it is back online. Sites that are no longer maintained may not be restored.</p></blockquote>'}
+tombstoneRecoverLink: {other: request a restore via GitHub Issues}
+tombstoneReasonDefault: {other: Site unreachable}
+tombstoneUnknownName: {other: Unknown site}

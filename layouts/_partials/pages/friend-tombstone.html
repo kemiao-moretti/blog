@@ -1,0 +1,28 @@
+{{ $lost := slice }}
+{{ range .groups }}
+  {{ if eq .type "lost" }}
+    {{ range .link_list }}
+      {{ $lost = $lost | append . }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ if gt (len $lost) 0 }}
+  <section class="tombstone-section">
+    <h2 class="tombstone-title">{{ i18n "tombstoneTitle" }}</h2>
+    <div class="tombstone-desc">{{ partial "pages/friend-tombstone-desc.html" . }}</div>
+    <div class="tombstone-list">
+      {{ range $index, $item := $lost }}
+        {{ $name := $item.name | default (i18n "tombstoneUnknownName") }}
+        <span class="tombstone-item" tabindex="0" aria-describedby="tombstone-reason-{{ $index }}">
+          <span class="tombstone-avatar" aria-hidden="true">
+            {{ with $item.avatar }}<img class="no-lightbox" src="{{ . }}" alt="" loading="lazy" onerror="this.remove()">{{ end }}
+            <span class="tombstone-avatar-initial">{{ substr $name 0 1 }}</span>
+          </span>
+          <span class="tombstone-name">{{ $name }}</span>
+          <span class="tombstone-reason" id="tombstone-reason-{{ $index }}" role="tooltip">{{ $item.lost_reason | default (i18n "tombstoneReasonDefault") }}</span>
+        </span>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}

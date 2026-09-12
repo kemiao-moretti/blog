@@ -127,3 +127,10 @@ randomSort: {other: 隨機排序}
 sortLinks: {other: 切換排序方式}
 scrollLeft: {other: 向左捲動}
 scrollRight: {other: 向右捲動}
+
+# 友鏈墓碑（失聯友鏈）
+tombstoneTitle: {other: 🪵 友鏈墓碑 · 相逢何必曾相識}
+tombstoneDesc: {other: '<blockquote><p>💡 <strong>說明</strong>：此處記錄的友鏈因連續多日無法訪問、站點關閉或已停止維護，由巡檢機器人自動移入墓碑暫存，並非對貴站的否定。</p><p>若因技術問題導致暫時下線，歡迎站長修復後 {recover}；若站點已停止維護，則可能不再接受恢復請求。</p></blockquote>'}
+tombstoneRecoverLink: {other: 透過 GitHub Issues 申請恢復}
+tombstoneReasonDefault: {other: 站點無法訪問}
+tombstoneUnknownName: {other: 未知站點}

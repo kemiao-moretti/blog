@@ -1146,3 +1146,176 @@ div#banners .bannerText {
   margin-right: 8px;
   font-size: 22px;
 }
+
+/* Friend tombstone (lost links) */
+.tombstone-section {
+  margin-top: 26px;
+}
+
+.tombstone-section .tombstone-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--efu-fontcolor);
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.tombstone-section .tombstone-desc {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--efu-secondtext);
+}
+
+.tombstone-section .tombstone-desc blockquote {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--efu-theme-op);
+  border-radius: 8px;
+  background: var(--efu-secondbg);
+  color: var(--efu-secondtext);
+}
+
+.tombstone-section .tombstone-desc blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.tombstone-section .tombstone-desc a {
+  color: var(--efu-main);
+  text-decoration: none;
+}
+
+.tombstone-section .tombstone-desc a:hover {
+  text-decoration: underline;
+}
+
+.tombstone-section .tombstone-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tombstone-section .tombstone-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border: var(--style-border-dashed);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--efu-secondtext);
+  cursor: default;
+  user-select: none;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+
+.tombstone-section .tombstone-item:hover,
+.tombstone-section .tombstone-item:focus-visible {
+  border-color: var(--efu-main);
+  color: var(--efu-main);
+  background: var(--efu-main-op-light);
+  outline: none;
+}
+
+.tombstone-section .tombstone-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--efu-secondtext) 20%, transparent);
+  color: var(--efu-secondtext);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: filter 0.3s, opacity 0.3s, color 0.3s, background 0.3s;
+  user-select: none;
+}
+
+/* 特异性 (0,3,1) 必须高于 shell.css 的 `.article-container img:not(.post_bg)` (0,2,1)，
+   否则会被它的 object-fit:cover / max-width:90% / margin:0.8rem auto 覆盖，
+   导致头像被裁成底部一条横带。 */
+.tombstone-section .tombstone-item .tombstone-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+.tombstone-section .tombstone-avatar-initial {
+  line-height: 1;
+}
+
+.tombstone-section .tombstone-avatar img + .tombstone-avatar-initial {
+  display: none;
+}
+
+.tombstone-section .tombstone-item:hover .tombstone-avatar,
+.tombstone-section .tombstone-item:focus-visible .tombstone-avatar {
+  filter: grayscale(0);
+  opacity: 1;
+  color: var(--efu-main);
+  background: var(--efu-main-op-light);
+}
+
+.tombstone-section .tombstone-name {
+  font-size: 0.875rem;
+  line-height: 1;
+  text-decoration: line-through;
+  text-decoration-color: var(--efu-theme-op);
+}
+
+.tombstone-section .tombstone-reason {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 10;
+  max-width: min(280px, 70vw);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #3d3d3f;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+
+.tombstone-section .tombstone-reason::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #3d3d3f;
+}
+
+.tombstone-section .tombstone-item:hover .tombstone-reason,
+.tombstone-section .tombstone-item:focus-visible .tombstone-reason {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media screen and (max-width: 768px) {
+  .tombstone-section .tombstone-reason {
+    white-space: normal;
+  }
+}

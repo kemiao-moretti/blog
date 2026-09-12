@@ -1,0 +1,3 @@
+{{- $url := site.Params.solitude.page.links.tombstone_recover_url | default ("/exchange/" | relLangURL) -}}
+{{- $link := printf `<a href="%s">%s</a>` $url (i18n "tombstoneRecoverLink") -}}
+{{- replace (i18n "tombstoneDesc") "{recover}" $link | safeHTML -}}
