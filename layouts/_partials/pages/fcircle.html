@@ -1,0 +1,75 @@
+{{ $cfg := site.Params.solitude.fcircle }}
+{{ if $cfg.enable }}
+{{ $api := strings.TrimSuffix "/" ($cfg.api | default "") }}
+<div class="fcircle-page" id="fcircle"
+  data-api="{{ $api }}"
+  data-page-size="{{ $cfg.page_size | default 24 }}"
+  data-cache-minutes="{{ $cfg.cache_minutes | default 10 }}"
+  data-error-img="{{ $cfg.error_img | default "/img/default_avatar.avif" | relURL }}"
+  data-random-post="{{ cond (ne $cfg.random_post false) true false }}"
+  data-author-modal="{{ cond (ne $cfg.author_modal false) true false }}"
+  data-sort-toggle="{{ cond (ne $cfg.sort_toggle false) true false }}"
+  data-limit="{{ $cfg.limit | default 0 }}"
+  data-label-stat-friends="{{ i18n "fcircleStatsFriends" | default "订阅" }}"
+  data-label-stat-active="{{ i18n "fcircleStatsActive" | default "活跃" }}"
+  data-label-stat-articles="{{ i18n "fcircleStatsArticles" | default "文章" }}"
+  data-label-stat-updated="{{ i18n "fcircleStatsUpdated" | default "更新于" }}"
+  data-label-random="{{ i18n "fcircleRandom" | default "随机钓鱼" }}"
+  data-label-refresh="{{ i18n "fcircleRefresh" | default "刷新" }}"
+  data-label-visit="{{ i18n "fcircleVisit" | default "看看" }}"
+  data-label-caught="{{ i18n "fcircleCaught" | default "钓到了" }}"
+  data-label-sort-created="{{ i18n "fcircleSortCreated" | default "按发布时间" }}"
+  data-label-sort-updated="{{ i18n "fcircleSortUpdated" | default "按更新时间" }}"
+  data-label-loading="{{ i18n "commentsLoading" | default "加载中" }}"
+  data-label-empty="{{ i18n "fcircleEmpty" | default "暂时还没有友链文章" }}"
+  data-label-error="{{ i18n "fcircleError" | default "友链朋友圈加载失败，请稍后重试。" }}"
+  data-label-more="{{ i18n "fcircleMore" | default "再来亿点" }}"
+  data-label-no-more="{{ i18n "fcircleNoMore" | default "没有更多了" }}">
+
+  {{ with .Params.description }}<p class="fcircle-desc">{{ . }}</p>{{ end }}
+
+  <div class="fcircle-stats" id="fcircle-stats" hidden></div>
+
+  {{ if ne $cfg.random_post false }}
+  <div class="fcircle-random" id="fcircle-random" hidden>
+    <div class="fcircle-random-text">
+      <span class="fcircle-random-label">{{ i18n "fcircleRandom" | default "随机钓鱼" }}</span>
+      <span class="fcircle-random-body">{{ i18n "fcircleCaught" | default "钓到了" }}<b id="fcircle-random-author"></b>{{ i18n "fcircleCaughtSuffix" | default "的文章：" }}<b id="fcircle-random-title"></b></span>
+    </div>
+    <div class="fcircle-random-actions">
+      <button class="fcircle-chip" type="button" id="fcircle-random-refresh"><i class="solitude fas fa-shuffle" aria-hidden="true"></i><span>{{ i18n "fcircleRefresh" | default "刷新" }}</span></button>
+      <button class="fcircle-chip fcircle-chip-primary" type="button" id="fcircle-random-visit"><span>{{ i18n "fcircleVisit" | default "看看" }}</span></button>
+    </div>
+  </div>
+  {{ end }}
+
+  <div class="fcircle-toolbar" id="fcircle-toolbar" hidden>
+    <button class="fcircle-chip" type="button" id="fcircle-sort-toggle" aria-live="polite"></button>
+  </div>
+
+  <div class="fcircle-list" id="fcircle-list" aria-live="polite">
+    <div class="fcircle-state" id="fcircle-loading">
+      <i class="solitude fas fa-spinner fa-spin" aria-hidden="true"></i>
+      <span>{{ i18n "commentsLoading" | default "加载中" }}</span>
+    </div>
+  </div>
+
+  <div class="fcircle-footer" id="fcircle-footer" hidden>
+    <button class="fcircle-more" type="button" id="fcircle-more">{{ i18n "fcircleMore" | default "再来亿点" }}</button>
+  </div>
+
+  <p class="fcircle-credit" id="fcircle-credit" data-credit-text="{{ i18n "fcircleCredit" | default "数据来自好友的朋友圈。" }}" hidden></p>
+</div>
+
+<div class="fcircle-modal" id="fcircle-modal" hidden role="dialog" aria-modal="true" aria-labelledby="fcircle-modal-name">
+  <div class="fcircle-modal-mask" data-fcircle-close></div>
+  <div class="fcircle-modal-panel">
+    <button class="fcircle-modal-close" type="button" data-fcircle-close aria-label="{{ i18n "fcircleClose" | default "关闭" }}"><i class="solitude fas fa-xmark" aria-hidden="true"></i></button>
+    <div class="fcircle-modal-head">
+      <img class="fcircle-modal-avatar" id="fcircle-modal-avatar" src="" alt="">
+      <a class="fcircle-modal-name" id="fcircle-modal-name" href="#" target="_blank" rel="noopener noreferrer"></a>
+    </div>
+    <div class="fcircle-modal-list" id="fcircle-modal-list"></div>
+  </div>
+</div>
+{{ end }}

@@ -134,3 +134,23 @@ tombstoneDesc: {other: '<blockquote><p>💡 <strong>Nota</strong>: estos sitios 
 tombstoneRecoverLink: {other: solicitar la restauración vía GitHub Issues}
 tombstoneReasonDefault: {other: Sitio inaccesible}
 tombstoneUnknownName: {other: Sitio desconocido}
+
+# Círculo de amigos (fcircle)
+fcircleRandom: {other: Pesca aleatoria}
+fcircleCaught: {other: Ha picado un artículo de}
+fcircleCaughtSuffix: {other: ": "}
+fcircleRefresh: {other: Otro}
+fcircleVisit: {other: Visitar}
+fcircleSortCreated: {other: Ordenar por fecha de publicación}
+fcircleSortUpdated: {other: Ordenar por fecha de actualización}
+fcircleEmpty: {other: Aún no hay artículos de amigos}
+fcircleError: {other: No se pudo cargar el círculo de amigos. Inténtalo de nuevo más tarde.}
+fcircleMore: {other: Cargar más}
+fcircleNoMore: {other: No hay más artículos}
+fcircleClose: {other: Cerrar}
+fcircleStatsFriends: {other: Amigos}
+fcircleStatsActive: {other: Activos}
+fcircleStatsArticles: {other: Artículos}
+fcircleStatsUpdated: {other: Actualizado}
+fcircleByAuthor: {other: "Artículos de "}
+fcircleCredit: {other: "Los datos provienen de los círculos de amigos, impulsado por Hexo Circle of Friends."}

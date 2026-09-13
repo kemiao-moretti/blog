@@ -134,3 +134,23 @@ tombstoneDesc: {other: '<blockquote><p>💡 <strong>說明</strong>：此處記�
 tombstoneRecoverLink: {other: 透過 GitHub Issues 申請恢復}
 tombstoneReasonDefault: {other: 站點無法訪問}
 tombstoneUnknownName: {other: 未知站點}
+
+# 友鏈朋友圈（fcircle）
+fcircleRandom: {other: 隨機釣魚}
+fcircleCaught: {other: 釣到了}
+fcircleCaughtSuffix: {other: 的文章：}
+fcircleRefresh: {other: 換一條}
+fcircleVisit: {other: 看看}
+fcircleSortCreated: {other: 按發布時間排序}
+fcircleSortUpdated: {other: 按更新時間排序}
+fcircleEmpty: {other: 暫時還沒有友鏈文章}
+fcircleError: {other: 友鏈朋友圈載入失敗，請稍後重試。}
+fcircleMore: {other: 再來億點}
+fcircleNoMore: {other: 沒有更多了}
+fcircleClose: {other: 關閉}
+fcircleStatsFriends: {other: 訂閱}
+fcircleStatsActive: {other: 活躍}
+fcircleStatsArticles: {other: 文章}
+fcircleStatsUpdated: {other: 更新於}
+fcircleByAuthor: {other: 的文章}
+fcircleCredit: {other: 資料來自好友的朋友圈，由 Hexo Circle of Friends 驅動。}

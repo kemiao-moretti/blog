@@ -24,6 +24,7 @@
 @import "./pages/links-equipment.css" layer(solitude.pages);
 @import "./pages/exchange.css" layer(solitude.pages);
 @import "./pages/shuoshuo.css" layer(solitude.pages);
+@import "./pages/fcircle.css" layer(solitude.pages);
 @import "./pages/post.css" layer(solitude.pages);
 @import "./pages/about.css" layer(solitude.pages);
 

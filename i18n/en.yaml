@@ -134,3 +134,23 @@ tombstoneDesc: {other: '<blockquote><p>💡 <strong>Note</strong>: these sites h
 tombstoneRecoverLink: {other: request a restore via GitHub Issues}
 tombstoneReasonDefault: {other: Site unreachable}
 tombstoneUnknownName: {other: Unknown site}
+
+# Friend circle (fcircle)
+fcircleRandom: {other: Random fishing}
+fcircleCaught: {other: Hooked an article by}
+fcircleCaughtSuffix: {other: ": "}
+fcircleRefresh: {other: Another one}
+fcircleVisit: {other: Visit}
+fcircleSortCreated: {other: Sort by publish time}
+fcircleSortUpdated: {other: Sort by update time}
+fcircleEmpty: {other: No friend articles yet}
+fcircleError: {other: Failed to load the friend circle. Please try again later.}
+fcircleMore: {other: Load more}
+fcircleNoMore: {other: No more articles}
+fcircleClose: {other: Close}
+fcircleStatsFriends: {other: Friends}
+fcircleStatsActive: {other: Active}
+fcircleStatsArticles: {other: Articles}
+fcircleStatsUpdated: {other: Updated}
+fcircleByAuthor: {other: "Articles by "}
+fcircleCredit: {other: "Data comes from friends' circles, powered by Hexo Circle of Friends."}

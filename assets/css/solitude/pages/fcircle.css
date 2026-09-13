@@ -1,0 +1,519 @@
+/* 友链朋友圈（fcircle）页面。所有颜色/圆角/动效一律走 --efu-* token，
+   明暗两种模式由 [data-theme] 自动驱动，页面内不出现任何硬编码色值。 */
+
+.fcircle-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-4, 16px);
+}
+
+.fcircle-desc {
+  margin: 0;
+  color: var(--efu-secondtext);
+  line-height: 1.7;
+}
+
+/* ---------- 统计栏（订阅 / 活跃 / 文章） ---------- */
+.fcircle-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-2, 8px);
+  padding: var(--efu-space-4, 16px);
+  border-radius: var(--radius);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+}
+
+.fcircle-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--efu-space-3, 12px);
+}
+
+.fcircle-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.fcircle-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--efu-main);
+  line-height: 1.2;
+}
+
+.fcircle-stat-label {
+  font-size: 12px;
+  color: var(--efu-secondtext);
+}
+
+.fcircle-stats-time {
+  font-size: 12px;
+  color: var(--efu-secondtext);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 随机钓鱼 ---------- */
+.fcircle-random {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--efu-space-3, 12px);
+  flex-wrap: wrap;
+  padding: var(--efu-space-3, 12px) var(--efu-space-4, 16px);
+  border-radius: var(--radius);
+  background: var(--efu-main-op-light);
+  border: 1px solid var(--efu-card-border);
+}
+
+.fcircle-random-text {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.fcircle-random-label {
+  flex: none;
+  font-weight: 700;
+  color: var(--efu-main);
+}
+
+.fcircle-random-body {
+  color: var(--efu-secondtext);
+}
+
+.fcircle-random-body b {
+  color: var(--efu-fontcolor);
+  font-weight: 600;
+}
+
+.fcircle-random-actions {
+  display: flex;
+  gap: var(--efu-space-2, 8px);
+  flex: none;
+}
+
+/* ---------- 通用小按钮 ---------- */
+.fcircle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--efu-radius-pill, 999px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+
+.fcircle-chip:hover {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+.fcircle-chip-primary {
+  background: var(--efu-main);
+  border-color: var(--efu-main);
+  color: var(--efu-white);
+}
+
+.fcircle-chip-primary:hover {
+  color: var(--efu-white);
+  opacity: 0.88;
+}
+
+/* ---------- 排序工具条 ---------- */
+.fcircle-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--efu-space-2, 8px);
+}
+
+/* ---------- 卡片网格 ---------- */
+.fcircle-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--efu-space-4, 16px);
+}
+
+.fcircle-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-3, 12px);
+  padding: var(--efu-space-4, 16px);
+  border-radius: var(--radius);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+  transition: transform var(--efu-motion-fast, 180ms), border-color 0.3s, box-shadow 0.3s;
+}
+
+.fcircle-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--efu-main);
+  box-shadow: var(--efu-shadow-main);
+}
+
+.fcircle-card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--efu-fontcolor);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.fcircle-card-title:hover {
+  color: var(--efu-main);
+}
+
+.fcircle-card-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  color: var(--efu-secondtext);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.fcircle-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--efu-space-2, 8px);
+  margin-top: auto;
+  padding-top: var(--efu-space-2, 8px);
+  border-top: 1px solid var(--efu-card-border);
+}
+
+.fcircle-card-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.fcircle-card-author:focus-visible {
+  outline: none;
+  border-radius: var(--efu-radius-pill, 999px);
+  box-shadow: var(--efu-focus-ring);
+}
+
+.fcircle-card-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+}
+
+.fcircle-card-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--efu-fontcolor);
+  font-size: 13px;
+  transition: color 0.3s;
+}
+
+.fcircle-card-author:hover .fcircle-card-name {
+  color: var(--efu-main);
+}
+
+.fcircle-card-date {
+  flex: none;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 状态提示 ---------- */
+.fcircle-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  grid-column: 1 / -1;
+  padding: var(--efu-space-5, 24px);
+  color: var(--efu-secondtext);
+  font-size: 14px;
+}
+
+.fcircle-state.is-error {
+  color: var(--efu-red);
+}
+
+/* ---------- 底部加载更多 ---------- */
+.fcircle-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.fcircle-more {
+  padding: 8px 22px;
+  border-radius: var(--efu-radius-pill, 999px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s, opacity 0.3s;
+}
+
+.fcircle-more:hover:not(:disabled) {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
+}
+
+.fcircle-more:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* ---------- 数据来源 ---------- */
+.fcircle-credit {
+  margin: 0;
+  text-align: center;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+}
+
+.fcircle-credit a {
+  color: var(--efu-main);
+  text-decoration: none;
+}
+
+.fcircle-credit a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- 作者文章弹窗 ---------- */
+.fcircle-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--efu-space-4, 16px);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.fcircle-modal.is-open {
+  opacity: 1;
+}
+
+.fcircle-modal-mask {
+  position: absolute;
+  inset: 0;
+  background: var(--efu-maskbgdeep, rgba(0, 0, 0, 0.85));
+  backdrop-filter: blur(2px);
+}
+
+.fcircle-modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-4, 16px);
+  width: 100%;
+  max-width: 480px;
+  max-height: min(78vh, 640px);
+  overflow-y: auto;
+  padding: var(--efu-space-5, 24px);
+  border-radius: var(--efu-radius-lg, 14px);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--efu-card-border);
+  box-shadow: var(--efu-shadow-blackdeep);
+  transform: scale(0.92) translateY(12px);
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.fcircle-modal.is-open .fcircle-modal-panel {
+  transform: scale(1) translateY(0);
+}
+
+.fcircle-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+  color: var(--efu-secondtext);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+}
+
+.fcircle-modal-close:hover {
+  color: var(--efu-red);
+  border-color: var(--efu-red);
+}
+
+.fcircle-modal-head {
+  display: flex;
+  align-items: center;
+  gap: var(--efu-space-3, 12px);
+  padding-right: 32px;
+}
+
+.fcircle-modal-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  border: 2px solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+}
+
+.fcircle-modal-name {
+  color: var(--efu-fontcolor);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fcircle-modal-name:hover {
+  color: var(--efu-main);
+}
+
+.fcircle-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--efu-space-2, 8px);
+}
+
+.fcircle-modal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--efu-space-3, 12px);
+  padding: 10px 12px;
+  border-radius: var(--efu-radius-sm, 8px);
+  background: var(--efu-secondbg);
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.fcircle-modal-item:hover {
+  background: var(--efu-main-op-light);
+}
+
+.fcircle-modal-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+}
+
+.fcircle-modal-item:hover .fcircle-modal-item-title {
+  color: var(--efu-main);
+}
+
+.fcircle-modal-item-date {
+  flex: none;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fcircle-modal-empty {
+  margin: 0;
+  color: var(--efu-secondtext);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- 多端适配 ---------- */
+@media screen and (max-width: 1200px) {
+  .fcircle-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .fcircle-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--efu-space-3, 12px);
+  }
+
+  .fcircle-card {
+    padding: var(--efu-space-3, 12px);
+  }
+
+  .fcircle-stats-grid {
+    gap: var(--efu-space-2, 8px);
+  }
+
+  .fcircle-stat-value {
+    font-size: 19px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .fcircle-random {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fcircle-random-actions {
+    align-self: flex-end;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .fcircle-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- 无障碍：尊重系统动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .fcircle-card,
+  .fcircle-chip,
+  .fcircle-more,
+  .fcircle-modal,
+  .fcircle-modal-panel {
+    transition: none;
+  }
+
+  .fcircle-card:hover {
+    transform: none;
+  }
+}
