@@ -1,0 +1,1171 @@
+/* ============================================================
+   candy-components.css · 糖果屋魔改组件覆盖层
+   unlayered 规则，优先级高于主题各 layer 与厂商 CSS。
+   仅覆盖上游硬编码的几何/视觉细节；颜色统一引用 token。
+   ============================================================ */
+
+/* 选中文字：糖果强调色 */
+::selection {
+  background: var(--efu-theme-op-deep);
+  color: var(--efu-card-bg);
+}
+
+/* 滚动条：粗壮糖果条 */
+::-webkit-scrollbar-thumb {
+  border: 2px solid var(--efu-background);
+  border-radius: var(--candy-radius);
+}
+
+/* ---------- 文章卡片 ---------- */
+.recent-post-item {
+  border-radius: var(--candy-radius);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.recent-post-item:hover {
+  box-shadow: var(--card-hover-box-shadow);
+  transform: translate(-2px, -2px);
+  border-color: var(--efu-theme);
+}
+
+.recent-post-item .post_cover,
+.recent-post-item .post_cover img.post_bg {
+  border-radius: var(--candy-radius) var(--candy-radius) 0 0;
+}
+
+/* 文章卡片内小圆角统一（封面图、信息区） */
+.recent-post-item .recent-post-info {
+  border-radius: 0 0 var(--candy-radius) var(--candy-radius);
+}
+
+/* ---------- 引用块 ---------- */
+blockquote {
+  border-left: var(--candy-border-width) solid var(--efu-theme);
+  border-top: 1px solid var(--efu-card-border);
+  border-bottom: 1px solid var(--efu-card-border);
+  border-right: 1px solid var(--efu-card-border);
+  border-radius: 0 var(--candy-radius-sm) var(--candy-radius-sm) 0;
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--efu-theme-op-deep) 55%, transparent);
+}
+
+/* ---------- 代码块 ---------- */
+.highlight,
+.highlight pre,
+figure.highlight {
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 color-mix(in srgb, var(--efu-card-border) 45%, transparent);
+}
+
+.highlight .code-tools,
+.highlight figcaption {
+  border-bottom: var(--style-border-always);
+}
+
+/* 行内代码：糖果描边 */
+code:not(.code-block code) {
+  border: 1px solid var(--efu-theme-op-deep);
+  border-radius: var(--candy-radius-sm);
+}
+
+/* ---------- 分页 ---------- */
+#pagination:not(.pagination-post) .page-number,
+#pagination:not(.pagination-post) .extend,
+#pagination:not(.pagination-post) .space {
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+}
+
+#pagination:not(.pagination-post) .page-number.current {
+  background: var(--efu-theme);
+  color: var(--efu-card-bg);
+  border-color: var(--efu-card-border);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+}
+
+#pagination:not(.pagination-post) .page-number:hover:not(.current),
+#pagination:not(.pagination-post) .extend:hover {
+  background: var(--efu-theme-op-light);
+  color: var(--efu-theme);
+}
+
+/* ---------- 搜索弹窗 ---------- */
+.search-dialog {
+  border: var(--candy-border-width) solid var(--efu-card-border);
+  border-radius: var(--candy-radius-lg);
+  box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0 var(--efu-card-border);
+}
+
+.search-dialog .search-dialog__form,
+.search-dialog .search-dialog__suggestions {
+  border-color: var(--efu-card-border);
+}
+
+/* ---------- 关键词 / 标签点缀 ---------- */
+/* 注意：标签 DOM 是 <span class="tags-punctuation"><i/>文字<span class="tagsPageCount"/></span>，
+   即 # 图标与标签文字同属一个 span。此处只让「图标」做橙色点缀，
+   文字必须继承容器文字色 —— 否则上游任何「橙色底 + 橙色字」的组合
+   （文章底部标签 hover、#post-info 橙底等）都会让标签文字隐形。 */
+.tags-punctuation {
+  color: inherit;
+  font-weight: 500;
+}
+
+.tags-punctuation i {
+  color: var(--efu-theme);
+  opacity: 1;
+}
+
+/* ---------- 返回顶部等侧栏圆钮 ---------- */
+#rightside > div {
+  border: 0;
+  box-shadow: none;
+}
+
+#rightside a {
+  border-radius: var(--candy-radius-sm);
+}
+
+/* ---------- 顶部导航 ---------- */
+#nav .menus_items {
+  gap: 10px;
+  padding: 3px 6px;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius-lg);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 3px 3px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+#nav .menus_items .menus_item {
+  margin: 0;
+}
+
+#nav .menus_items .menus_item > .site-page {
+  min-height: 38px;
+  padding: 0.45rem 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--candy-radius);
+  color: var(--efu-fontcolor);
+  font-weight: 600;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+
+#nav .menus_items .menus_item > .site-page:hover,
+#nav .menus_items .menus_item:hover > .site-page {
+  background: var(--candy-nav-hover-surface, var(--efu-main-op-light));
+  color: var(--efu-fontcolor);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+#nav .menus_items .menus_item > .site-page:focus-visible,
+#nav .menus_items .menus_item .menus_item_child a:focus-visible {
+  outline: 2px solid var(--efu-theme);
+  outline-offset: 2px;
+}
+
+/* 下拉菜单改成独立面板，避免和父级 hover 高亮叠色 */
+#nav .menus_items .menus_item .menus_item_child {
+  min-width: 180px;
+  padding: 8px;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+#nav .menus_items .menus_item .menus_item_child li {
+  margin: 2px 0;
+  border-radius: var(--candy-radius-sm);
+}
+
+#nav .menus_items .menus_item .menus_item_child li a {
+  border-radius: var(--candy-radius-sm);
+  color: var(--efu-fontcolor);
+}
+
+#nav .menus_items .menus_item .menus_item_child li a:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  transform: none;
+}
+
+/* 顶部品牌按钮与侧边菜单不再复用导航白条 */
+#nav #site-name,
+#nav .back-home-button,
+#nav #nav-right .nav-button > a,
+#nav #toggle-menu > a {
+  border: 1px solid transparent;
+  border-radius: var(--candy-radius);
+}
+
+#nav #site-name:hover,
+#nav .back-home-button:hover,
+#nav #nav-right .nav-button > a:hover,
+#nav #toggle-menu > a:hover {
+  background: var(--candy-nav-hover-surface, var(--efu-main-op-light));
+  color: var(--efu-fontcolor);
+  box-shadow: none;
+}
+
+/* 左上角次级导航：独立面板，不与首页按钮叠加高光 */
+#nav .back-home-button .back-home-button-icon {
+  color: var(--efu-fontcolor);
+}
+
+#nav .back-home-button:hover,
+#nav .back-home-button:focus-within {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+#nav .back-home-button .back-menu-list-groups {
+  min-width: 220px;
+  padding: 10px;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius-lg);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#nav .back-home-button .back-menu-list-groups:hover {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+}
+
+#nav .back-home-button .back-menu-list-group .back-menu-list-title {
+  margin: 5px 8px 7px;
+  color: var(--efu-secondtext);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+#nav .back-home-button .back-menu-list .back-menu-item {
+  width: 100%;
+  min-height: 40px;
+  margin: 2px 0;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: var(--candy-radius-sm);
+  color: var(--efu-fontcolor);
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+#nav .back-home-button .back-menu-list .back-menu-item:hover,
+#nav .back-home-button .back-menu-list .back-menu-item:focus-visible {
+  border-color: var(--efu-theme);
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  transform: translateX(2px);
+}
+
+#nav .back-home-button .back-menu-list .back-menu-item-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--candy-radius-sm);
+  object-fit: cover;
+}
+
+[data-theme="dark"] #nav .back-home-button .back-menu-list-groups {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 4px 4px 0 #0F0A06;
+}
+
+/* 次级导航保持一行两个项目 */
+#nav .back-home-button .back-menu-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: 340px;
+  justify-content: initial;
+}
+
+#nav .back-home-button .back-menu-list .back-menu-item {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+}
+
+#nav .back-home-button .back-menu-list .back-menu-item-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 中控台打开时，顶部导航同步进入深色层 */
+[data-theme="dark"] #page-header.console-open #nav #blog_name,
+[data-theme="dark"] #page-header.console-open #nav #nav-right,
+[data-theme="dark"] #page-header.console-open #nav #nav-right::before,
+[data-theme="dark"] #page-header.console-open #nav .menus_items {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 #0F0A06;
+}
+
+[data-theme="dark"] #page-header.console-open #nav #site-name,
+[data-theme="dark"] #page-header.console-open #nav #page-name-text,
+[data-theme="dark"] #page-header.console-open #nav .menus_items .site-page,
+[data-theme="dark"] #page-header.console-open #nav #nav-right .nav-button > a {
+  color: var(--efu-fontcolor);
+}
+
+/* 浅色中控台打开时，顶部不能继续使用深色遮罩 */
+[data-theme="light"] #page-header.console-open #nav #blog_name,
+[data-theme="light"] #page-header.console-open #nav #nav-right,
+[data-theme="light"] #page-header.console-open #nav #nav-right::before,
+[data-theme="light"] #page-header.console-open #nav .menus_items {
+  background: var(--efu-card-bg);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #page-header.console-open #nav #site-name,
+[data-theme="light"] #page-header.console-open #nav #page-name-text,
+[data-theme="light"] #page-header.console-open #nav .menus_items .site-page,
+[data-theme="light"] #page-header.console-open #nav #nav-right .nav-button > a {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #page-header.console-open #nav .menus_items .menus_item:hover > .site-page,
+[data-theme="light"] #page-header.console-open #nav #nav-right .nav-button > a:hover,
+[data-theme="light"] #page-header.console-open #nav #site-name:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: none;
+}
+
+[data-theme="light"] #console .console-mask {
+  background: color-mix(in srgb, var(--efu-background) 72%, transparent);
+  backdrop-filter: saturate(120%) blur(14px);
+  -webkit-backdrop-filter: saturate(120%) blur(14px);
+}
+
+/* ---------- 浅色滚动固定导航 ---------- */
+[data-theme="light"] #page-header.nav-fixed #nav #blog_name,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right::before,
+[data-theme="light"] #page-header.nav-fixed #nav #menus > .menus_items,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name {
+  background: var(--efu-card-bg);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="light"] #page-header.nav-fixed #nav #blog_name,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #page-header.nav-fixed #nav #page-name::before,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right::before {
+  opacity: 0;
+  background: transparent;
+}
+
+[data-theme="light"] #page-header.nav-fixed #nav #site-name,
+[data-theme="light"] #page-header.nav-fixed #nav #site-name i,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text,
+[data-theme="light"] #page-header.nav-fixed #nav .menus_items .site-page,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right .nav-button > a {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #page-header.nav-fixed #nav .menus_items .menus_item:hover > .site-page,
+[data-theme="light"] #page-header.nav-fixed #nav #site-name:hover,
+[data-theme="light"] #page-header.nav-fixed #nav #nav-right .nav-button > a:hover,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  box-shadow: none;
+}
+
+/* 回顶按钮的明暗两套规则已统一收敛到下方的 totopbtn 权威块，
+   此处不再单独声明，避免 !important 与 :hover 特异性互相打架。 */
+
+/* 固定导航使用矩形体系，避免胶囊容器包住矩形选中项 */
+#page-header.nav-fixed #nav #menus > .menus_items,
+#page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page,
+#page-header.nav-fixed #nav #page-name,
+#page-header.nav-fixed #nav #page-name-text {
+  border-radius: var(--candy-radius);
+}
+
+#page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page {
+  border: 1px solid transparent;
+}
+
+/* 固定导航页面标题：始终保留可读文字 */
+#page-header.nav-fixed #nav #page-name-text,
+#page-header.nav-fixed #nav #page-name-text:hover,
+#page-header.nav-fixed #nav #page-name-text:focus-visible {
+  opacity: 1;
+  visibility: visible;
+  color: var(--efu-fontcolor) !important;
+  -webkit-text-fill-color: var(--efu-fontcolor);
+  text-shadow: none;
+}
+
+/* 深色固定导航：选中/hover 使用暖橙底 + 深可可字 */
+[data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item:hover > .site-page,
+[data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page:hover,
+[data-theme="dark"] #page-header.nav-fixed #nav #nav-right .nav-button > a:hover,
+[data-theme="dark"] #page-header.nav-fixed #nav #site-name:hover,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+  box-shadow: none;
+}
+
+[data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item:hover > .site-page span,
+[data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item:hover > .site-page i,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover {
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+}
+
+/* 深色固定导航默认状态也不能使用过暗文字。
+   注意排除 .totopbtn —— 回顶按钮自带浅色实底，会被这条 !important
+   一并染成浅米文字，与容器同色而彻底隐形。 */
+[data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text,
+[data-theme="dark"] #page-header.nav-fixed #nav #site-name,
+[data-theme="dark"] #page-header.nav-fixed #nav #nav-right .nav-button > a:not(.totopbtn) {
+  color: var(--efu-fontcolor) !important;
+  -webkit-text-fill-color: var(--efu-fontcolor);
+}
+
+/* 固定导航完整矩形化：覆盖站点名、次级入口和右侧控制组 */
+#page-header.nav-fixed #nav #blog_name,
+#page-header.nav-fixed #nav #blog_name .back-home-button,
+#page-header.nav-fixed #nav #site-name,
+#page-header.nav-fixed #nav #nav-right,
+#page-header.nav-fixed #nav #nav-right .nav-button,
+#page-header.nav-fixed #nav #nav-right .nav-button > a,
+#page-header.nav-fixed #nav #nav-right .nav-button > a.totopbtn,
+#page-header.nav-fixed #nav #toggle-menu,
+#page-header.nav-fixed #nav #toggle-menu > a {
+  border-radius: var(--candy-radius);
+}
+
+#page-header.nav-fixed #nav #blog_name,
+#page-header.nav-fixed #nav #nav-right {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#page-header.nav-fixed #nav #blog_name .back-home-button,
+#page-header.nav-fixed #nav #site-name,
+#page-header.nav-fixed #nav #nav-right .nav-button > a,
+#page-header.nav-fixed #nav #toggle-menu > a {
+  background: transparent;
+  box-shadow: none;
+}
+
+#page-header.nav-fixed #nav #blog_name .back-home-button:hover,
+#page-header.nav-fixed #nav #site-name:hover,
+#page-header.nav-fixed #nav #nav-right .nav-button > a:hover,
+#page-header.nav-fixed #nav #toggle-menu > a:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  box-shadow: none;
+}
+
+/* 回顶按钮：浅色实底 + 深色文字，明暗两套主题都由 token 自动对调。
+   两处必须 !important：
+   1) 深色下上游有 [data-theme=dark] #page-header #nav #nav-right #nav-totop a.totopbtn
+      的径向渐变（特异性 4 个 ID），高于本规则，会盖掉实底色；
+   2) 文字若被任何分组规则（如「深色固定导航默认文字」）染成 --efu-fontcolor，
+      就会与浅色底同色而隐形。
+
+   动画同步（数字/「返回顶部」标签 → 按钮变宽）：
+   - overflow: hidden 加在按钮【自身】，使文字的显现边缘就是按钮自己正在动画的
+     边缘 —— 文字与容器变宽由同一元素驱动，天然同时，不会出现「文字先蹦出来，
+     容器随后才变宽」。
+   - transition 的时长与缓动刻意与上游 #nav-totop 的 width 过渡（0.3s ease-in-out）
+     写成一致：按钮 30→70px 始终小于外层 35→80px，过渡中期也不会溢出外层，
+     因此不能用 token 覆盖这两个值，否则会重新错位。
+   这两条不限 .nav-fixed —— .long 过渡在任何滚动状态都可能触发。 */
+#page-header #nav #nav-right .nav-button a.totopbtn {
+  overflow: hidden;
+  transition:
+    width 0.3s ease-in-out,
+    transform 0.3s ease-in-out,
+    background-color 0.3s ease-in-out,
+    border-color 0.3s ease-in-out,
+    color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+#page-header.nav-fixed #nav #nav-right .nav-button a.totopbtn {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  background: var(--efu-fontcolor) !important;
+  color: var(--efu-card-bg) !important;
+  -webkit-text-fill-color: var(--efu-card-bg) !important;
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+/* 容器宽度 30px → 70px 是 0.3s 过渡；文字若不裁切会先于容器显现。
+   这里让数字/图标始终继承容器文字色，保证任何状态下都高对比。 */
+#page-header.nav-fixed #nav #nav-right .nav-button a.totopbtn :is(i, #percent) {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+#page-header.nav-fixed #nav #nav-right .nav-button a.totopbtn:hover {
+  border-color: var(--efu-theme);
+  background: var(--efu-theme) !important;
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  box-shadow: none;
+}
+
+[data-theme="dark"] #page-header.nav-fixed #nav #blog_name,
+[data-theme="dark"] #page-header.nav-fixed #nav #nav-right {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 #0F0A06;
+}
+
+/* 深色下只需补边框色：底色/文字色已由上面的 token 规则自动对调 */
+[data-theme="dark"] #page-header.nav-fixed #nav #nav-right .nav-button a.totopbtn {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--efu-fontcolor) !important;
+  color: var(--efu-card-bg) !important;
+  -webkit-text-fill-color: var(--efu-card-bg) !important;
+}
+
+[data-theme="dark"] #page-header.nav-fixed #nav #nav-right .nav-button a.totopbtn:hover {
+  border-color: var(--efu-theme);
+  background: var(--efu-theme) !important;
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12) !important;
+  box-shadow: none;
+}
+
+/* 版权作者头像：主题 layered 设计（背景图 + 前景贴纸）需配透明贴纸素材才成立，
+   本站前景为方形 logo，故改走主题内建的「无背景图 = 单张圆形头像」逻辑
+   （见 hugo.yaml 的 post.default.copyright）。此处只套糖果屋描边与硬阴影，
+   不再用 CSS 强制隐藏图层，保持与上游组件一致。 */
+#post .post-copyright .post-copyright__author_img {
+  background: var(--efu-card-bg);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 3px 3px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+#post .post-copyright .post-copyright__author_img:hover .post-copyright__author_img_front,
+#post .post-copyright .post-copyright__author_img:focus-visible .post-copyright__author_img_front {
+  transform: scale(1.04);
+}
+
+/* 全局选中态与主题橙色背景统一使用深可可文字 */
+#category-bar .category-bar-item.select a,
+#tag #tag-page-tags a.select,
+#page .category-lists .tag-cloud-list a:hover,
+#page .category-lists .tag-cloud-list a:focus-visible,
+#console .button-group .console-btn-item.on :is(span, button),
+#console .button-group .console-btn-item:hover :is(span, button),
+#console .button-group .console-btn-item :is(span, button):focus-visible,
+#nav .menus_items .menus_item:hover > .site-page,
+#nav .menus_items .menus_item .menus_item_child li a:hover,
+#nav .back-home-button .back-menu-list .back-menu-item:hover,
+#nav .back-home-button .back-menu-list .back-menu-item:focus-visible,
+.article-container a.solitude-tag.tag-button:hover,
+#rightside button:hover,
+#rightside button:focus-visible {
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+}
+
+#category-bar .category-bar-item.select a i,
+#category-bar .category-bar-item.select a span,
+#tag #tag-page-tags a.select i,
+#tag #tag-page-tags a.select span,
+#console .button-group .console-btn-item.on :is(span, button) i,
+#console .button-group .console-btn-item:hover :is(span, button) i,
+#nav .menus_items .menus_item:hover > .site-page i,
+#nav .menus_items .menus_item:hover > .site-page span {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit;
+}
+
+/* 固定导航最终矩形规则：覆盖上游胶囊半径 */
+#page-header.nav-fixed #nav #blog_name,
+#page-header.nav-fixed #nav #blog_name .back-home-button,
+#page-header.nav-fixed #nav #site-name,
+#page-header.nav-fixed #nav #menus > .menus_items,
+#page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page,
+#page-header.nav-fixed #nav #nav-right,
+#page-header.nav-fixed #nav #nav-right .nav-button,
+#page-header.nav-fixed #nav #nav-right .nav-button > a,
+#page-header.nav-fixed #nav #toggle-menu,
+#page-header.nav-fixed #nav #toggle-menu > a,
+#page-header.nav-fixed #nav #page-name,
+#page-header.nav-fixed #nav #page-name-text {
+  border-radius: var(--candy-radius) !important;
+}
+
+/* 页面标题在固定导航中的选中态不使用上游深色渐变 */
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text:hover,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover {
+  background: var(--efu-theme);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+  box-shadow: none;
+}
+
+/* 深色模式全部橙色导航状态保持清晰字色 */
+[data-theme="dark"] #page-header #nav .menus_items .menus_item:hover > .site-page,
+[data-theme="dark"] #page-header #nav .menus_items .menus_item .menus_item_child li a:hover,
+[data-theme="dark"] #page-header #nav .back-home-button:hover,
+[data-theme="dark"] #page-header #nav .back-menu-item:hover,
+[data-theme="dark"] #category-bar .category-bar-item.select a,
+[data-theme="dark"] #tag #tag-page-tags a.select,
+[data-theme="dark"] #console .button-group .console-btn-item.on :is(span, button),
+[data-theme="dark"] #console .button-group .console-btn-item:hover :is(span, button) {
+  color: #241A12 !important;
+  -webkit-text-fill-color: #241A12;
+}
+
+[data-theme="dark"] #page-header.console-open #nav .menus_items .menus_item:hover > .site-page,
+[data-theme="dark"] #page-header.console-open #nav #nav-right .nav-button > a:hover,
+[data-theme="dark"] #page-header.console-open #nav #site-name:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: none;
+}
+
+@media screen and (max-width: 768px) {
+  #nav .back-home-button .back-menu-list {
+    width: min(340px, calc(100vw - 56px));
+  }
+}
+
+
+/* 自定义 tooltip 只保留一次主题提示，不再产生刺眼的白色框 */
+.custom-tooltip {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius-sm);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 3px 3px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+/* 顶部按钮 hover 时只高亮内部，不重复叠加外部胶囊 */
+#nav .menus_items .menus_item:hover,
+#nav .menus_items .menus_item:hover > .site-page,
+#nav .menus_items .menus_item > .site-page:hover {
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nav .menus_items .menus_item > .site-page {
+    transition: none;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #nav .menus_items {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+}
+
+/* 中控台打开时，顶部导航统一为矩形容器 */
+#page-header.console-open #nav #blog_name,
+#page-header.console-open #nav #nav-right,
+#page-header.console-open #nav #menus > .menus_items,
+#page-header.console-open #nav #page-name,
+#page-header.console-open #nav #page-name-text {
+  border-radius: var(--candy-radius);
+}
+
+/* 当前页面标题使用单独的橙色选中块，确保文字可读 */
+#page-header.console-open #nav #page-name {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+#page-header.console-open #nav #page-name::before {
+  display: none;
+  opacity: 0;
+  background: transparent;
+}
+
+#page-header.console-open #nav #page-name-text {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 16px;
+  background: var(--efu-theme);
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: none;
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#page-header.console-open #nav #page-name-text:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  box-shadow: none;
+}
+
+/* 页面标题按钮最终可见性：防止导航状态覆盖文字 */
+#page-header.console-open #nav #page-name-text,
+#page-header.console-open #nav #page-name-text:hover,
+#page-header.console-open #nav #page-name-text:focus-visible {
+  position: relative;
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  text-shadow: none;
+}
+
+#page-header.console-open #nav #page-name-text::first-letter {
+  color: inherit;
+}
+
+/* 明暗模式分别校准顶部矩形容器 */
+[data-theme="light"] #page-header.console-open #nav #blog_name,
+[data-theme="light"] #page-header.console-open #nav #nav-right,
+[data-theme="light"] #page-header.console-open #nav #menus > .menus_items {
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="dark"] #page-header.console-open #nav #blog_name,
+[data-theme="dark"] #page-header.console-open #nav #nav-right,
+[data-theme="dark"] #page-header.console-open #nav #menus > .menus_items {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  color: var(--efu-fontcolor);
+}
+
+/* ---------- 分类栏按钮：单层状态 ---------- */
+#category-bar .category-bar-item a {
+  min-height: 40px;
+  padding: 8px 17px;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: none;
+  color: var(--efu-fontcolor);
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+#category-bar .category-bar-item a:hover {
+  background: var(--candy-nav-hover-surface, var(--efu-main-op-light));
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+#category-bar .category-bar-item.select a,
+#category-bar .category-bar-item.select a:hover {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: none;
+  transform: none;
+}
+
+#category-bar .category-bar-item a:focus-visible,
+#category-bar .category-bar-next:focus-visible,
+#category-bar .category-bar-more:focus-visible {
+  outline: 2px solid var(--efu-theme);
+  outline-offset: 2px;
+}
+
+#category-bar .category-bar-item.select a::after,
+#category-bar .category-bar-item:not(.select) a::after {
+  display: none;
+}
+
+/* 选中分类项：直接指定文字色，避免 tags-punctuation 自身颜色覆盖 */
+#category-bar .category-bar-item.select a,
+#category-bar .category-bar-item.select a span,
+#category-bar .category-bar-item.select a i,
+#category-bar .category-bar-item.select a .tags-punctuation,
+#category-bar .category-bar-item.select a .tagsPageCount,
+#page .category-lists .tag-cloud-list a:hover,
+#page .category-lists .tag-cloud-list a:focus-visible,
+#page .category-lists .tag-cloud-list a:hover .tags-punctuation,
+#page .category-lists .tag-cloud-list a:focus-visible .tags-punctuation,
+#tag #tag-page-tags a.select,
+#tag #tag-page-tags a.select .tags-punctuation {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+}
+
+/* 橙色高亮容器内的 # 图标不能再做橙色点缀，必须跟随文字色，
+   否则与容器底色同色而隐形（文章顶部 meta、文章底部标签 hover、分类/标签选中态） */
+#post-info .tags-punctuation i,
+.post #post-info .post-meta__tags .tags-punctuation i,
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:hover .tags-punctuation i,
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:focus-visible .tags-punctuation i,
+#category-bar .category-bar-item.select a .tags-punctuation i,
+#page .category-lists .tag-cloud-list a:hover .tags-punctuation i,
+#page .category-lists .tag-cloud-list a:focus-visible .tags-punctuation i,
+#tag #tag-page-tags a.select .tags-punctuation i {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor;
+}
+
+#category-bar .category-bar-item.select a .tagsPageCount,
+#tag #tag-page-tags a.select .tagsPageCount {
+  background: var(--efu-card-bg);
+  color: var(--efu-theme) !important;
+}
+
+#page .category-lists .tag-cloud-list a:hover .tagsPageCount,
+#page .category-lists .tag-cloud-list a:focus-visible .tagsPageCount {
+  background: var(--efu-card-bg);
+  color: var(--efu-theme) !important;
+}
+
+@media screen and (max-width: 768px) {
+  #category-bar .category-bar-item a {
+    min-height: 40px;
+    padding: 8px 17px;
+    border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+    border-radius: var(--candy-radius);
+    box-shadow: none;
+  }
+
+  #category-bar .category-bar-item.select a,
+  #category-bar .category-bar-item.select a:hover {
+    border-color: var(--efu-theme);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #category-bar .category-bar-item a {
+    transition: none;
+  }
+}
+
+/* ---------- 全局按钮：单一高亮层 ---------- */
+.article-container a.solitude-tag.tag-button {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+}
+
+.article-container a.solitude-tag.tag-button:hover,
+.article-container a.solitude-tag.tag-button:is(.blue, .pink, .red, .purple, .orange, .green):not(.outline):hover,
+.article-container a.solitude-tag.tag-button.outline:hover {
+  border-color: var(--efu-theme);
+  border-radius: var(--candy-radius);
+  background: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  filter: none;
+  transform: translateY(-1px);
+}
+
+.article-container a.solitude-tag.tag-button:hover::before {
+  opacity: 0;
+}
+
+.article-container a.solitude-tag.tag-button:active {
+  border-radius: var(--candy-radius);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+/* 侧栏控制组只保留容器边界，按钮自身负责状态 */
+#rightside .rs_show,
+#rightside .rs_hide {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+}
+
+#rightside button:hover,
+#rightside button:focus-visible {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: none;
+}
+
+/* 深色下取消过亮的通用焦点光圈，仅保留主题色轮廓 */
+[data-theme="dark"] :focus-visible {
+  outline-color: var(--efu-theme);
+}
+
+/* ---------- 浅色中控台 ---------- */
+[data-theme="light"] #console .console-card {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  color: var(--efu-fontcolor);
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius-lg);
+  box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #console .console-card.history {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+[data-theme="light"] #console .console-card.tags .card-tag-cloud a,
+[data-theme="light"] #console .console-card.history .card-archive-list a {
+  color: var(--efu-fontcolor);
+  background: var(--efu-card-bg);
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: none;
+}
+
+[data-theme="light"] #console .console-card.tags .card-tag-cloud a:hover,
+[data-theme="light"] #console .console-card.history .card-archive-list a:hover {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #console .button-group .console-btn-item :is(span, button) {
+  color: var(--efu-fontcolor);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #console .button-group .console-btn-item.on :is(span, button),
+[data-theme="light"] #console .button-group .console-btn-item:hover :is(span, button),
+[data-theme="light"] #console .button-group .console-btn-item :is(span, button):focus-visible {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #console .console-mask {
+  background: var(--efu-maskbg);
+}
+
+[data-theme="light"] #console .author-content-item-tips,
+[data-theme="light"] #console .author-content-item-title,
+[data-theme="light"] #console .recent-comment-more,
+[data-theme="light"] #console .aside-list,
+[data-theme="light"] #console .console-card {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #console .console-card-group-left,
+[data-theme="light"] #console .console-card-group-right {
+  color: var(--efu-fontcolor);
+}
+
+/* ---------- Hugo 代码块：单一外框 ---------- */
+.code-block {
+  border: 0;
+  border-radius: var(--candy-radius);
+  background: var(--code-block-bg);
+  box-shadow: var(--candy-code-shadow);
+}
+
+.code-block__viewport,
+.code-block__fallback,
+.code-block pre,
+.code-block .shiki {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.code-block__viewport,
+.code-block__fallback,
+.code-block .shiki {
+  background: var(--code-block-bg) !important;
+}
+
+.code-block__toolbar {
+  border: 0;
+}
+
+.code-block__copy {
+  border: 0;
+  border-radius: 0 var(--candy-radius) 0 var(--candy-radius);
+  background: var(--code-block-bg);
+}
+
+.code-block__copy:hover,
+.code-block__copy:focus-visible {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  opacity: 1;
+}
+
+.code-block__copy:focus-visible,
+.code-block__expand:focus-visible,
+.code-block :is(pre, code):focus-visible {
+  outline: 2px solid var(--efu-theme);
+  outline-offset: -3px;
+}
+
+[data-theme="dark"] .code-block {
+  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--candy-code-shadow-color, #0F0A06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-block__copy {
+    transition: none;
+  }
+}
+
+/* ---------- 浅色音乐胶囊 ---------- */
+[data-theme="light"] #nav-music .aplayer {
+  color: var(--efu-fontcolor);
+  background: var(--efu-card-bg);
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 3px 3px 0 var(--candy-nav-border, var(--efu-card-border));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="light"] #nav-music .aplayer .aplayer-title,
+[data-theme="light"] #nav-music .aplayer .aplayer-author,
+[data-theme="light"] #nav-music .aplayer .aplayer-time,
+[data-theme="light"] #nav-music .aplayer .aplayer-lrc p,
+[data-theme="light"] #nav-music .aplayer .aplayer-lrc p.aplayer-lrc-current {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #nav-music .aplayer .aplayer-pic {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: none;
+}
+
+[data-theme="light"] #nav-music:not(.playing):hover .aplayer {
+  color: var(--efu-fontcolor);
+  background: var(--efu-card-bg);
+  border-color: var(--efu-theme);
+}
+
+[data-theme="light"] #nav-music:not(.playing):hover .aplayer .aplayer-info,
+[data-theme="light"] #nav-music:not(.playing):hover .aplayer .aplayer-title,
+[data-theme="light"] #nav-music:not(.playing):hover .aplayer .aplayer-author {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #nav-music.playing .aplayer {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 3px 3px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-info,
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-title,
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-author,
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-time,
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-lrc p,
+[data-theme="light"] #nav-music.playing .aplayer .aplayer-lrc p.aplayer-lrc-current {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+/* ---------- 右下角控制组：容器无边框，按钮独立成组 ---------- */
+#rightside .rs_show,
+#rightside .rs_hide {
+  padding: 3px;
+  gap: 6px;
+  border: 0;
+  border-radius: var(--candy-radius-lg);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#rightside button {
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+}
+
+#rightside button:hover,
+#rightside button:focus-visible {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+#rightside button:active {
+  box-shadow: none;
+  transform: translate(2px, 2px) scale(0.96);
+}
+
+[data-theme="dark"] #rightside button {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+}
+
+@media screen and (max-width: 768px) {
+  #rightside .rs_show,
+  #rightside .rs_hide {
+    gap: 4px;
+  }
+}
+
+/* ---------- 文章页标签可读性统一 ---------- */
+/* 顶部 meta 标签位于 #post-info 的主题橙底上，上游用近白文字 + 0.8 透明度，
+   对比度偏低；统一为深可可文字并取消透明度衰减。 */
+.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags {
+  color: var(--candy-nav-active-text, #241A12);
+  opacity: 1;
+}
+
+.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:hover,
+.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:focus-visible {
+  background: color-mix(in srgb, var(--candy-nav-active-text, #241A12) 16%, transparent);
+  color: var(--candy-nav-active-text, #241A12);
+  opacity: 1;
+}
+
+/* 文章底部标签 hover：上游为橙底 + 奶油白字（对比度约 1.6:1），
+   统一为糖果屋规范「橙底 + 深可可字」，并锁定文字与图标填充色。
+   tagsPageCount 徽标保持上游「深底浅字」，在橙容器内自带反差。 */
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:hover,
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:focus-visible {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+  box-shadow: none;
+}
+
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:hover .tags-punctuation,
+#post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:focus-visible .tags-punctuation {
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: currentColor;
+}

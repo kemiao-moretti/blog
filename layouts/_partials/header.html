@@ -14,7 +14,7 @@
             </div>
           </div>
         {{ end }}
-        <a id="site-name" href="{{ site.Home.RelPermalink }}" title="{{ i18n "backHome" }}" heotip="{{ i18n "backHome" }}">
+        <a id="site-name" href="{{ site.Home.RelPermalink }}" aria-label="{{ i18n "backHome" }}" heotip="{{ i18n "backHome" }}">
           {{ if eq $cfg.site.name.class "img" }}<img src="{{ $cfg.site.name.custom | relURL }}" alt="{{ site.Title }}">{{ else if eq $cfg.site.name.class "i_class" }}<i class="solitude {{ $cfg.site.name.custom }}"></i>{{ else }}<span class="title">{{ $cfg.site.name.custom }}</span>{{ end }}
           <i class="solitude fas fa-home"></i>
         </a>

@@ -1,0 +1,209 @@
+/* ============================================================
+   candy-tokens.css · 糖果屋魔改设计令牌层
+   覆盖 Solitude 上游 tokens，不修改上游文件。
+   全部取值走 var(--solitude-*, 兜底值) 模式：
+   hugo.yaml 的 params.vars 是外部覆盖通道（注入 --solitude-* 变量），
+   未配置时启用这里的内置糖果兜底值。
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* 几何令牌 */
+  --candy-border-width: var(--solitude-candy-border-width, 2px);
+  --candy-shadow-offset: var(--solitude-candy-shadow-offset, 4px);
+  --candy-radius: var(--solitude-candy-radius, 6px);
+  --candy-radius-sm: calc(var(--candy-radius) - 2px);
+  --candy-radius-lg: calc(var(--candy-radius) + 4px);
+  --candy-code-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--candy-nav-border, var(--efu-card-border));
+  --candy-code-surface: var(--solitude-candy-code-surface, #202327);
+
+  /* 覆盖上游圆角 */
+  --radius: var(--candy-radius);
+  --efu-radius-sm: var(--candy-radius-sm);
+  --efu-radius-md: var(--candy-radius);
+  --efu-radius-lg: var(--candy-radius-lg);
+
+  /* 卡片阴影 → 糖果硬阴影（值随主题色区切换） */
+  --card-box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--efu-card-border);
+  --card-hover-box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0 var(--efu-theme);
+}
+
+/* ============ 亮色 · 奶油纸 ============ */
+[data-theme=light] {
+  color-scheme: light;
+
+  /* 主色与派生 */
+  --efu-theme: var(--solitude-theme-light, #FFA000);
+  --efu-theme-op: color-mix(in srgb, var(--efu-theme) 14%, transparent);
+  --efu-theme-op-deep: color-mix(in srgb, var(--efu-theme) 87%, transparent);
+  --efu-theme-op-light: color-mix(in srgb, var(--efu-theme) 6%, transparent);
+  --efu-theme-none: color-mix(in srgb, var(--efu-theme) 0%, transparent);
+  --efu-nav-hover-text: var(--solitude-nav-hover-light, #241A12);
+
+  /* 语义色（糖果系） */
+  --efu-blue: #5AC8FA;
+  --efu-red: #FF6B6B;
+  --efu-pink: #FF6FA5;
+  --efu-green: #7ED957;
+  --efu-yellow: #C28B00;
+  --efu-orange: #FF7A00;
+  --efu-purple: #9B7BE8;
+  --efu-cyan: #00BCD4;
+  --efu-vip: #C28B00;
+  --efu-speed: #7ED957;
+  --efu-gray: #8A7A66;
+
+  /* 文字与背景 */
+  --efu-fontcolor: var(--solitude-candy-ink, #1F1B16);
+  --efu-secondtext: color-mix(in srgb, var(--efu-fontcolor) 72%, transparent);
+  --efu-card-bg: var(--solitude-candy-card, #FFFDF7);
+  --efu-secondbg: #FFF0CF;
+  --efu-card-btn-bg: #FFE0A3;
+  --efu-background: var(--solitude-candy-bg, #FFF6E5);
+  --efu-ahoverbg: #FFF0CF;
+  --efu-reverse: #1F1B16;
+  --efu-hovertext: var(--efu-theme);
+  --efu-lighttext: var(--efu-theme);
+  --efu-scrollbar: rgba(31, 27, 22, 0.4);
+  --efu-hl-bg: #FFFFFF;
+  --efu-hltools-bg: #FFE8C2;
+  --efu-maskbg: rgba(26, 22, 14, 0.55);
+  --efu-maskbgdeep: rgba(26, 22, 14, 0.83);
+  --efu-post-blockquote-bg: #FFF1D6;
+  --efu-post-tabs-bg: #FFF3E0;
+  --efu-navbg: var(--efu-theme-op);
+
+  /* 边框 → 糖果粗描边 */
+  --efu-card-border: var(--solitude-candy-ink, #1F1B16);
+  --efu-border-strong: color-mix(in srgb, var(--efu-card-border) 85%, transparent);
+  --style-border: var(--candy-border-width) solid var(--efu-card-border);
+  --style-border-always: var(--candy-border-width) solid var(--efu-card-border);
+  --style-border-hover: var(--candy-border-width) solid var(--efu-theme);
+  --style-border-hover-always: var(--candy-border-width) solid var(--efu-theme);
+  --style-border-dashed: var(--candy-border-width) dashed var(--efu-theme-op-deep);
+  --style-border-forever: var(--candy-border-width) solid var(--efu-theme);
+
+  /* 阴影 → 糖果硬阴影 */
+  --efu-shadow-border: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 color-mix(in srgb, var(--efu-card-border) 90%, transparent);
+  --efu-shadow-main: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--efu-theme);
+  --efu-shadow-black: 2px 2px 0 rgba(31, 27, 22, 0.12);
+  --efu-shadow-blackdeep: 2px 2px 0 rgba(31, 27, 22, 0.15);
+  --efu-shadow-lightblack: 3px 3px 0 rgba(31, 27, 22, 0.08);
+  --efu-shadow-light2black: 2px 2px 0 rgba(31, 27, 22, 0.06);
+  --efu-shadow-nav: 2px 2px 0 rgba(31, 27, 22, 0.10);
+  --efu-shadow-blue: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 rgba(90, 200, 250, 0.6);
+  --efu-shadow-white: 2px 2px 0 rgba(255, 255, 255, 0.4);
+  --efu-shadow-yellow: 4px 4px 0 rgba(255, 201, 62, 0.35);
+  --efu-shadow-red: 4px 4px 0 rgba(255, 107, 107, 0.35);
+  --efu-shadow-green: 4px 4px 0 rgba(126, 217, 87, 0.35);
+  --efu-shadow-glass: 0 24px 60px -24px rgba(139, 94, 25, 0.25);
+  --efu-shadow-glass-inset: 0 1px 2px rgba(255, 255, 255, 0.7) inset;
+  --efu-shadow-theme: 3px 3px 0 var(--efu-theme-op-deep);
+
+  /* 画布基色 */
+  --efu-white: #FFFDF7;
+  --efu-white-op: rgba(255, 253, 247, 0.25);
+  --efu-black: #1F1B16;
+  --efu-black-op: rgba(31, 27, 22, 0.2);
+  --efu-card-bg-op: rgba(31, 27, 22, 0.15);
+  --efu-card-bg-none: rgba(255, 253, 247, 0);
+  --efu-logo-color: linear-gradient(215deg, #FF7A00 0%, #FFA000 55%, #FF6FA5 100%);
+}
+
+/* ============ 暗色 · 深可可 ============ */
+[data-theme=dark] {
+  color-scheme: dark;
+
+  /* 主色与派生 */
+  --efu-theme: var(--solitude-theme-dark, #FFB84D);
+  --efu-theme-op: color-mix(in srgb, var(--efu-theme) 14%, transparent);
+  --efu-theme-op-deep: color-mix(in srgb, var(--efu-theme) 87%, transparent);
+  --efu-theme-op-light: color-mix(in srgb, var(--efu-theme) 6%, transparent);
+  --efu-theme-none: color-mix(in srgb, var(--efu-theme) 0%, transparent);
+  --efu-nav-hover-text: var(--solitude-nav-hover-dark, #241A12);
+
+  /* 语义色（暗色糖果） */
+  --efu-blue: #5AC8FA;
+  --efu-red: #FF6B6B;
+  --efu-pink: #FF6FA5;
+  --efu-green: #7ED957;
+  --efu-yellow: #FFC93E;
+  --efu-orange: #FF9F1C;
+  --efu-purple: #A78BFA;
+  --efu-cyan: #00BCD4;
+  --efu-vip: #FFC93E;
+  --efu-speed: #7ED957;
+  --efu-gray: #B8A690;
+
+  /* 文字与背景 */
+  --efu-fontcolor: #F5EDE0;
+  --efu-secondtext: rgba(245, 237, 224, 0.66);
+  --efu-card-bg: #33261B;
+  --efu-secondbg: #2E2117;
+  --efu-secondbg-bg: #271C13;
+  --efu-card-btn-bg: #4E3A26;
+  --efu-background: var(--solitude-candy-bg-dark, #241A12);
+  --efu-ahoverbg: #3A2C1E;
+  --efu-reverse: #241A12;
+  --efu-hovertext: var(--efu-theme);
+  --efu-lighttext: var(--efu-theme);
+  --efu-scrollbar: rgba(232, 216, 192, 0.4);
+  --efu-hl-bg: #2A1F15;
+  --efu-hltools-bg: #42331F;
+  --efu-maskbg: rgba(0, 0, 0, 0.6);
+  --efu-maskbgdeep: rgba(0, 0, 0, 0.85);
+  --efu-post-blockquote-bg: #1D1410;
+  --efu-post-tabs-bg: #121212;
+  --efu-navbg: var(--efu-theme-op);
+
+  /* 边框 → 奶油描边 */
+  --efu-card-border: #927A62;
+  --efu-border-strong: color-mix(in srgb, var(--efu-card-border) 72%, transparent);
+  --candy-nav-border: #765F4A;
+  --candy-nav-surface: #33261B;
+  --candy-nav-hover-surface: #4A3727;
+  --candy-nav-active-text: #241A12;
+  --style-border: var(--candy-border-width) solid var(--efu-card-border);
+  --style-border-always: var(--candy-border-width) solid var(--efu-card-border);
+  --style-border-hover: var(--candy-border-width) solid var(--efu-theme);
+  --style-border-hover-always: var(--candy-border-width) solid var(--efu-theme);
+  --style-border-dashed: var(--candy-border-width) dashed var(--efu-theme-op-deep);
+  --style-border-forever: var(--candy-border-width) solid var(--efu-theme);
+
+  /* 阴影 → 深色硬阴影 */
+  --card-box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 #0F0A06;
+  --card-hover-box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0 rgba(255, 184, 77, 0.8);
+  --efu-shadow-border: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 rgba(0, 0, 0, 0.55);
+  --efu-shadow-main: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--efu-theme);
+  --efu-shadow-black: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  --efu-shadow-blackdeep: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  --efu-shadow-lightblack: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --efu-shadow-light2black: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  --efu-shadow-nav: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  --efu-shadow-blue: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 rgba(90, 200, 250, 0.35);
+  --efu-shadow-white: 2px 2px 0 rgba(255, 255, 255, 0.08);
+  --efu-shadow-yellow: 4px 4px 0 rgba(255, 201, 62, 0.25);
+  --efu-shadow-red: 4px 4px 0 rgba(255, 107, 107, 0.25);
+  --efu-shadow-green: 4px 4px 0 rgba(126, 217, 87, 0.25);
+  --efu-shadow-glass: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  --efu-shadow-glass-inset: rgba(255, 255, 255, 0.05) 1px 1px 0 inset, rgba(0, 0, 0, 0.4) 2px 2px 4px inset;
+  --efu-shadow-theme: 3px 3px 0 rgba(255, 184, 77, 0.35);
+
+  /* 画布基色 */
+  --efu-white: #F5EDE0;
+  --efu-white-op: rgba(245, 237, 224, 0.25);
+  --efu-black: #0F0A06;
+  --efu-black-op: rgba(0, 0, 0, 0.45);
+  --efu-card-bg-op: rgba(245, 237, 224, 0.12);
+  --efu-card-bg-none: rgba(51, 38, 27, 0);
+  --efu-logo-color: linear-gradient(215deg, #FF9F1C 0%, #FFB84D 55%, #FF6FA5 100%);
+}
+
+/* 移动端保留糖果粗描边（上游 tokens 在 ≤768px 会抹掉边框） */
+@media screen and (max-width: 768px) {
+  :root {
+    --style-border: var(--candy-border-width) solid var(--efu-card-border);
+    --style-border-hover: var(--candy-border-width) solid var(--efu-theme);
+  }
+}

@@ -1,4 +1,5 @@
 {{ $cfg := site.Params.solitude }}
+{{ $candy := $cfg.candy | default dict }}
 {{ $targets := slice "chrome115" "edge115" "firefox116" "ios16.4" "opera101" "safari16.4" }}
 {{ $vars := dict
   "solitude-theme-light" $cfg.theme_color.light
@@ -9,6 +10,13 @@
   "solitude-code-font-size" $cfg.font.code_font_size
   "solitude-font-family" (css.Unquoted $cfg.font.font_family)
   "solitude-code-font-family" (css.Unquoted $cfg.font.code_font_family)
+  "solitude-candy-bg" ($candy.bg | default "#FFF6E5")
+  "solitude-candy-bg-dark" ($candy.bg_dark | default "#241A12")
+  "solitude-candy-card" ($candy.card | default "#FFFDF7")
+  "solitude-candy-ink" ($candy.ink | default "#1F1B16")
+  "solitude-candy-radius" ($candy.radius | default "6px")
+  "solitude-candy-border-width" ($candy.border_width | default "2px")
+  "solitude-candy-shadow-offset" ($candy.shadow_offset | default "4px")
 }}
 {{ $options := dict
   "externals" (slice "/img/*")
