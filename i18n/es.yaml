@@ -154,3 +154,7 @@ fcircleStatsArticles: {other: Artículos}
 fcircleStatsUpdated: {other: Actualizado}
 fcircleByAuthor: {other: "Artículos de "}
 fcircleCredit: {other: "Los datos provienen de los círculos de amigos, impulsado por Hexo Circle of Friends."}
+
+# Tablón de mensajes
+messageOpen: {other: Mostrar comentarios}
+messageClose: {other: Ocultar comentarios}

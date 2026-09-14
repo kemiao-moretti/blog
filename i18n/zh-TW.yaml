@@ -154,3 +154,7 @@ fcircleStatsArticles: {other: 文章}
 fcircleStatsUpdated: {other: 更新於}
 fcircleByAuthor: {other: 的文章}
 fcircleCredit: {other: 資料來自好友的朋友圈，由 Hexo Circle of Friends 驅動。}
+
+# 留言板（message）
+messageOpen: {other: 顯示彈幕}
+messageClose: {other: 隱藏彈幕}

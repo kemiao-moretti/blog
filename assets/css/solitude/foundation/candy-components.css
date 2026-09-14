@@ -233,6 +233,8 @@ code:not(.code-block code) {
   border: 1px solid var(--candy-nav-border, var(--efu-card-border));
   border-radius: var(--candy-radius-lg);
   background: var(--candy-nav-surface, var(--efu-card-bg));
+  color: var(--efu-fontcolor);
+  -webkit-text-fill-color: var(--efu-fontcolor);
   box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -244,7 +246,8 @@ code:not(.code-block code) {
 
 #nav .back-home-button .back-menu-list-group .back-menu-list-title {
   margin: 5px 8px 7px;
-  color: var(--efu-secondtext);
+  color: var(--efu-fontcolor);
+  -webkit-text-fill-color: var(--efu-fontcolor);
   font-size: 11px;
   font-weight: 600;
 }
@@ -257,28 +260,54 @@ code:not(.code-block code) {
   border: 1px solid transparent;
   border-radius: var(--candy-radius-sm);
   color: var(--efu-fontcolor);
-  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
+/* 子级导航项的选中态必须自己接管 box-shadow。
+   navigation.css 的 `.page #nav a:hover { box-shadow: var(--efu-shadow-main) }`
+   对面板内这个 <a> 同样生效，而糖果层把 --efu-shadow-main 重映射成了
+   `4px 4px 0 var(--efu-theme)` —— 橙色硬阴影落在同色橙底上完全隐形，只剩
+   圆角外侧露出两片同色方块，观感就是「橙块叠橙块」。糖果层其余所有橙底规则
+   都显式接管了阴影，仅此处漏掉。按下拉子项（.menus_item_child li a:hover）的
+   选中效果统一改挂描边色硬阴影，明暗两套主题一致。 */
 #nav .back-home-button .back-menu-list .back-menu-item:hover,
 #nav .back-home-button .back-menu-list .back-menu-item:focus-visible {
-  border-color: var(--efu-theme);
+  border-color: transparent;
   background: var(--efu-theme);
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
-  transform: translateX(2px);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  transform: none;
 }
 
+/* 子级导航项图标：站内 logo.png 是「白底方形 + 居中圆形徽标」的素材，
+   原样贴到深可可面板上会是一块扎眼的白方块。这里统一裁成圆形徽章并加一圈
+   描边，让白色变成刻意的贴纸底而不是漏出的素材底 —— 明暗两套主题一致。 */
 #nav .back-home-button .back-menu-list .back-menu-item-icon {
   width: 24px;
   height: 24px;
-  border-radius: var(--candy-radius-sm);
+  flex: 0 0 24px;
+  border-radius: 50%;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  background: var(--efu-white);
+  box-shadow: 1px 1px 0 color-mix(in srgb, var(--candy-nav-border, var(--efu-card-border)) 55%, transparent);
   object-fit: cover;
+  object-position: center;
 }
 
+[data-theme="dark"] #nav .back-home-button .back-menu-list .back-menu-item-icon {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  filter: brightness(0.86) saturate(1.02);
+  opacity: 0.86;
+}
+
+/* 暗色面板的「浮起感」不能靠黑色硬阴影 —— 页面底色 #241A12 已经比它更暗，
+   4px 4px 0 #0F0A06 在屏幕上等于不存在，面板会退化成一个没有边界的暗块。
+   按糖果层既有的做法改挂 --candy-nav-border 暖棕阴影（与 --candy-code-shadow 同源），
+   这样暗色下也能看到和亮色同一套「粗描边 + 硬偏移」的卡面。 */
 [data-theme="dark"] #nav .back-home-button .back-menu-list-groups {
   border-color: var(--candy-nav-border, var(--efu-card-border));
   background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 4px 4px 0 #0F0A06;
+  box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
 /* 次级导航保持一行两个项目 */
@@ -298,6 +327,8 @@ code:not(.code-block code) {
 
 #nav .back-home-button .back-menu-list .back-menu-item-text {
   min-width: 0;
+  color: var(--efu-fontcolor);
+  -webkit-text-fill-color: var(--efu-fontcolor);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -310,7 +341,7 @@ code:not(.code-block code) {
 [data-theme="dark"] #page-header.console-open #nav .menus_items {
   background: var(--candy-nav-surface, var(--efu-card-bg));
   border-color: var(--candy-nav-border, var(--efu-card-border));
-  box-shadow: 2px 2px 0 #0F0A06;
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
 [data-theme="dark"] #page-header.console-open #nav #site-name,
@@ -369,10 +400,32 @@ code:not(.code-block code) {
   border: 1px solid var(--candy-nav-border, var(--efu-card-border));
 }
 
-[data-theme="light"] #page-header.nav-fixed #nav #page-name::before,
-[data-theme="light"] #page-header.nav-fixed #nav #nav-right::before {
+/* 固定导航三块面板（品牌 / 页面标题 / 右侧控制组）必须同底色。
+   上游给 #blog_name、#nav-right、#page-name 各铺了一层
+   linear-gradient(maskbg → maskbgdeep) 的深色玻璃：深色主题下它是
+   0.6→0.85 的近黑遮罩，于是同一排出现「暖棕 #blog_name + 近黑 #nav-right /
+   #page-name」两种面，右侧那两块看起来像独立黑块。
+   糖果层已把 #blog_name 的渐变换成平坦的 --candy-nav-surface，这里把剩下两个
+   伪元素一并掐掉，并补上 #page-name 缺失的实底色 —— 亮色下 #page-name 本来就有
+   --efu-card-bg，深色下却只靠这层渐变撑底，属于同一个坑。 */
+#page-header.nav-fixed #nav #nav-right::before,
+#page-header.nav-fixed #nav #page-name::before {
   opacity: 0;
   background: transparent;
+}
+
+#page-header.nav-fixed #nav #page-name {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
 [data-theme="light"] #page-header.nav-fixed #nav #site-name,
@@ -541,7 +594,7 @@ code:not(.code-block code) {
 [data-theme="dark"] #page-header.nav-fixed #nav #nav-right {
   border-color: var(--candy-nav-border, var(--efu-card-border));
   background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 2px 2px 0 #0F0A06;
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
 /* 深色下只需补边框色：底色/文字色已由上面的 token 规则自动对调 */
@@ -575,7 +628,11 @@ code:not(.code-block code) {
   transform: scale(1.04);
 }
 
-/* 全局选中态与主题橙色背景统一使用深可可文字 */
+/* 全局选中态与主题橙色背景统一使用深可可文字。
+   注意「橙底」是本组的前提：下面每一项的 hover/选中背景都必须是 --efu-theme 或等效暖橙。
+   顶部父级菜单项（pages 菜单的 .menus_item > .site-page）不在此列 —— 它在页面顶部
+   （#page-header.nav-at-top:not(.not-top-img)）的 hover 背景是 transparent、文字必须是
+   上游的 --efu-white；在固定导航下才是橙底深字。它由下面的 nav-at-top / nav-fixed 分状态规则接管。 */
 #category-bar .category-bar-item.select a,
 #tag #tag-page-tags a.select,
 #page .category-lists .tag-cloud-list a:hover,
@@ -583,7 +640,6 @@ code:not(.code-block code) {
 #console .button-group .console-btn-item.on :is(span, button),
 #console .button-group .console-btn-item:hover :is(span, button),
 #console .button-group .console-btn-item :is(span, button):focus-visible,
-#nav .menus_items .menus_item:hover > .site-page,
 #nav .menus_items .menus_item .menus_item_child li a:hover,
 #nav .back-home-button .back-menu-list .back-menu-item:hover,
 #nav .back-home-button .back-menu-list .back-menu-item:focus-visible,
@@ -606,36 +662,87 @@ code:not(.code-block code) {
   -webkit-text-fill-color: inherit;
 }
 
-/* 固定导航最终矩形规则：覆盖上游胶囊半径 */
-#page-header.nav-fixed #nav #blog_name,
-#page-header.nav-fixed #nav #blog_name .back-home-button,
-#page-header.nav-fixed #nav #site-name,
-#page-header.nav-fixed #nav #menus > .menus_items,
-#page-header.nav-fixed #nav #menus > .menus_items > .menus_item > .site-page,
-#page-header.nav-fixed #nav #nav-right,
-#page-header.nav-fixed #nav #nav-right .nav-button,
-#page-header.nav-fixed #nav #nav-right .nav-button > a,
-#page-header.nav-fixed #nav #toggle-menu,
-#page-header.nav-fixed #nav #toggle-menu > a,
-#page-header.nav-fixed #nav #page-name,
-#page-header.nav-fixed #nav #page-name-text {
+/* 顶部容器最终矩形规则：覆盖上游胶囊半径。
+   刻意限定「所有状态」而非 .nav-fixed —— 回顶时该 class 会被摘掉，上游的 99px
+   胶囊半径立刻回弹，而此时 #nav-right::before 的深色底还在 0.3s 淡出，
+   两者叠起来就是一颗突兀的深色胶囊。让两种状态都用矩形即可根除。 */
+#page-header #nav #blog_name,
+#page-header #nav #blog_name .back-home-button,
+#page-header #nav #site-name,
+#page-header #nav #menus > .menus_items,
+#page-header #nav #menus > .menus_items > .menus_item > .site-page,
+#page-header #nav #nav-right,
+#page-header #nav #nav-right .nav-button,
+#page-header #nav #nav-right .nav-button > a,
+#page-header #nav #toggle-menu,
+#page-header #nav #toggle-menu > a,
+#page-header #nav #page-name,
+#page-header #nav #page-name-text {
   border-radius: var(--candy-radius) !important;
 }
 
-/* 页面标题在固定导航中的选中态不使用上游深色渐变 */
+/* 回顶瞬间的残影：nav-fixed 摘除后，#nav-right::before 的深色底与 #blog_name 的
+   实体底色仍在按上游 0.3s 淡出，会与「已回到顶部」的干净导航叠出脏块。
+   nav-at-top 状态下直接把过渡掐断，让它们即刻归零。 */
+#page-header.nav-at-top #nav #blog_name,
+#page-header.nav-at-top #nav #nav-right {
+  transition: none;
+}
+
+#page-header.nav-at-top #nav #nav-right::before {
+  opacity: 0;
+  transition: none;
+}
+
+/* 中控台汉堡图标：固定导航下上游 hover 会把三条横线刷成 --efu-card-bg，
+   而固定导航容器的底色正是同一个 --candy-nav-surface（= --efu-card-bg），
+   横线会与容器完全同色而整体消失。这里对齐页面顶部状态的画布浅色，
+   hover / focus / 容器 hover 三种触发路径都保持不变色。 */
+#page-header #nav #nav-right .nav-button .console_switchbutton label i,
+#page-header #nav #nav-right .nav-button:hover .console_switchbutton label i,
+#page-header #nav #nav-right .nav-button .console_switchbutton:hover label i,
+#page-header #nav #nav-right .nav-button .console_switchbutton:focus-visible label i {
+  background: var(--efu-fontcolor);
+}
+
+[data-theme="light"] #page-header #nav #nav-right .nav-button .console_switchbutton label i,
+[data-theme="light"] #page-header #nav #nav-right .nav-button:hover .console_switchbutton label i,
+[data-theme="light"] #page-header #nav #nav-right .nav-button .console_switchbutton:hover label i,
+[data-theme="light"] #page-header #nav #nav-right .nav-button .console_switchbutton:focus-visible label i {
+  background: var(--efu-fontcolor) !important;
+}
+
+[data-theme="dark"] #page-header #nav #nav-right .nav-button .console_switchbutton label i,
+[data-theme="dark"] #page-header #nav #nav-right .nav-button:hover .console_switchbutton label i,
+[data-theme="dark"] #page-header #nav #nav-right .nav-button .console_switchbutton:hover label i,
+[data-theme="dark"] #page-header #nav #nav-right .nav-button .console_switchbutton:focus-visible label i {
+  background: var(--efu-white) !important;
+}
+
+/* 页面标题按钮：#site-name 同款外观 —— 自身不铺底，只作为可点文字。
+   容器底色由 #page-name 提供，这里一旦给 background 就会叠出一个橙色高亮块。
+   hover / focus 只换文字色（暖橙），背景保持透明。 */
 [data-theme="light"] #page-header.nav-fixed #nav #page-name-text,
-[data-theme="light"] #page-header.nav-fixed #nav #page-name-text:hover,
-[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text,
-[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover {
-  background: var(--efu-theme);
-  border-color: var(--candy-nav-border, var(--efu-card-border));
-  color: var(--candy-nav-active-text, #241A12) !important;
-  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--efu-fontcolor) !important;
+  -webkit-text-fill-color: var(--efu-fontcolor);
   box-shadow: none;
 }
 
-/* 深色模式全部橙色导航状态保持清晰字色 */
-[data-theme="dark"] #page-header #nav .menus_items .menus_item:hover > .site-page,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text:hover,
+[data-theme="light"] #page-header.nav-fixed #nav #page-name-text:focus-visible,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover,
+[data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  color: var(--efu-theme) !important;
+  -webkit-text-fill-color: var(--efu-theme);
+  box-shadow: none;
+}
+
+/* 深色模式全部橙色导航状态保持清晰字色（同上：仅限橙底项，父级菜单项按状态分治） */
 [data-theme="dark"] #page-header #nav .menus_items .menus_item .menus_item_child li a:hover,
 [data-theme="dark"] #page-header #nav .back-home-button:hover,
 [data-theme="dark"] #page-header #nav .back-menu-item:hover,
@@ -643,8 +750,19 @@ code:not(.code-block code) {
 [data-theme="dark"] #tag #tag-page-tags a.select,
 [data-theme="dark"] #console .button-group .console-btn-item.on :is(span, button),
 [data-theme="dark"] #console .button-group .console-btn-item:hover :is(span, button) {
-  color: #241A12 !important;
-  -webkit-text-fill-color: #241A12;
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+/* 深色子级导航仍使用橙色高亮，但硬阴影改为深墨色，避免橙底与橙色阴影融成一块。 */
+[data-theme="dark"] #page-header #nav .back-home-button .back-menu-list .back-menu-item:hover,
+[data-theme="dark"] #page-header #nav .back-home-button .back-menu-list .back-menu-item:focus-visible {
+  border-color: transparent;
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, #241A12) !important;
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+  box-shadow: 2px 2px 0 var(--efu-black);
+  transform: none;
 }
 
 [data-theme="dark"] #page-header.console-open #nav .menus_items .menus_item:hover > .site-page,
@@ -776,12 +894,23 @@ code:not(.code-block code) {
   transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
-#category-bar .category-bar-item a:hover {
+#category-bar .category-bar-item a:hover,
+#category-bar .category-bar-more:hover {
   background: var(--candy-nav-hover-surface, var(--efu-main-op-light));
   border-color: var(--candy-nav-border, var(--efu-card-border));
   color: var(--efu-fontcolor);
   box-shadow: none;
   transform: translateY(-1px);
+}
+
+#category-bar .category-bar-more {
+  min-height: 40px;
+  padding: 8px 17px;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  color: var(--efu-fontcolor);
+  box-shadow: none;
 }
 
 #category-bar .category-bar-item.select a,
@@ -919,8 +1048,13 @@ code:not(.code-block code) {
   outline-color: var(--efu-theme);
 }
 
-/* ---------- 浅色中控台 ---------- */
-[data-theme="light"] #console .console-card {
+/* ---------- 中控台：明暗同源 ----------
+   中控台是浮在 .console-mask 上的一块独立面板，内部每张卡片、每个按钮的底色
+   都必须和顶部糖果导航面板同源（--candy-nav-surface：亮色回落 --efu-card-bg 奶油纸，
+   暗色为深可可 #33261B）。这段此前整段挂在 [data-theme="light"] 下，暗色分支为空 ——
+   于是暗色下所有卡片与按钮都回落到上游的 linear-gradient(maskbg → maskbgdeep) 近黑玻璃，
+   同一块面板里混出「近黑卡 + 深棕标签 + 橙按钮」三种面。这里去掉主题前缀统一接管。 */
+#console .console-card {
   background: var(--candy-nav-surface, var(--efu-card-bg));
   color: var(--efu-fontcolor);
   border: 1px solid var(--candy-nav-border, var(--efu-card-border));
@@ -928,29 +1062,39 @@ code:not(.code-block code) {
   box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
-[data-theme="light"] #console .console-card.history {
+[data-theme="dark"] #console .console-card {
+  box-shadow: 4px 4px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+/* 历史卡是标签卡下方的一条容器，自身不成块，只给里面的条目描边 */
+#console .console-card.history {
   background: transparent;
   border: 0;
   box-shadow: none;
 }
 
-[data-theme="light"] #console .console-card.tags .card-tag-cloud a,
-[data-theme="light"] #console .console-card.history .card-archive-list a {
+/* 标签云药丸 / 归档条目：卡片上的贴纸片 —— 与卡片同底，改用糖果描边 */
+#console .console-card.tags .card-tag-cloud a,
+#console .console-card.history .card-archive-list a {
   color: var(--efu-fontcolor);
-  background: var(--efu-card-bg);
-  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
   box-shadow: none;
 }
 
-[data-theme="light"] #console .console-card.tags .card-tag-cloud a:hover,
-[data-theme="light"] #console .console-card.history .card-archive-list a:hover {
+#console .console-card.tags .card-tag-cloud a:hover,
+#console .console-card.history .card-archive-list a:hover {
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
   background: var(--efu-theme);
   border-color: var(--efu-theme);
   box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
-[data-theme="light"] #console .button-group .console-btn-item :is(span, button) {
+/* 底部按钮组：一律糖果面板底 + 硬阴影，"当前项"才是橙底深字。
+   上游另外给暗色下的 .darkmode_switchbutton 单独上了橙色高亮，亮色却保持素底 ——
+   两套主题会各长出一排不一样的按钮，这里把那条暗色特例也收编到同一套底里。 */
+#console .button-group .console-btn-item :is(span, button),
+[data-theme="dark"] #console .button-group .console-btn-item :is(span, button).darkmode_switchbutton {
   color: var(--efu-fontcolor);
   background: var(--candy-nav-surface, var(--efu-card-bg));
   border: 1px solid var(--candy-nav-border, var(--efu-card-border));
@@ -958,29 +1102,31 @@ code:not(.code-block code) {
   box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
-[data-theme="light"] #console .button-group .console-btn-item.on :is(span, button),
-[data-theme="light"] #console .button-group .console-btn-item:hover :is(span, button),
-[data-theme="light"] #console .button-group .console-btn-item :is(span, button):focus-visible {
+#console .button-group .console-btn-item.on :is(span, button),
+#console .button-group .console-btn-item:hover :is(span, button),
+#console .button-group .console-btn-item :is(span, button):focus-visible,
+[data-theme="dark"] #console .button-group .console-btn-item:hover :is(span, button).darkmode_switchbutton,
+[data-theme="dark"] #console .button-group .console-btn-item :is(span, button).darkmode_switchbutton:focus-visible {
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
   background: var(--efu-theme);
   border-color: var(--efu-theme);
   box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
 }
 
+/* 遮罩：两套主题共用同一层「压暗」底（--efu-maskbg）。这里必须带上 [data-theme="light"]
+   前缀才压得住前面 L366 那条浅色奶油纱 —— 中控台是模态层，背景要压暗而不是提亮。 */
+#console .console-mask,
 [data-theme="light"] #console .console-mask {
   background: var(--efu-maskbg);
 }
 
-[data-theme="light"] #console .author-content-item-tips,
-[data-theme="light"] #console .author-content-item-title,
-[data-theme="light"] #console .recent-comment-more,
-[data-theme="light"] #console .aside-list,
-[data-theme="light"] #console .console-card {
-  color: var(--efu-fontcolor);
-}
-
-[data-theme="light"] #console .console-card-group-left,
-[data-theme="light"] #console .console-card-group-right {
+#console .author-content-item-tips,
+#console .author-content-item-title,
+#console .recent-comment-more,
+#console .aside-list,
+#console .console-card,
+#console .console-card-group-left,
+#console .console-card-group-right {
   color: var(--efu-fontcolor);
 }
 
@@ -1091,6 +1237,72 @@ code:not(.code-block code) {
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
 }
 
+/* ---------- 音乐胶囊 → 导航栏同款矩形胶囊 ---------- */
+/* 上游是 40px/60px 圆角胶囊 + 渐变玻璃底。形状无前缀统一接管；
+   背景分主题：亮色走上方既有 light 规则（--efu-card-bg），
+   暗色补 --candy-nav-surface；playing/hover 的品牌色语义保留。 */
+#nav-music,
+#nav-music .music-capsule-hitarea,
+#nav-music #nav-music-hoverTips,
+#nav-music .aplayer,
+#nav-music .aplayer .aplayer-body,
+#nav-music .aplayer .aplayer-pic {
+  border-radius: var(--candy-radius);
+}
+
+[data-theme="dark"] #nav-music .aplayer {
+  color: var(--efu-fontcolor);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: 2px 2px 0 var(--efu-black);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="dark"] #nav-music .aplayer .aplayer-title,
+[data-theme="dark"] #nav-music .aplayer .aplayer-author,
+[data-theme="dark"] #nav-music .aplayer .aplayer-time,
+[data-theme="dark"] #nav-music .aplayer .aplayer-lrc p,
+[data-theme="dark"] #nav-music .aplayer .aplayer-lrc p.aplayer-lrc-current {
+  color: var(--efu-fontcolor);
+}
+
+[data-theme="dark"] #nav-music:not(.playing):hover .aplayer {
+  color: var(--efu-fontcolor);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border-color: var(--efu-theme);
+}
+
+[data-theme="dark"] #nav-music:not(.playing):hover .aplayer .aplayer-info,
+[data-theme="dark"] #nav-music:not(.playing):hover .aplayer .aplayer-title,
+[data-theme="dark"] #nav-music:not(.playing):hover .aplayer .aplayer-author {
+  color: var(--efu-fontcolor);
+}
+
+/* ---------- 上下篇 → 导航栏同款矩形胶囊 ---------- */
+/* 只命中 .pagination-post（文章页上下篇），不碰 :not(.pagination-post) 分页数字。 */
+#post #pagination.pagination-post {
+  border-radius: var(--candy-radius-lg);
+}
+
+#post #pagination .next-post,
+#post #pagination .prev-post,
+#post #pagination .next-post.pull-right,
+#post #pagination .prev-post.pull-left {
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  border-radius: var(--candy-radius);
+}
+
+#post #pagination .next-post a:hover,
+#post #pagination .prev-post a:hover {
+  background: var(--efu-theme);
+}
+
+#post #pagination .next-post a:hover div,
+#post #pagination .prev-post a:hover div {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
 /* ---------- 右下角控制组：容器无边框，按钮独立成组 ---------- */
 #rightside .rs_show,
 #rightside .rs_hide {
@@ -1138,15 +1350,34 @@ code:not(.code-block code) {
 }
 
 /* ---------- 文章页标签可读性统一 ---------- */
-/* 顶部 meta 标签位于 #post-info 的主题橙底上，上游用近白文字 + 0.8 透明度，
-   对比度偏低；统一为深可可文字并取消透明度衰减。 */
-.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags {
+/* #post-info 有两条渲染路径，底色相反，标签文字必须分别适配，不能用一条无差别规则通吃：
+
+   ① 有封面 → post-meta.html 由 header.html 渲染进 #page-header.post-bg，
+      底色是封面取色深底（covercolor），且与明暗模式无关；
+      深可可字会与底色同色而隐形 → 回归上游「--efu-white + 0.8 透明度」。
+
+   ② 无封面 → post-meta.html 由 page.html 渲染进 #post，
+      底色是主题橙（--efu-hovertext = --efu-theme）；
+      上游近白文字对比度偏低 → 统一为深可可字并取消透明度衰减。 */
+.post #page-header.post-bg #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags {
+  color: var(--efu-white);
+  opacity: 0.8;
+}
+
+.post #page-header.post-bg #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:hover,
+.post #page-header.post-bg #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:focus-visible {
+  background: var(--efu-white-op);
+  color: var(--efu-white);
+  opacity: 1;
+}
+
+.post #post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags {
   color: var(--candy-nav-active-text, #241A12);
   opacity: 1;
 }
 
-.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:hover,
-.post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:focus-visible {
+.post #post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:hover,
+.post #post #post-info #post-firstinfo .meta-firstline .tag_share .post-meta__tag-list .post-meta__tags:focus-visible {
   background: color-mix(in srgb, var(--candy-nav-active-text, #241A12) 16%, transparent);
   color: var(--candy-nav-active-text, #241A12);
   opacity: 1;
@@ -1168,4 +1399,88 @@ code:not(.code-block code) {
 #post .post-tools-right .tag_share .post-meta__tag-list .post-meta__tags:focus-visible .tags-punctuation {
   color: var(--candy-nav-active-text, #241A12) !important;
   -webkit-text-fill-color: currentColor;
+}
+
+/* ---------- 留言板弹幕页（message） ----------
+   页面 = 信封弹幕浮层（#barrage，fixed 铺满视口）＋ 两个开关按钮。
+
+   按钮：上游是「--efu-main 橙底 + --efu-card-bg 卡片色字」，亮色下是
+   奶油白字压在橙底上（对比度约 2:1），且与糖果屋其余控件的规范不一致。
+   这里接回「卡面底 + 粗描边 + 2px 硬阴影，hover 橙底深可可字」的糖果控件规范
+   （同 .solitude-tag.tag-button），明暗两套 token 都自洽。
+
+   弹幕条目：DOM 是 .default-style（条目容器，自带圆角与 overflow:hidden）
+   > a（铺满，负责底色）> img + p。弹幕浮在页面之上、背景不可控，
+   所以底色取 --efu-maskbg（亮色深墨 / 暗色近黑）、文字恒为 --efu-white，
+   描边用 --efu-white-op（浅色半透明，两种模式下都在深底上可见），
+   硬阴影取 --efu-card-border（亮色深墨 / 暗色暖棕，落在两种页面底色上都看得见）。
+   与上游「黑玻璃 + 浅字」意图一致，但不写任何字面色值。 */
+.switch_message {
+  flex-wrap: wrap;
+}
+
+.switch_message button {
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.switch_message button:hover,
+.switch_message button:focus-visible {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  transform: translateY(-1px);
+}
+
+.switch_message button:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+#barrage .default-style {
+  border: var(--candy-border-width) solid var(--efu-white-op);
+  border-radius: var(--candy-radius-lg, 10px);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+}
+
+#barrage .default-style a {
+  background-color: var(--efu-maskbg);
+  color: var(--efu-white);
+}
+
+#barrage .default-style a:hover {
+  background-color: var(--efu-maskbgdeep);
+}
+
+/* 弹幕文本字号：上游靠 .default-style 的 font-size 继承，但 #barrage 位于
+   .article-container 内，正文 p 字号规则（18px）会压掉继承值 —— 这里直接钉在 p 上。 */
+#barrage .default-style p {
+  font-size: var(--efu-font-size, 16px);
+}
+
+/* 移动端：按钮与弹幕条整体收窄，长评论不占满整行 */
+@media screen and (max-width: 768px) {
+  .switch_message button {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  #barrage .default-style a {
+    padding: 4px 12px 4px 4px;
+  }
+
+  #barrage .default-style img {
+    height: 24px;
+    width: 24px;
+  }
+
+  #barrage .default-style p {
+    font-size: calc(var(--efu-font-size, 16px) - 2px);
+    max-width: 52vw;
+  }
 }

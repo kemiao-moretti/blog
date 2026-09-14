@@ -560,6 +560,38 @@ const fetchPageComments = async (path: string) =>
     ? fetchArtalkPageComments(path)
     : fetchValinePageComments(path);
 
+// 留言板信封弹幕数据源（对齐 hexo-solitude message 页行为）：
+// - Artalk：全站最新评论（stats/latest_comments，limit 100），hexo artalk.pug 同款；
+// - Valine：当前页评论（hexo valine.pug 同款，LeanCloud 按 url 过滤）。
+const envelopeCacheKey = () =>
+  `${activeProvider()}-hugo-envelope:v${aggregateCacheVersion}:${location.host}:${location.pathname}`;
+
+let envelopeRequest: Promise<NormalizedComment[]> | null = null;
+
+const fetchArtalkEnvelopeComments = () => {
+  if (envelopeRequest) return envelopeRequest;
+  const cached = Solitude.saveToLocal.get<NormalizedComment[]>(envelopeCacheKey());
+  if (cached) {
+    envelopeRequest = Promise.resolve(cached);
+    return envelopeRequest;
+  }
+  envelopeRequest = (async () => {
+    const response = await requestArtalk("stats/latest_comments", {
+      site_name: artalkConfig().site,
+      limit: 100,
+    });
+    const result = await normalizeArtalkRecords((response.data || []) as ArtalkComment[]);
+    if (result.length) {
+      Solitude.saveToLocal.set(envelopeCacheKey(), result, 0.02);
+    }
+    return result;
+  })().catch((error) => {
+    envelopeRequest = null;
+    throw error;
+  });
+  return envelopeRequest;
+};
+
 const setStatus = (container: Element, message: string, state: string) => {
   const status = document.createElement("div");
   status.className = `comment-status is-${state}`;
@@ -879,11 +911,12 @@ const initializeEnvelope = async (comments: NormalizedComment[]) => {
     hover: container.dataset.hover === "true",
     loop: container.dataset.loop === "true",
   });
+  const isArtalk = activeProvider() === "artalk";
   instance.batchSend(
     comments.map((comment) => ({
       content: escapeHtml(`${comment.nick}: ${comment.content}`),
       avatar: comment.avatar,
-      url: comment.url,
+      url: isArtalk ? `${comment.url}#atk-comment-${comment.id}` : comment.url,
     })),
     true
   );
@@ -905,8 +938,22 @@ const initializeValineEffects = async () => {
   }
 };
 
-// Artalk 与 Valine 共用同一套弹幕/信封渲染管线，仅数据源不同。
-const initializeArtalkEffects = initializeValineEffects;
+// Artalk：文章页热评弹幕用当前页评论；留言板信封弹幕用全站最新评论（对齐 hexo artalk.pug）。
+const initializeArtalkEffects = async () => {
+  try {
+    const pageComments = fetchPageComments(location.pathname);
+    const envelopeComments = fetchArtalkEnvelopeComments();
+    await Promise.all([
+      initializePageBarrage(await pageComments),
+      initializeEnvelope(await envelopeComments),
+    ]);
+  } catch {
+    const barrage = document.querySelector(".comment-barrage");
+    if (barrage) barrage.replaceChildren();
+    const envelope = document.getElementById("barrage");
+    if (envelope) envelope.replaceChildren();
+  }
+};
 
 // 文章页 meta 区的评论数与 PV：Valine 由 LeanCloud SDK 自动填充，
 // Artalk 则通过 stats 接口拉取后回填到相同的 DOM 位置。

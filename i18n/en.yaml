@@ -154,3 +154,7 @@ fcircleStatsArticles: {other: Articles}
 fcircleStatsUpdated: {other: Updated}
 fcircleByAuthor: {other: "Articles by "}
 fcircleCredit: {other: "Data comes from friends' circles, powered by Hexo Circle of Friends."}
+
+# Message board
+messageOpen: {other: Show comments}
+messageClose: {other: Hide comments}
