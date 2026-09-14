@@ -158,3 +158,23 @@ fcircleCredit: {other: 数据来自好友的朋友圈，由 Hexo Circle of Frien
 # 留言板（message）
 messageOpen: {other: 显示弹幕}
 messageClose: {other: 隐藏弹幕}
+
+# 相册（gallery）
+galleryBack: {other: 返回相册列表}
+galleryEmpty: {other: 暂无相册，敬请期待}
+galleryEmptyAlbum: {other: 此相册暂无照片或视频}
+galleryPhotoUnit: {other: 张照片}
+galleryMonthFormat: {other: "%s 年 %d 月"}
+galleryUnknownDate: {other: 未标注日期}
+galleryPhoto: {other: 相册照片}
+
+# 侧边栏时钟（clock）
+clockTitle: {other: 时钟}
+clockLoading: {other: 加载中…}
+clockWeek1: {other: 周日}
+clockWeek2: {other: 周一}
+clockWeek3: {other: 周二}
+clockWeek4: {other: 周三}
+clockWeek5: {other: 周四}
+clockWeek6: {other: 周五}
+clockWeek7: {other: 周六}

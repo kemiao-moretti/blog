@@ -158,3 +158,23 @@ fcircleCredit: {other: "Los datos provienen de los círculos de amigos, impulsad
 # Tablón de mensajes
 messageOpen: {other: Mostrar comentarios}
 messageClose: {other: Ocultar comentarios}
+
+# Galería
+galleryBack: {other: Volver a la galería}
+galleryEmpty: {other: Aún no hay álbumes}
+galleryEmptyAlbum: {other: Aún no hay fotos ni vídeos}
+galleryPhotoUnit: {other: fotos}
+galleryMonthFormat: {other: "%s-%d"}
+galleryUnknownDate: {other: Sin fecha}
+galleryPhoto: {other: Foto de galería}
+
+# Reloj lateral
+clockTitle: {other: Reloj}
+clockLoading: {other: Cargando…}
+clockWeek1: {other: Dom}
+clockWeek2: {other: Lun}
+clockWeek3: {other: Mar}
+clockWeek4: {other: Mié}
+clockWeek5: {other: Jue}
+clockWeek6: {other: Vie}
+clockWeek7: {other: Sáb}

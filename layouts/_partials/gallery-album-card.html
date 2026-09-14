@@ -1,0 +1,42 @@
+{{ $page := . }}
+{{ $photos := $page.Params.photos | default slice }}
+{{ $stackPhotos := slice }}
+{{ with $page.Params.cover }}
+  {{ $stackPhotos = $stackPhotos | append . }}
+{{ end }}
+{{ range $photos }}
+  {{ with .url }}
+    {{ if ne . $page.Params.cover }}
+      {{ $stackPhotos = $stackPhotos | append . }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+<li class="gallery-album-card">
+  <a class="gallery-album-card__link" href="{{ $page.RelPermalink }}" aria-label="{{ $page.Title }}">
+    <div class="gallery-album-card__stack" aria-hidden="true">
+      {{ if $stackPhotos }}
+        {{ range $index, $photo := first 3 $stackPhotos }}
+        <img
+          class="gallery-album-card__cover gallery-album-card__cover--{{ add $index 1 }}"
+          src="{{ $photo }}"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        >
+        {{ end }}
+      {{ else }}
+        <span class="gallery-album-card__cover gallery-album-card__cover--1 gallery-album-card__cover--placeholder">
+          <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true"><path fill="currentColor" d="M8.5 13.5l2.5 3 3.5-4.5 4.5 6H5m16 1V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2M9 7a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/></svg>
+        </span>
+      {{ end }}
+    </div>
+    <div class="gallery-album-card__body">
+      <h2 class="gallery-album-card__title">{{ $page.Title }}</h2>
+      {{ with $page.Params.desc }}<p class="gallery-album-card__desc">{{ . }}</p>{{ end }}
+      <p class="gallery-album-card__meta">
+        {{ len $photos }} {{ i18n "galleryPhotoUnit" }}
+        {{ with $page.Params.location }}<span class="gallery-album-card__location">{{ . }}</span>{{ end }}
+      </p>
+    </div>
+  </a>
+</li>

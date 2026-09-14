@@ -1,0 +1,33 @@
+{{ $cfg := site.Params.solitude.aside.clock }}
+{{ if and $cfg.enable $cfg.qweatherKey }}
+<div class="card-widget card-clock" id="card-clock">
+  <div class="item-headline"><i class="solitude fas fa-clock"></i><span>{{ i18n "clockTitle" }}</span></div>
+  <div
+    class="card-content clock-content"
+    id="hexo-electric-clock"
+    data-location-id="{{ $cfg.locationId }}"
+    data-city="{{ $cfg.city }}"
+    data-qweather-host="{{ $cfg.qweatherHost | default "https://devapi.qweather.com" }}"
+    data-qweather-key="{{ $cfg.qweatherKey }}"
+    data-timezone="{{ $cfg.timezone | default "Asia/Shanghai" }}"
+    data-cache-minutes="{{ $cfg.cacheMinutes | default 30 }}"
+    aria-live="off"
+  >
+    <div class="clock-row clock-row--date">
+      <span class="clock-date" id="clock-date">{{ i18n "clockLoading" }}</span>
+    </div>
+    <div class="clock-row clock-row--time">
+      <span class="clock-time" id="clock-time">--:--:--</span>
+    </div>
+    <div class="clock-row clock-row--weather">
+      <span class="clock-weather" id="clock-weather"><svg class="clock-weather-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M9.7 9.7a2.5 2.5 0 1 1 3.1 2.4v1.3M12.2 16.5h.01"/></svg><span class="clock-weather-text">{{ i18n "clockLoading" }}</span></span>
+    </div>
+    <div class="clock-row clock-row--extra">
+      <span class="clock-extra">
+        <span class="clock-city" id="clock-city">{{ $cfg.city }}</span>
+        <span class="clock-detail" id="clock-detail"></span>
+      </span>
+    </div>
+  </div>
+</div>
+{{ end }}

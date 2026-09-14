@@ -1,0 +1,90 @@
+{{ define "main" }}
+<main class="layout hide-aside" id="content-inner">
+  <div id="page" class="gallery-page gallery-page--album">
+    <div class="gallery-album-back">
+      <a href="{{ "/gallery/" | relLangURL }}" rel="prev">{{ i18n "galleryBack" }}</a>
+    </div>
+    <header class="gallery-page-head">
+      <h1 class="gallery-page-title">{{ .Title }}</h1>
+      {{ with .Params.desc }}<p class="gallery-page-desc">{{ . }}</p>{{ end }}
+      {{ with .Params.photos }}
+      <p class="gallery-page-meta">
+        {{ len . }} {{ i18n "galleryPhotoUnit" }}
+        {{ with $.Params.location }}<span class="gallery-page-meta__item">· {{ . }}</span>{{ end }}
+        {{ with $.GetTerms "tags" }}
+          {{ range . }}<a class="gallery-page-tag" href="{{ .RelPermalink }}"># {{ .LinkTitle }}</a>{{ end }}
+        {{ end }}
+      </p>
+      {{ end }}
+    </header>
+    {{ with .Content }}<div class="gallery-page-content article-container">{{ . }}</div>{{ end }}
+    {{ $photos := sort (.Params.photos | default slice) "date" "desc" }}
+    {{ if not $photos }}
+    <p class="gallery-empty">{{ i18n "galleryEmptyAlbum" }}</p>
+    {{ else }}
+      {{ $groupKeys := slice }}
+      {{ range $photos }}
+        {{ $key := "unknown" }}
+        {{ with .date }}
+          {{ $key = replaceRE "^([0-9]{4})-([0-9]{1,2}).*" "$1-$2" . }}
+        {{ end }}
+        {{ if not (in $groupKeys $key) }}
+          {{ $groupKeys = $groupKeys | append $key }}
+        {{ end }}
+      {{ end }}
+      {{ $slug := .File.ContentBaseName }}
+      {{ range $groupKeys }}
+        {{ $monthKey := . }}
+        <section class="gallery-month">
+          <h2 class="gallery-month__title">
+            {{ if eq $monthKey "unknown" }}
+              {{ i18n "galleryUnknownDate" }}
+            {{ else }}
+              {{ $parts := split $monthKey "-" }}
+              {{ printf (i18n "galleryMonthFormat") (index $parts 0) (int (index $parts 1)) }}
+            {{ end }}
+          </h2>
+          <div class="gallery-photo-grid">
+            {{ range $photos }}
+              {{ $key := "unknown" }}
+              {{ with .date }}
+                {{ $key = replaceRE "^([0-9]{4})-([0-9]{1,2}).*" "$1-$2" . }}
+              {{ end }}
+              {{ if eq $key $monthKey }}
+                {{ $photo := . }}
+                {{ $urlLower := lower $photo.url }}
+                {{ $isVideo := or (hasSuffix $urlLower ".mp4") (hasSuffix $urlLower ".webm") (hasSuffix $urlLower ".mov") }}
+                <figure class="gallery-photo{{ if $isVideo }} is-video{{ end }}">
+                  {{ if $isVideo }}
+                  <video
+                    class="gallery-photo__media"
+                    src="{{ $photo.url }}"
+                    {{ with $photo.poster }}poster="{{ . }}"{{ end }}
+                    controls
+                    preload="metadata"
+                    muted
+                    playsinline
+                    disablepictureinpicture
+                  ></video>
+                  {{ else }}
+                  <a
+                    class="gallery-photo__link"
+                    href="{{ $photo.url }}"
+                    data-fancybox="gallery-{{ $slug }}"
+                    {{ with $photo.caption }}data-caption="{{ . }}"{{ end }}
+                    aria-label="{{ $photo.caption | default (i18n "galleryPhoto") }}"
+                  >
+                    <img class="gallery-photo__media" src="{{ $photo.url }}" alt="{{ $photo.caption | default "" }}" loading="lazy" decoding="async">
+                  </a>
+                  {{ end }}
+                  {{ with $photo.caption }}<figcaption class="gallery-photo__caption">{{ . }}</figcaption>{{ end }}
+                </figure>
+              {{ end }}
+            {{ end }}
+          </div>
+        </section>
+      {{ end }}
+    {{ end }}
+  </div>
+</main>
+{{ end }}

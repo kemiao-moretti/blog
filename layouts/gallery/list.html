@@ -1,0 +1,30 @@
+{{ define "main" }}
+<main class="layout hide-aside" id="content-inner">
+  <div id="page" class="gallery-page gallery-page--list">
+    <header class="gallery-page-head">
+      <h1 class="gallery-page-title">{{ .Title }}</h1>
+      {{ with .Params.description }}<p class="gallery-page-desc">{{ . }}</p>{{ end }}
+    </header>
+    {{ with .Content }}<div class="gallery-page-content article-container">{{ . }}</div>{{ end }}
+    {{ $albums := slice }}
+    {{ with .Params.albums }}
+      {{ range . }}
+        {{ with $.GetPage (printf "gallery/%s" .) }}
+          {{ $albums = $albums | append . }}
+        {{ end }}
+      {{ end }}
+    {{ else }}
+      {{ $albums = .RegularPages.ByDate.Reverse }}
+    {{ end }}
+    {{ if not $albums }}
+    <p class="gallery-empty">{{ i18n "galleryEmpty" }}</p>
+    {{ else }}
+    <ul class="gallery-album-grid">
+      {{ range $albums }}
+        {{ partial "gallery-album-card.html" . }}
+      {{ end }}
+    </ul>
+    {{ end }}
+  </div>
+</main>
+{{ end }}

@@ -1484,3 +1484,73 @@ code:not(.code-block code) {
     max-width: 52vw;
   }
 }
+
+/* ============================================================
+   移动端侧栏抽屉（#sidebar-menus）
+   上游把「遮罩色」--efu-maskbgdeep 直接当成抽屉表面：
+   亮色下它 = rgba(26,22,14,.83)（近黑），而抽屉内的卡片走 --efu-card-bg（奶油）、
+   分组标题走 --efu-secondtext（深墨）→ 深字压暗底，对比度约 1.2:1，
+   整块抽屉在浅色模式下是「黑面板 + 奶油卡片」的割裂状态。
+   这里把表面换回糖果页底色（亮 #FFF6E5 / 暗 #241A12），并让内部单元按糖果语言
+   （粗描边 + 硬阴影）从底色上浮起，明暗两态同构。
+   注意：#sidebar 自身仍保留 --efu-maskbg 作为遮罩，抽屉打开时背景压暗不变。
+   ============================================================ */
+
+#sidebar #sidebar-menus {
+  background: var(--efu-background);
+  border-radius: var(--candy-radius-lg);
+  box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0 var(--efu-card-border);
+}
+
+/* 抽屉内所有承载内容的单元：统一卡面 + 粗描边 + 硬阴影 */
+#sidebar #sidebar-menus .site-data,
+#sidebar #sidebar-menus .sidebar-menu-item span.menu-child,
+#sidebar #sidebar-menus .menus_items .menus_item_child .site-page.child,
+#sidebar #sidebar-menus .card-tag-cloud a,
+#sidebar #sidebar-menus .back-menu-list-groups .back-menu-list .back-menu-item {
+  border-radius: var(--candy-radius);
+  border: var(--style-border-always);
+  background: var(--efu-card-bg);
+  box-shadow: var(--card-box-shadow);
+}
+
+/* 显示模式按钮：上游只给 [data-theme=dark] 刷橙底 + --efu-white 字（≈1.9:1），
+   并让明暗两态外观分裂。这里对齐其余卡片，图标继承文字色。 */
+[data-theme="dark"] #sidebar #sidebar-menus .sidebar-menu-item span.darkmode_switchbutton {
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+}
+
+#sidebar #sidebar-menus .sidebar-menu-item span.menu-child:hover,
+#sidebar #sidebar-menus .sidebar-menu-item span.darkmode_switchbutton:hover {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  color: var(--candy-nav-active-text, #241A12);
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+}
+
+/* 子级菜单按钮：上游在 ≤768px 用 !important 强制橙底，只能改字色 ——
+   按糖果屋「橙底 + 深可可字」的既定规范补齐，否则是橙底奶油字（≈1.9:1）。 */
+#sidebar #sidebar-menus .menus_items li .site-page:hover,
+#sidebar #sidebar-menus .menus_items li .site-page:focus-visible,
+#sidebar #sidebar-menus .menus_items li .site-page:hover i,
+#sidebar #sidebar-menus .menus_items li .site-page:hover span,
+#sidebar #sidebar-menus .menus_items li .site-page span:hover {
+  color: var(--candy-nav-active-text, #241A12);
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+}
+
+#sidebar #sidebar-menus .menus_items li .site-page:hover {
+  transform: translate(-2px, -2px);
+}
+
+/* 标签云同样：上游 hover 是橙底 + --efu-white，改成橙底深可可字 */
+#sidebar #sidebar-menus .card-tag-cloud a:hover,
+#sidebar #sidebar-menus .card-tag-cloud a:focus-visible {
+  background: var(--efu-theme);
+  border-color: var(--efu-theme);
+  color: var(--candy-nav-active-text, #241A12);
+  -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
+  box-shadow: var(--card-hover-box-shadow);
+  transform: translate(-2px, -2px);
+}

@@ -1,0 +1,410 @@
+/* ============================================================
+   gallery.css · 相册页（糖果屋风格）
+   列表页：相册卡片网格；详情页：按月分组的照片/视频网格。
+   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
+   ============================================================ */
+
+/* ---------- 页面外层 ---------- */
+.gallery-page {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: 0 1rem;
+}
+
+/* ---------- 页头：橙底胶带标题 ---------- */
+.gallery-page-head {
+  text-align: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.gallery-page-title {
+  display: inline-block;
+  margin: 0;
+  padding: 0.4rem 1.4rem;
+  background: var(--efu-theme);
+  color: var(--efu-card-bg);
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  box-shadow: 3px 3px 0 var(--efu-card-border);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.5;
+  transform: rotate(-1deg);
+}
+
+.gallery-page-desc {
+  margin: 0.9rem 0 0;
+  color: var(--efu-secondtext);
+  font-size: 0.95rem;
+}
+
+.gallery-page-meta {
+  margin: 0.7rem 0 0;
+  color: var(--efu-secondtext);
+  font-size: 0.88rem;
+}
+
+.gallery-page-meta__item {
+  margin-left: 0.3rem;
+}
+
+.gallery-page-tag {
+  display: inline-block;
+  margin: 0 0 0 0.45rem;
+  padding: 0 0.45rem;
+  color: var(--efu-theme);
+  font-weight: 600;
+}
+
+.gallery-page-tag:hover {
+  color: var(--efu-fontcolor);
+}
+
+/* ---------- 返回链接 ---------- */
+.gallery-album-back {
+  margin: 1rem 0 0;
+}
+
+.gallery-album-back a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.9rem;
+  background: var(--efu-card-bg);
+  color: var(--efu-fontcolor);
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.gallery-album-back a::before {
+  content: "←";
+  color: var(--efu-theme);
+}
+
+.gallery-album-back a:hover {
+  color: var(--efu-theme);
+  border-color: var(--efu-theme);
+  box-shadow: 3px 3px 0 var(--efu-theme);
+  transform: translate(-1px, -1px);
+}
+
+/* ---------- 空状态 ---------- */
+.gallery-empty {
+  margin: 0;
+  padding: 3rem 1.5rem;
+  color: var(--efu-secondtext);
+  text-align: center;
+  border: var(--style-border-dashed);
+  border-radius: var(--candy-radius);
+}
+
+/* ============================================================
+   列表页 · 相册卡片网格
+   ============================================================ */
+.gallery-album-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery-album-card {
+  min-width: 0;
+}
+
+.gallery-album-card__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--efu-card-bg);
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  box-shadow: var(--card-box-shadow);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.gallery-album-card__link:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--efu-theme);
+  box-shadow: var(--card-hover-box-shadow);
+}
+
+/* 封面堆叠（拍立得感）：三张错位叠放，hover 由堆变散 */
+.gallery-album-card__stack {
+  position: relative;
+  width: calc(100% - 1rem);
+  aspect-ratio: 4 / 3;
+  margin: 0.5rem;
+  isolation: isolate;
+}
+
+.gallery-album-card__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: var(--candy-border-width) solid var(--efu-card-border);
+  border-radius: calc(var(--candy-radius) - 2px);
+  background: var(--efu-secondbg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.gallery-album-card__cover--1 {
+  z-index: 3;
+  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 color-mix(in srgb, var(--efu-card-border) 55%, transparent);
+}
+
+.gallery-album-card__cover--2 {
+  z-index: 2;
+  transform: translate(7px, 8px) rotate(2.5deg);
+}
+
+.gallery-album-card__cover--3 {
+  z-index: 1;
+  transform: translate(-6px, 9px) rotate(-2.5deg);
+}
+
+.gallery-album-card__link:hover .gallery-album-card__cover--2 {
+  transform: translate(14px, 13px) rotate(5deg);
+  box-shadow: var(--card-box-shadow);
+}
+
+.gallery-album-card__link:hover .gallery-album-card__cover--3 {
+  transform: translate(-13px, 14px) rotate(-5deg);
+  box-shadow: var(--card-box-shadow);
+}
+
+/* 无封面占位 */
+.gallery-album-card__cover--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--efu-theme);
+  background: var(--efu-secondbg);
+}
+
+/* 卡片信息区 */
+.gallery-album-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0.25rem 0.9rem 1rem;
+}
+
+.gallery-album-card__title {
+  margin: 0;
+  color: var(--efu-fontcolor);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.gallery-album-card__desc {
+  margin: 0.25rem 0 0;
+  color: var(--efu-secondtext);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gallery-album-card__meta {
+  margin: auto 0 0;
+  padding-top: 0.6rem;
+  color: var(--efu-secondtext);
+  font-size: 0.8rem;
+}
+
+.gallery-album-card__location {
+  margin-left: 0.4rem;
+}
+
+.gallery-album-card__location::before {
+  content: "·";
+  margin-right: 0.4rem;
+}
+
+/* ============================================================
+   详情页 · 月份分组与照片网格
+   ============================================================ */
+.gallery-month {
+  margin-top: 2.2rem;
+}
+
+.gallery-month__title {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: 0.25rem 1rem;
+  background: var(--efu-theme);
+  color: var(--efu-card-bg);
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transform: rotate(-0.8deg);
+}
+
+.gallery-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.gallery-photo {
+  margin: 0;
+  position: relative;
+}
+
+.gallery-photo__link,
+.gallery-photo__media {
+  display: block;
+  width: 100%;
+}
+
+/* 照片与视频统一方形取景框 */
+.gallery-photo__media {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: var(--candy-border-width) solid var(--efu-card-border);
+  border-radius: var(--candy-radius);
+  background: var(--efu-secondbg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+/* 图片 hover 糖果效果 */
+.gallery-photo__link:hover .gallery-photo__media {
+  transform: translate(-2px, -2px);
+  border-color: var(--efu-theme);
+  box-shadow: var(--card-hover-box-shadow);
+}
+
+/* 视频：深底 + 居中糖果播放钮 */
+.gallery-photo video.gallery-photo__media {
+  border-color: color-mix(in srgb, var(--efu-card-border) 70%, transparent);
+}
+
+.gallery-photo.is-video::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 52px;
+  height: 52px;
+  transform: translate(-50%, -50%);
+  background: var(--efu-theme);
+  border: var(--candy-border-width) solid var(--efu-card-border);
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gallery-photo.is-video::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-38%, -50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 14px solid var(--efu-card-bg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gallery-photo.is-video:hover::after {
+  box-shadow: 3px 3px 0 var(--efu-card-border);
+  transform: translate(calc(-50% - 1px), calc(-50% - 1px));
+}
+
+/* 图注 */
+.gallery-photo__caption {
+  margin: 0.5rem 0 0;
+  color: var(--efu-secondtext);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media screen and (max-width: 1100px) {
+  .gallery-album-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gallery-photo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .gallery-page {
+    padding: 0;
+  }
+
+  .gallery-page-title {
+    font-size: 1.35rem;
+    padding: 0.35rem 1.1rem;
+  }
+
+  .gallery-page-head {
+    margin: 1.2rem 0 1.4rem;
+  }
+
+  .gallery-album-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .gallery-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .gallery-album-card__stack {
+    width: calc(100% - 0.7rem);
+    margin: 0.35rem;
+  }
+
+  .gallery-album-card__body {
+    padding: 0.15rem 0.6rem 0.8rem;
+  }
+
+  .gallery-album-card__title {
+    font-size: 0.98rem;
+  }
+
+  .gallery-month {
+    margin-top: 1.6rem;
+  }
+
+  .gallery-photo.is-video::after {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media screen and (max-width: 460px) {
+  .gallery-album-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .gallery-album-card__desc {
+    display: none;
+  }
+}

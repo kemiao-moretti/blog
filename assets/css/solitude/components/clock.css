@@ -1,0 +1,114 @@
+/* ============================================================
+   clock.css · 侧边栏时钟卡片（糖果屋风格）
+   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
+   卡片外壳继承 #aside-content .card-widget 糖果规则。
+   注意：侧栏仅在 ≥1200px 显示（主题 #aside-content .card-widget
+   在 ≤1199px 被 display:none），可见时宽度恒为 300px。
+   ============================================================ */
+
+/* ---------- 卡片外壳：解除主题对 .card-content 的 320px 定高 ---------- */
+#aside-content .card-widget.card-clock .card-content {
+  height: auto;
+  min-height: 0;
+  gap: 0;
+  padding: 0.15rem 1rem 1rem;
+}
+
+.card-widget.card-clock .item-headline {
+  padding-top: 12px;
+}
+
+/* ---------- 行布局 ---------- */
+.clock-row {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.clock-row--date {
+  margin-bottom: 0.1rem;
+}
+
+.clock-row--weather {
+  margin-top: 0.55rem;
+}
+
+.clock-row--extra {
+  margin-top: 0.2rem;
+}
+
+/* ---------- 日期行 ---------- */
+.clock-date {
+  color: var(--efu-secondtext);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 大号时间：糖果 LED 数字 ---------- */
+.clock-time {
+  color: var(--efu-fontcolor);
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 0 var(--efu-theme-op-light);
+}
+
+/* ---------- 天气行 ---------- */
+.clock-weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--efu-fontcolor);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* 天气图标：内联 SVG，走 currentColor → 主题橙 */
+.clock-weather-svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  color: var(--efu-theme);
+}
+
+.clock-weather-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--efu-secondtext);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+#clock-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.clock-detail-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.clock-detail-svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+}
+
+.clock-city {
+  color: var(--efu-theme);
+  font-weight: 700;
+}

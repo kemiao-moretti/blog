@@ -158,3 +158,23 @@ fcircleCredit: {other: "Data comes from friends' circles, powered by Hexo Circle
 # Message board
 messageOpen: {other: Show comments}
 messageClose: {other: Hide comments}
+
+# Gallery
+galleryBack: {other: Back to gallery}
+galleryEmpty: {other: No albums yet}
+galleryEmptyAlbum: {other: No photos or videos yet}
+galleryPhotoUnit: {other: photos}
+galleryMonthFormat: {other: "%s-%d"}
+galleryUnknownDate: {other: Undated}
+galleryPhoto: {other: Gallery photo}
+
+# Sidebar clock
+clockTitle: {other: Clock}
+clockLoading: {other: Loading…}
+clockWeek1: {other: Sun}
+clockWeek2: {other: Mon}
+clockWeek3: {other: Tue}
+clockWeek4: {other: Wed}
+clockWeek5: {other: Thu}
+clockWeek6: {other: Fri}
+clockWeek7: {other: Sat}
