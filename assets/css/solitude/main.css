@@ -16,6 +16,7 @@
 
 @import "./components/aside-console.css" layer(solitude.components);
 @import "./components/clock.css" layer(solitude.components);
+@import "./components/ip-welcome.css" layer(solitude.components);
 @import "./components/keyboard.css" layer(solitude.components);
 @import "./components/post-feed.css" layer(solitude.components);
 @import "./components/comments-share.css" layer(solitude.components);
@@ -30,6 +31,7 @@
 @import "./pages/post.css" layer(solitude.pages);
 @import "./pages/about.css" layer(solitude.pages);
 @import "./pages/gallery.css" layer(solitude.pages);
+@import "./pages/changelog.css" layer(solitude.pages);
 
 @import "./shortcodes/text-status.css" layer(solitude.shortcodes);
 @import "./shortcodes/disclosure.css" layer(solitude.shortcodes);

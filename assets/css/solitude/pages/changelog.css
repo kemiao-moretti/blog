@@ -1,0 +1,508 @@
+/* ============================================================
+   changelog.css · 更新日志页（糖果屋规范）
+   全部颜色走 token：明暗两套自动适配，禁止硬编码色值。
+   ============================================================ */
+
+.cl-header {
+  margin-bottom: 4px;
+}
+
+.cl-header p {
+  margin: 4px 0 0;
+  color: var(--efu-secondtext);
+  font-size: 15px;
+}
+
+.cl-intro {
+  margin-bottom: 4px;
+}
+
+.cl-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- 筛选栏 ---------- */
+.cl-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cl-search {
+  position: relative;
+}
+
+.cl-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--efu-secondtext);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.cl-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px 9px 36px;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cl-search input::placeholder {
+  color: var(--efu-secondtext);
+  opacity: 0.75;
+}
+
+.cl-search input:focus {
+  outline: none;
+  border-color: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--efu-theme);
+}
+
+.cl-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  font-size: 13px;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.cl-pill:hover,
+.cl-pill[data-active] {
+  border-color: var(--efu-theme);
+  background: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+.cl-pill:hover {
+  transform: translateY(-1px);
+}
+
+.cl-pill:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+/* ---------- 时间线 ---------- */
+.cl-timeline {
+  position: relative;
+}
+
+.cl-timeline::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 9px;
+  width: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--efu-card-border) 40%, transparent);
+}
+
+.cl-entry {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  padding-bottom: 18px;
+}
+
+.cl-entry:last-child {
+  padding-bottom: 0;
+}
+
+.cl-entry[hidden] {
+  display: none;
+}
+
+.cl-entry-dot {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  border: 2px solid var(--efu-card-border);
+  border-radius: 50%;
+  background: var(--efu-theme);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+}
+
+.cl-entry-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cl-entry-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.cl-entry-meta time {
+  font-size: 13px;
+  color: var(--efu-secondtext);
+  margin-right: 2px;
+}
+
+.cl-entry-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--candy-radius-sm);
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.cl-entry.cl-improvement .cl-entry-type {
+  background: var(--efu-blue);
+}
+
+.cl-entry.cl-fix .cl-entry-type {
+  background: var(--efu-red);
+}
+
+.cl-entry-version {
+  padding: 2px 8px;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--efu-fontcolor);
+}
+
+/* ---------- 条目卡片（<details> 折叠） ---------- */
+.cl-entry-card {
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.cl-entry-card:hover {
+  border-color: var(--efu-theme);
+  box-shadow: 3px 3px 0 var(--efu-theme);
+  transform: translate(-1px, -1px);
+}
+
+.cl-entry-card[open] {
+  border-color: var(--efu-theme);
+}
+
+.cl-entry-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.cl-entry-summary::-webkit-details-marker {
+  display: none;
+}
+
+.cl-entry-summary:hover {
+  background: var(--efu-theme-op-light);
+}
+
+.cl-entry-text {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--efu-fontcolor);
+}
+
+.cl-entry-chevron {
+  flex: none;
+  font-size: 14px;
+  color: var(--efu-secondtext);
+  transition: transform 0.25s ease;
+}
+
+.cl-entry-card[open] .cl-entry-chevron {
+  transform: rotate(180deg);
+}
+
+.cl-entry-detail {
+  padding: 12px 14px;
+  border-top: 1px dashed color-mix(in srgb, var(--efu-card-border) 35%, transparent);
+}
+
+/* ---------- 详情区 Markdown 排版 ----------
+   目录里的条目正文由 Hugo 直接渲染成 HTML（h2/h3、ul/ol、p、strong、
+   code、a、blockquote、hr、表格），模板不做二次加工。这里按糖果屋规范补齐
+   各类元素的样式：颜色全部走 token，明暗两套自动适配。 */
+.cl-entry-md {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--efu-fontcolor);
+  word-break: break-word;
+}
+
+/* 首尾子元素的纵向外边距不再叠加到卡片内边距上 */
+.cl-entry-md > :first-child {
+  margin-top: 0;
+}
+
+.cl-entry-md > :last-child {
+  margin-bottom: 0;
+}
+
+/* 段落：与列表、标题之间留出呼吸 */
+.cl-entry-md p {
+  margin: 0 0 10px;
+}
+
+.cl-entry-md p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- 标题 ---------- */
+/* 详情区起手就是 ## 变更详情，用它做区块标题：
+   左侧糖果色竖条 + 小号大写感字重，和正文列表拉开层级。 */
+.cl-entry-md h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--efu-fontcolor);
+}
+
+.cl-entry-md h2::before {
+  content: "";
+  flex: none;
+  width: 4px;
+  height: 1em;
+  border-radius: 2px;
+  background: var(--efu-theme);
+  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+/* 三级标题：降一级的弱化标题，靠颜色区分 */
+.cl-entry-md h3 {
+  margin: 14px 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--efu-fontcolor);
+}
+
+.cl-entry-md h3::before {
+  content: "▸ ";
+  color: var(--efu-theme);
+}
+
+/* ---------- 列表 ----------
+   主题在 base 层有一条全局重置 `li,ul{list-style:none;display:block}`，
+   详情区必须自己把 list-style 与 list-item 显示方式恢复回来，
+   否则有序列表的序号会被整条重置吃掉（只剩缩进、看不到 1. 2.）。 */
+.cl-entry-md ul,
+.cl-entry-md ol {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+.cl-entry-md li {
+  display: list-item;
+  list-style-position: outside;
+  padding-left: 2px;
+  line-height: 1.75;
+}
+
+/* 列表项间距用 margin 而非 grid/flex gap：
+   grid 子项与 flex 子项都会失去 ::marker，序号与方点会一起消失。 */
+.cl-entry-md li + li {
+  margin-top: 6px;
+}
+
+.cl-entry-md ul > li {
+  list-style-type: none;
+}
+
+.cl-entry-md ol > li {
+  list-style-type: decimal;
+}
+
+.cl-entry-md ul:last-child,
+.cl-entry-md ol:last-child {
+  margin-bottom: 0;
+}
+
+/* 嵌套列表：与父项收紧间距 */
+.cl-entry-md li > ul,
+.cl-entry-md li > ol {
+  margin: 6px 0 0;
+}
+
+.cl-entry-md li > ul > li + li,
+.cl-entry-md li > ol > li + li {
+  margin-top: 4px;
+}
+
+.cl-entry-md li::marker {
+  color: var(--efu-theme);
+  font-weight: 700;
+}
+
+/* 无序列表用方块点，和有序列号的层级区分更明显 */
+.cl-entry-md ul > li::marker {
+  content: "▪ ";
+}
+
+/* ---------- 强调与行内代码 ---------- */
+.cl-entry-md strong {
+  font-weight: 700;
+  color: var(--efu-theme);
+}
+
+.cl-entry-md em {
+  font-style: italic;
+  color: var(--efu-secondtext);
+}
+
+/* 行内代码：卡面底 + 糖果描边，等宽字体，与主题既有 code 规范一致 */
+.cl-entry-md code {
+  padding: 1px 6px;
+  border: 1px solid var(--efu-theme-op-deep);
+  border-radius: var(--candy-radius-sm);
+  background: var(--efu-secondbg);
+  color: var(--efu-fontcolor);
+  font-family: var(--efu-code-font-family);
+  font-size: 0.88em;
+  word-break: break-word;
+}
+
+/* 代码块内的 code 不再重复描边与内边距 */
+.cl-entry-md pre code {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: inherit;
+}
+
+/* ---------- 链接 ---------- */
+.cl-entry-md a {
+  color: var(--efu-theme);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.cl-entry-md a:hover,
+.cl-entry-md a:focus-visible {
+  color: var(--efu-theme);
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- 引用 ---------- */
+.cl-entry-md blockquote {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-left: var(--candy-border-width) solid var(--efu-theme);
+  border-radius: 0 var(--candy-radius-sm) var(--candy-radius-sm) 0;
+  background: var(--efu-post-blockquote-bg);
+  color: var(--efu-fontcolor);
+}
+
+.cl-entry-md blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- 分隔线 ---------- */
+.cl-entry-md hr {
+  height: 0;
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px dashed color-mix(in srgb, var(--efu-card-border) 55%, transparent);
+}
+
+/* ---------- 表格 ---------- */
+.cl-entry-md table {
+  width: 100%;
+  margin: 0 0 10px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.cl-entry-md th,
+.cl-entry-md td {
+  padding: 6px 10px;
+  border: 1px solid var(--efu-card-border);
+  text-align: left;
+}
+
+.cl-entry-md th {
+  background: var(--efu-secondbg);
+  font-weight: 700;
+  color: var(--efu-fontcolor);
+}
+
+/* 窄屏：详情区收紧内边距，长单词可断行 */
+@media screen and (max-width: 768px) {
+  .cl-entry-md {
+    font-size: 14px;
+  }
+
+  .cl-entry-md ul,
+  .cl-entry-md ol {
+    padding-left: 18px;
+  }
+}
+
+/* ---------- 空态 ---------- */
+.cl-empty {
+  padding: 28px 0;
+  text-align: center;
+  color: var(--efu-secondtext);
+  font-size: 14px;
+}
+
+.cl-empty[hidden] {
+  display: none;
+}
+
+/* ---------- 动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cl-search input,
+  .cl-pill,
+  .cl-entry-card,
+  .cl-entry-chevron {
+    transition: none;
+  }
+}

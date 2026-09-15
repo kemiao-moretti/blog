@@ -1,0 +1,40 @@
+{{ $cfg := site.Params.solitude.aside.ipWelcome }}
+{{ if and $cfg $cfg.enable }}
+<div class="card-widget card-ip-welcome" id="card-ip-welcome">
+  <div class="item-headline"><i class="solitude fas fa-location-dot"></i><span>{{ i18n "ipWelcomeTitle" }}</span></div>
+  <div
+    class="card-content ip-welcome-content"
+    id="ip-welcome-info"
+    data-lang="{{ site.Language.Lang }}"
+    data-loading="{{ i18n "ipWelcomeLoading" }}"
+    data-fallback="{{ i18n "ipWelcomeFallback" }}"
+    data-label-from="{{ i18n "ipWelcomeFrom" }}"
+    data-label-friend="{{ i18n "ipWelcomeFriend" }}"
+    data-label-distance="{{ i18n "ipWelcomeDistance" }}"
+    data-label-place="{{ i18n "ipWelcomeUnknownPlace" }}"
+    data-blogger-lat="{{ $cfg.bloggerLat | default 32.0603 }}"
+    data-blogger-lng="{{ $cfg.bloggerLng | default 118.7969 }}"
+    data-cache-hours="{{ $cfg.cacheHours | default 24 }}"
+    data-timeout-ms="{{ $cfg.timeoutMs | default 6000 }}"
+    data-primary-api="{{ $cfg.primaryApi | default "https://api.ip.sb/geoip" }}"
+    data-ip-apis="{{ delimit ($cfg.ipApis | default (slice "https://api.ipify.org?format=json" "https://icanhazip.com/")) "," }}"
+    data-fallback-api="{{ $cfg.fallbackApi | default "https://ipapi.co/%s/json/" }}"
+    data-tips="{{ $cfg.tips | default dict | jsonify }}"
+    aria-live="polite"
+    aria-busy="true"
+  >
+    <div class="ip-welcome-row ip-welcome-row--greet">
+      <span class="ip-welcome-greet" id="ip-welcome-greet">{{ i18n "ipWelcomeLoading" }}</span>
+    </div>
+    <div class="ip-welcome-row ip-welcome-row--place">
+      <span class="ip-welcome-place" id="ip-welcome-place"></span>
+    </div>
+    <div class="ip-welcome-row ip-welcome-row--dist">
+      <span class="ip-welcome-dist" id="ip-welcome-dist"></span>
+    </div>
+    <div class="ip-welcome-row ip-welcome-row--tip">
+      <span class="ip-welcome-tip" id="ip-welcome-tip"></span>
+    </div>
+  </div>
+</div>
+{{ end }}

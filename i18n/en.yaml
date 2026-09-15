@@ -178,3 +178,12 @@ clockWeek4: {other: Wed}
 clockWeek5: {other: Thu}
 clockWeek6: {other: Fri}
 clockWeek7: {other: Sat}
+
+# Sidebar visitor welcome (ipWelcome)
+ipWelcomeTitle: {other: Current Visitor}
+ipWelcomeLoading: {other: Locating…}
+ipWelcomeFallback: {other: Welcome to Meowloge}
+ipWelcomeFrom: {other: 'Welcome, friend from'}
+ipWelcomeFriend: {other: ' '}
+ipWelcomeDistance: {other: "%s km from the author"}
+ipWelcomeUnknownPlace: {other: somewhere far away}

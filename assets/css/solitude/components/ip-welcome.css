@@ -1,0 +1,105 @@
+/* ============================================================
+   ip-welcome.css · 侧边栏访客欢迎卡片（糖果屋风格）
+   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
+   卡片外壳继承 #aside-content .card-widget 糖果规则。
+   注意：侧栏仅在 ≥1200px 显示，可见时宽度恒为 300px。
+   ============================================================ */
+
+/* ---------- 卡片外壳：解除主题对 .card-content 的 320px 定高 ---------- */
+#aside-content .card-widget.card-ip-welcome .card-content {
+  height: auto;
+  min-height: 0;
+  gap: 0.35rem;
+  padding: 0.15rem 1rem 1rem;
+  align-items: center;
+  text-align: center;
+}
+
+.card-widget.card-ip-welcome .item-headline {
+  padding-top: 12px;
+}
+
+/* ---------- 行布局 ---------- */
+.ip-welcome-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  line-height: 1.6;
+}
+
+.ip-welcome-row--greet {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--efu-fontcolor);
+}
+
+.ip-welcome-row--place {
+  font-size: 0.9rem;
+  color: var(--efu-secondtext);
+}
+
+.ip-welcome-row--dist,
+.ip-welcome-row--tip {
+  font-size: 0.82rem;
+  color: var(--efu-secondtext);
+}
+
+/* ---------- 地区强调：糖果橙 + 下划硬线 ---------- */
+.ip-welcome-place .ip-welcome-strong {
+  color: var(--efu-theme);
+  font-weight: 700;
+  padding: 0 2px;
+  border-bottom: var(--candy-border-width) solid var(--efu-theme);
+}
+
+/* ---------- 距离徽标：糖果 pill ---------- */
+.ip-welcome-dist-chip {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--candy-radius);
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- 地区 Tip：引自文章的糖果便签 ---------- */
+.ip-welcome-tip-text {
+  display: block;
+  padding: 0.35rem 0.6rem;
+  border-left: var(--candy-border-width) solid var(--efu-theme);
+  border-radius: 0 var(--candy-radius-sm) var(--candy-radius-sm) 0;
+  background: var(--efu-post-blockquote-bg, var(--efu-secondbg));
+  color: var(--efu-fontcolor);
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+/* ---------- 加载态：呼吸动画 ---------- */
+.ip-welcome-content[aria-busy="true"] .ip-welcome-greet {
+  opacity: 0.7;
+  animation: ip-welcome-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ip-welcome-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.9; }
+}
+
+/* ---------- 空行不占位 ---------- */
+.ip-welcome-row:empty,
+.ip-welcome-place:empty,
+.ip-welcome-dist:empty,
+.ip-welcome-tip:empty {
+  display: none;
+}
+
+/* ---------- 动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ip-welcome-content[aria-busy="true"] .ip-welcome-greet {
+    animation: none;
+  }
+}

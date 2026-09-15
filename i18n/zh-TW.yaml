@@ -178,3 +178,12 @@ clockWeek4: {other: 週三}
 clockWeek5: {other: 週四}
 clockWeek6: {other: 週五}
 clockWeek7: {other: 週六}
+
+# 側邊欄訪客歡迎（ipWelcome）
+ipWelcomeTitle: {other: 當前訪客}
+ipWelcomeLoading: {other: 正在定位…}
+ipWelcomeFallback: {other: 歡迎來到喵洛閣}
+ipWelcomeFrom: {other: 歡迎來自}
+ipWelcomeFriend: {other: 的朋友}
+ipWelcomeDistance: {other: 距站長約 %s 公里}
+ipWelcomeUnknownPlace: {other: 遠方}

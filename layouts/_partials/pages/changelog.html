@@ -1,0 +1,49 @@
+{{ $entries := .Pages.ByDate.Reverse }}
+{{ $typeLabels := dict "feature" "功能新增" "improvement" "功能优化" "fix" "问题修复" }}
+{{ $typeIcons := dict "feature" "fas fa-rocket" "improvement" "fas fa-wrench" "fix" "fas fa-bug" }}
+<header class="page-title-wrap cl-header">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{ with .Description }}<p>{{ . }}</p>{{ end }}
+</header>
+{{ with .Content }}<div class="cl-intro article-container">{{ . }}</div>{{ end }}
+<div class="cl-shell">
+  <div class="cl-filter">
+    <div class="cl-search">
+      <i class="fas fa-magnifying-glass cl-search-icon"></i>
+      <input type="text" data-cl-search placeholder="搜索更新日志…" />
+    </div>
+    <div class="cl-pills" role="group" aria-label="类型筛选">
+      <button type="button" class="cl-pill" data-filter="all" data-active>全部 ({{ len $entries }})</button>
+      {{ range $key := slice "feature" "improvement" "fix" }}
+        {{ $count := len (where $entries "Params.type" $key) }}
+        {{ if gt $count 0 }}
+        <button type="button" class="cl-pill" data-filter="{{ $key }}"><i class="{{ index $typeIcons $key }}"></i>{{ index $typeLabels $key }} ({{ $count }})</button>
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
+  <div class="cl-timeline" id="cl-timeline">
+    {{ range $i, $entry := $entries }}
+      <article class="cl-entry cl-{{ $entry.Params.type }}" data-type="{{ $entry.Params.type }}">
+        <div class="cl-entry-dot"></div>
+        <div class="cl-entry-body">
+          <div class="cl-entry-meta">
+            <time datetime="{{ $entry.Date.Format "2006-01-02T15:04" }}">{{ $entry.Date.Format "2006-01-02 · 15:04" }}</time>
+            <span class="cl-entry-type"><i class="{{ index $typeIcons $entry.Params.type }}"></i>{{ index $typeLabels $entry.Params.type }}</span>
+            <span class="cl-entry-version">{{ $entry.Params.version }}</span>
+          </div>
+          <details class="cl-entry-card"{{ if eq $i 0 }} open{{ end }}>
+            <summary class="cl-entry-summary">
+              <p class="cl-entry-text">{{ with $entry.Params.description }}{{ . }}{{ else }}{{ $entry.Summary }}{{ end }}</p>
+              <span class="cl-entry-chevron" aria-hidden="true"><i class="fas fa-chevron-down"></i></span>
+            </summary>
+            <div class="cl-entry-detail">
+              <div class="cl-entry-md">{{ $entry.Content }}</div>
+            </div>
+          </details>
+        </div>
+      </article>
+    {{ end }}
+    <div class="cl-empty" hidden>没有匹配的更新记录</div>
+  </div>
+</div>

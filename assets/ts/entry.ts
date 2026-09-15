@@ -4,5 +4,7 @@ import "./main";
 import "./comments";
 import "./shuoshuo";
 import "./fcircle";
+import "./changelog";
 import "./clock";
+import "./ip-welcome";
 import "./core/pjax";
