@@ -366,6 +366,15 @@ params:
       cache: 0.2
       page: /recentcomments/
     verify_site: []
+    # 数据统计页（/stats/）
+    stats:
+      # 热力图右侧的星期标注；关掉可以省下左侧留白
+      weekday_label: true
+      # 一周从哪天开始，决定热力图第一行是星期几
+      # 支持 sunday/monday/.../saturday（可写前三个字母缩写），或 0-6（0 = 周日）
+      week_start: monday
+      # 覆盖星期名；留空则取 i18n（clockWeek1..7，四语齐备）
+      weekday_names: []
     extends:
       head: []
       body: []
@@ -379,6 +388,7 @@ params:
       fancyapps_js: https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.umd.js
       mermaid: https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.min.js
       chart: https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js
+      echarts: https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js
       abcjs: https://cdn.jsdelivr.net/npm/abcjs@6.6.4/dist/abcjs-basic-min.js
       typeit: https://cdn.jsdelivr.net/npm/typeit@8.8.7/dist/index.umd.min.js
       katex_css: https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css

@@ -18,6 +18,7 @@ declare global {
     Solitude: Record<string, any>;
     globalFn: Record<string, any>;
     Chart?: any;
+    echarts?: any;
     ABCJS?: any;
     mermaid?: any;
     TypeIt?: any;

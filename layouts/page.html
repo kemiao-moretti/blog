@@ -1,7 +1,7 @@
 {{ define "main" }}
   {{ $special := lower (or .Params.type .Layout) }}
   {{ $isTaxonomyOverview := in (slice "tags" "categories") $special }}
-  {{ $isWideOverview := or $isTaxonomyOverview (in (slice "links" "kit") $special) }}
+  {{ $isWideOverview := or $isTaxonomyOverview (in (slice "links" "kit" "stats") $special) }}
   {{ $hideAside := or (in (slice "about" "music") $special) $isWideOverview (eq .Params.aside false) }}
   <main class="layout{{ if $hideAside }} hide-aside{{ end }}" id="content-inner">
     <div id="page">
@@ -11,6 +11,7 @@
       {{ else if eq $special "music" }}{{ partial "pages/music.html" . }}
       {{ else if eq $special "message" }}{{ partial "pages/message.html" . }}
       {{ else if eq $special "changelog" }}{{ partial "pages/changelog.html" . }}
+      {{ else if eq $special "stats" }}{{ partial "pages/stats.html" . }}
       {{ else if eq $special "brevity" }}{{ partial "pages/brevity.html" . }}
       {{ else if eq $special "recentcomment" }}{{ partial "pages/recentcomment.html" . }}
       {{ else if eq $special "tags" }}{{ partial "pages/tags.html" . }}

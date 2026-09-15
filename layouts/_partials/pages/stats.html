@@ -1,0 +1,212 @@
+{{- /* ============================================================
+     统计页（stats）· 数据层 + 骨架
+     统计口径全部在构建期由 Hugo 算完，前端只负责渲染。
+     口径对齐 hexo-graph：仅统计 Section=posts 的文章；
+     热力图取「发布日期 → 当天成文篇数」。
+     ============================================================ */ -}}
+
+{{- $posts := where site.RegularPages "Section" "posts" -}}
+
+{{- /* ---- 每日 / 每月成文数：GroupByDate 的 Key 是 ISO 字符串，天然可排序 ---- */ -}}
+{{- $dailyItems := slice -}}
+{{- range $posts.GroupByDate "2006-01-02" "asc" -}}
+  {{- $dailyItems = $dailyItems | append (dict "date" .Key "count" (len .Pages)) -}}
+{{- end -}}
+
+{{- $monthlyItems := slice -}}
+{{- range $posts.GroupByDate "2006-01" "asc" -}}
+  {{- $monthlyItems = $monthlyItems | append (dict "month" .Key "count" (len .Pages)) -}}
+{{- end -}}
+
+{{- /* ---- 分类法条目：计数与链接必须同源于 Taxonomies。
+        Hugo 会把 term 归一化（Hexo → hexo），若自行拼 /tags/<原名> 会 404。 ---- */ -}}
+{{- $tags := slice -}}
+{{- range $term, $wp := site.Taxonomies.tags -}}
+  {{- $n := 0 -}}
+  {{- range $wp -}}{{- if eq .Page.Section "posts" -}}{{- $n = add $n 1 -}}{{- end -}}{{- end -}}
+  {{- if gt $n 0 -}}
+    {{- $name := $term -}}
+    {{- $url := printf "/tags/%s/" $term -}}
+    {{- with site.GetPage (printf "/tags/%s" $term) -}}
+      {{- $name = .LinkTitle -}}
+      {{- $url = .RelPermalink -}}
+    {{- end -}}
+    {{- $tags = $tags | append (dict "name" $name "value" $n "url" $url) -}}
+  {{- end -}}
+{{- end -}}
+{{- $tags = sort $tags "value" "desc" -}}
+
+{{- $categories := slice -}}
+{{- range $term, $wp := site.Taxonomies.categories -}}
+  {{- $n := 0 -}}
+  {{- range $wp -}}{{- if eq .Page.Section "posts" -}}{{- $n = add $n 1 -}}{{- end -}}{{- end -}}
+  {{- if gt $n 0 -}}
+    {{- $name := $term -}}
+    {{- $url := printf "/categories/%s/" $term -}}
+    {{- with site.GetPage (printf "/categories/%s" $term) -}}
+      {{- $name = .LinkTitle -}}
+      {{- $url = .RelPermalink -}}
+    {{- end -}}
+    {{- $categories = $categories | append (dict "name" $name "value" $n "url" $url) -}}
+  {{- end -}}
+{{- end -}}
+{{- $categories = sort $categories "value" "desc" -}}
+
+{{- /* ---- 概览指标 ---- */ -}}
+{{- $words := 0 -}}
+{{- range $posts -}}{{- $words = add $words .WordCount -}}{{- end -}}
+
+{{- /* ---- 热力图的星期标注 ----
+       一周从哪天开始由 hugo.yaml 的 solitude.stats 决定；
+       名字默认取 i18n 的 clockWeek1..7（1 = 周日，四语齐备）。
+       ECharts 的 nameMap 是按星期序号（0 = 周日）索引的，不随起始日旋转，
+       所以这里必须始终从周日排到周六，让 firstDay 单独控制行的顺序。 ---- */ -}}
+{{- $statsCfg := index (site.Params.solitude | default dict) "stats" | default dict -}}
+
+{{- $weekdayLabel := true -}}
+{{- range $key := slice "weekday_label" "weekdayLabel" -}}
+  {{- if isset $statsCfg $key -}}
+    {{- $weekdayLabel = eq "true" (printf "%v" (index $statsCfg $key)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $weekStartAliases := dict
+      "sunday" 0 "sun" 0
+      "monday" 1 "mon" 1
+      "tuesday" 2 "tue" 2 "tues" 2
+      "wednesday" 3 "wed" 3
+      "thursday" 4 "thu" 4 "thur" 4 "thurs" 4
+      "friday" 5 "fri" 5
+      "saturday" 6 "sat" 6 -}}
+{{- $weekStart := lower (printf "%v" ($statsCfg.week_start | default "sunday")) -}}
+{{- $firstDay := 0 -}}
+{{- if isset $weekStartAliases $weekStart -}}
+  {{- $firstDay = index $weekStartAliases $weekStart -}}
+{{- else if findRE `^[0-6]$` $weekStart -}}
+  {{- $firstDay = int $weekStart -}}
+{{- end -}}
+
+{{- $weekdayNames := $statsCfg.weekday_names | default slice -}}
+{{- if ne (len $weekdayNames) 7 -}}
+  {{- $weekdayNames = slice -}}
+  {{- range seq 7 -}}
+    {{- $weekdayNames = $weekdayNames | append (i18n (printf "clockWeek%d" .)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $data := dict
+      "posts" (len $posts)
+      "daily" $dailyItems
+      "monthly" $monthlyItems
+      "tags" $tags
+      "categories" $categories
+      "words" $words
+      "activeDays" (len $dailyItems)
+      "dayLabel" (dict "show" $weekdayLabel "firstDay" $firstDay "names" $weekdayNames) -}}
+
+<header class="page-title-wrap st-header">
+  <h1 class="page-title">{{ .Title }}</h1>
+  {{ with .Description }}<p>{{ . }}</p>{{ end }}
+</header>
+
+{{ with .Content }}<div class="st-intro article-container">{{ . }}</div>{{ end }}
+
+{{ if $posts }}
+<div class="st-shell">
+
+  {{- /* ---------- 概览指标：服务端直出，无 JS 也可读 ---------- */ -}}
+  <section class="st-overview-wrap" aria-label="统计概览">
+    <dl class="st-overview">
+      <div class="st-metric">
+        <dt class="st-metric-label">文章总数</dt>
+        <dd class="st-metric-value">{{ len $posts }}<span class="st-metric-unit">篇</span></dd>
+      </div>
+      <div class="st-metric">
+        <dt class="st-metric-label">累计字数</dt>
+        <dd class="st-metric-value">{{ lang.FormatNumber 0 $words }}<span class="st-metric-unit">字</span></dd>
+      </div>
+      <div class="st-metric">
+        <dt class="st-metric-label">使用标签</dt>
+        <dd class="st-metric-value">{{ len $tags }}<span class="st-metric-unit">个</span></dd>
+      </div>
+      <div class="st-metric">
+        <dt class="st-metric-label">活跃写作</dt>
+        <dd class="st-metric-value">{{ len $dailyItems }}<span class="st-metric-unit">天</span></dd>
+      </div>
+    </dl>
+  </section>
+
+  {{- /* ---------- 写作热力图：页面主角，通栏 ---------- */ -}}
+  <section class="st-card st-card--hero" data-st-card="heatmap">
+    <header class="st-card-head">
+      <div class="st-card-title">
+        <h2>写作热力图</h2>
+        <p>按发布日期统计每天的成文篇数，颜色越深产量越高</p>
+      </div>
+      <div class="st-years" data-st-years role="group" aria-label="切换年份" hidden></div>
+    </header>
+    <div class="st-card-body">
+      <div class="st-chart st-chart--heatmap" data-st-chart="heatmap" aria-label="年度写作热力图"></div>
+    </div>
+    <footer class="st-card-foot">
+      {{- /* 图例由 JS 按 --efu-* token 现场生成，避免在模板里写死色标 */ -}}
+      <div class="st-legend" data-st-legend>
+        <span class="st-legend-label">少</span>
+        <span class="st-legend-scale" data-st-legend-scale></span>
+        <span class="st-legend-label">多</span>
+      </div>
+    </footer>
+  </section>
+
+  {{- /* ---------- 月度产出趋势 ---------- */ -}}
+  <section class="st-card" data-st-card="monthly">
+    <header class="st-card-head">
+      <div class="st-card-title">
+        <h2>月度产出趋势</h2>
+        <p>每个月的成文篇数，看写作节奏的起伏</p>
+      </div>
+    </header>
+    <div class="st-card-body">
+      <div class="st-chart st-chart--monthly" data-st-chart="monthly" aria-label="月度成文趋势折线图"></div>
+    </div>
+  </section>
+
+  {{- /* ---------- 标签与分类：宽屏并排，窄屏堆叠 ---------- */ -}}
+  <div class="st-grid">
+    <section class="st-card" data-st-card="tags">
+      <header class="st-card-head">
+        <div class="st-card-title">
+          <h2>标签分布</h2>
+          <p>点击扇区可进入对应标签页</p>
+        </div>
+      </header>
+      <div class="st-card-body">
+        <div class="st-chart st-chart--tags" data-st-chart="tags" aria-label="标签使用分布饼图"></div>
+      </div>
+    </section>
+
+    <section class="st-card" data-st-card="categories">
+      <header class="st-card-head">
+        <div class="st-card-title">
+          <h2>分类分布</h2>
+          <p>点击条形可进入对应分类页</p>
+        </div>
+      </header>
+      <div class="st-card-body">
+        <div class="st-chart st-chart--categories" data-st-chart="categories" aria-label="分类文章数条形图"></div>
+      </div>
+    </section>
+  </div>
+
+  <p class="st-note">
+    统计范围仅含「文章」列表下的内容，不含独立页面、说说与留言。
+    数据在构建时由 Hugo 计算，不依赖外部统计服务。
+  </p>
+</div>
+
+<template id="stats-data">{{ $data | jsonify | safeHTML }}</template>
+{{ else }}
+<div class="st-empty">
+  <p>还没有已发布的文章，统计数据要等第一篇文章上线后才有意义。</p>
+</div>
+{{ end }}

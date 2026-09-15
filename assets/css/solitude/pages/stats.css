@@ -1,0 +1,388 @@
+/* ============================================================
+   stats.css · 数据统计页（糖果屋规范）
+   全部颜色走 token：明暗两套自动适配，禁止硬编码色值。
+   图表内部的配色由 stats.ts 从 --efu-* 现场解析后注入 canvas，
+   本文件只负责外壳、排版、布局与动效降级。
+   ============================================================ */
+
+/* ---------- 页头 ---------- */
+.st-header {
+  margin-bottom: 4px;
+}
+
+.st-header p {
+  margin: 4px 0 0;
+  color: var(--efu-secondtext);
+  font-size: 15px;
+}
+
+.st-intro {
+  margin-bottom: 4px;
+}
+
+.st-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- 概览指标 ----------
+   左侧 4px 主题色竖条沿用 changelog 条目标题的既有母题，
+   让两页在视觉上属于同一家族。 */
+.st-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.st-metric {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px 14px 20px;
+  overflow: hidden;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--efu-card-bg);
+  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0
+    var(--candy-nav-border, var(--efu-card-border));
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.st-metric::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--efu-theme);
+}
+
+.st-metric:hover {
+  border-color: var(--efu-theme);
+  box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0
+    var(--efu-theme);
+  transform: translate(-2px, -2px);
+}
+
+.st-metric-label {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--efu-secondtext);
+}
+
+.st-metric-value {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--efu-fontcolor);
+  /* 数据类界面统一等宽数字，避免位数变化导致宽度跳动 */
+  font-variant-numeric: tabular-nums;
+}
+
+.st-metric-unit {
+  margin-left: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--efu-secondtext);
+}
+
+/* ---------- 图表卡片 ---------- */
+.st-card {
+  position: relative;
+  overflow: hidden;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--efu-card-bg);
+  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0
+    var(--candy-nav-border, var(--efu-card-border));
+}
+
+.st-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 14px 16px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--efu-card-border) 45%, transparent);
+}
+
+.st-card-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--efu-fontcolor);
+}
+
+.st-card-title h2::before {
+  content: "";
+  flex: none;
+  width: 4px;
+  height: 1em;
+  border-radius: 2px;
+  background: var(--efu-theme);
+  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+.st-card-title p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--efu-secondtext);
+}
+
+.st-card-body {
+  padding: 12px 16px 4px;
+}
+
+/* 热力图在窄屏会超出容器：外层横向滚动，画布保持可读的固定最小宽度 */
+.st-card--hero .st-card-body {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+}
+
+/* ---------- 图表画布高度 ---------- */
+.st-chart {
+  width: 100%;
+}
+
+.st-chart--heatmap {
+  height: 200px;
+}
+
+.st-chart--monthly {
+  height: 280px;
+}
+
+.st-chart--tags,
+.st-chart--categories {
+  height: 300px;
+}
+
+/* ---------- 热力图图例（格子色标由 JS 按 token 现场生成） ---------- */
+.st-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 16px 14px;
+}
+
+.st-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--efu-secondtext);
+}
+
+.st-legend-scale {
+  display: flex;
+  gap: 4px;
+}
+
+.st-legend-cell {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--efu-card-border);
+  border-radius: 2px;
+  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+}
+
+/* ---------- 年份切换 ---------- */
+.st-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.st-years[hidden] {
+  display: none;
+}
+
+.st-year {
+  padding: 6px 14px;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  background: var(--efu-card-bg);
+  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  color: var(--efu-fontcolor);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease, border-color 0.2s ease;
+}
+
+.st-year:hover,
+.st-year[aria-pressed="true"] {
+  border-color: var(--efu-theme);
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+.st-year:hover {
+  transform: translateY(-1px);
+}
+
+.st-year:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.st-year:focus-visible {
+  outline: 2px solid var(--efu-theme);
+  outline-offset: 2px;
+}
+
+/* 触屏设备把点击目标撑到 44px，桌面端保持紧凑 */
+@media (pointer: coarse) {
+  .st-year {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+/* ---------- 口径说明 ---------- */
+.st-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--efu-secondtext);
+}
+
+/* ---------- 空态 ---------- */
+.st-empty {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--efu-secondtext);
+}
+
+.st-empty p {
+  margin: 0;
+}
+
+/* ---------- 两列栅格：宽屏并排，窄屏堆叠 ---------- */
+.st-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media screen and (min-width: 1024px) {
+  .st-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 640px) {
+  .st-overview {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* ---------- 窄屏 ---------- */
+@media screen and (max-width: 768px) {
+  .st-metric {
+    padding: 12px 12px 12px 16px;
+  }
+
+  .st-metric-value {
+    font-size: 24px;
+  }
+
+  .st-card-head {
+    padding: 12px 14px;
+  }
+
+  .st-card-body {
+    padding: 10px 12px 2px;
+  }
+
+  .st-card-foot {
+    padding: 0 12px 12px;
+  }
+
+  /* 热力图的最小宽度与高度由 stats.ts 按格子边长算出并写进行内样式，
+     这里只管普通图表的高度，避免两处各写一套几何常量 */
+
+  .st-chart--monthly {
+    height: 240px;
+  }
+
+  .st-chart--tags,
+  .st-chart--categories {
+    height: 280px;
+  }
+}
+
+/* ---------- 入场编排：一次错峰序列，而非零散微交互 ---------- */
+@keyframes st-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .st-overview,
+  .st-card,
+  .st-note {
+    animation: st-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .st-overview {
+    animation-delay: 40ms;
+  }
+
+  .st-card--hero {
+    animation-delay: 100ms;
+  }
+
+  .st-card[data-st-card="monthly"] {
+    animation-delay: 180ms;
+  }
+
+  .st-grid .st-card:nth-child(1) {
+    animation-delay: 260ms;
+  }
+
+  .st-grid .st-card:nth-child(2) {
+    animation-delay: 330ms;
+  }
+
+  .st-note {
+    animation-delay: 400ms;
+  }
+}
+
+/* ---------- 动效降级 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .st-metric,
+  .st-year {
+    transition: none;
+  }
+
+  .st-metric:hover {
+    transform: none;
+  }
+
+  .st-year:hover,
+  .st-year:active {
+    transform: none;
+  }
+}

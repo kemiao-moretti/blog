@@ -290,43 +290,9 @@
   box-shadow: var(--card-hover-box-shadow);
 }
 
-/* 视频：深底 + 居中糖果播放钮 */
+/* 视频：使用原生视频控件 */
 .gallery-photo video.gallery-photo__media {
   border-color: color-mix(in srgb, var(--efu-card-border) 70%, transparent);
-}
-
-.gallery-photo.is-video::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 52px;
-  height: 52px;
-  transform: translate(-50%, -50%);
-  background: var(--efu-theme);
-  border: var(--candy-border-width) solid var(--efu-card-border);
-  border-radius: 50%;
-  box-shadow: 2px 2px 0 var(--efu-card-border);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.gallery-photo.is-video::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-38%, -50%);
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-  border-left: 14px solid var(--efu-card-bg);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.gallery-photo.is-video:hover::after {
-  box-shadow: 3px 3px 0 var(--efu-card-border);
-  transform: translate(calc(-50% - 1px), calc(-50% - 1px));
 }
 
 /* 图注 */
