@@ -6,7 +6,6 @@
 <script defer src="{{ $cfg.cdn.snackbar }}"></script>
 {{ if $cfg.mermaid }}<script defer src="{{ $cfg.cdn.mermaid }}"></script>{{ end }}
 {{ if $cfg.chart }}<script defer src="{{ $cfg.cdn.chart }}"></script>{{ end }}
-{{ if eq $pageType "stats" }}<script defer src="{{ $cfg.cdn.echarts }}"></script>{{ end }}
 {{ if $cfg.typeit }}<script defer src="{{ $cfg.cdn.typeit }}"></script>{{ end }}
 {{ if eq $cfg.lightbox "fancybox" }}<script src="{{ $cfg.cdn.fancyapps_js }}"></script>{{ end }}
 {{ if and $cfg.search.enable (eq $cfg.search.type "algolia") }}<script src="{{ $cfg.cdn.algoliasearch }}"></script><script src="{{ $cfg.cdn.instantsearch }}"></script>{{ end }}

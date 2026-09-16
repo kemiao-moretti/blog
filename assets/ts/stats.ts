@@ -135,6 +135,8 @@ let themeObserver: MutationObserver | null = null;
 let resizer: ResizeObserver | null = null;
 let themeTimer = 0;
 let resizeRaf = 0;
+let initPromise: Promise<void> | null = null;
+const mountTimers: number[] = [];
 
 const prefersReducedMotion = () =>
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -298,8 +300,8 @@ const monthlyOption = (t: Tokens, monthly: MonthPoint[]): any => {
     ...baseOf(t),
     tooltip: {
       ...tooltipOf(t),
-      trigger: "axis",
-      formatter: (params: any) => `${params[0].axisValue}<br/>${params[0].data} 篇`,
+      trigger: "item",
+      formatter: (param: any) => `${param.axisValueLabel ?? param.name ?? ""}<br/>${param.value} 篇`,
     },
     grid: { top: 34, left: 8, right: 24, bottom: 8, containLabel: true },
     xAxis: {
@@ -555,6 +557,7 @@ const observeTheme = () => {
 };
 
 const teardown = () => {
+  mountTimers.splice(0).forEach((timer) => window.clearTimeout(timer));
   ctx?.charts.forEach((chart) => {
     try {
       chart.dispose();
@@ -595,6 +598,16 @@ const ensureECharts = async () => {
 };
 
 const initStats = async () => {
+  if (initPromise) return initPromise;
+  initPromise = initStatsOnce();
+  try {
+    await initPromise;
+  } finally {
+    initPromise = null;
+  }
+};
+
+const initStatsOnce = async () => {
   const shell = document.querySelector<HTMLElement>(SHELL_SEL);
   const holder = document.getElementById(DATA_ID);
   if (!shell || !holder || shell.dataset.stReady === "1") return;
@@ -643,7 +656,13 @@ const initStats = async () => {
   const step = prefersReducedMotion() ? 0 : 90;
   order.forEach((kind, index) => {
     const el = targets.get(kind);
-    if (el) window.setTimeout(() => mountChart(kind, el), index * step);
+    if (!el) return;
+    const timer = window.setTimeout(() => {
+      const timerIndex = mountTimers.indexOf(timer);
+      if (timerIndex >= 0) mountTimers.splice(timerIndex, 1);
+      mountChart(kind, el);
+    }, index * step);
+    mountTimers.push(timer);
   });
 
   observeTheme();
