@@ -62,6 +62,13 @@
        ECharts 的 nameMap 是按星期序号（0 = 周日）索引的，不随起始日旋转，
        所以这里必须始终从周日排到周六，让 firstDay 单独控制行的顺序。 ---- */ -}}
 {{- $statsCfg := index (site.Params.solitude | default dict) "stats" | default dict -}}
+{{- $umamiCfg := $statsCfg.umami | default dict -}}
+{{- $umamiEnable := false -}}
+{{- range $key := slice "enable" "enabled" -}}
+  {{- if isset $umamiCfg $key -}}
+    {{- $umamiEnable = eq "true" (printf "%v" (index $umamiCfg $key)) -}}
+  {{- end -}}
+{{- end -}}
 
 {{- $weekdayLabel := true -}}
 {{- range $key := slice "weekday_label" "weekdayLabel" -}}
@@ -198,9 +205,60 @@
     </section>
   </div>
 
+  {{ if $umamiEnable }}
+  <section class="st-card st-umami" data-st-umami aria-label="站访数据">
+    <header class="st-card-head">
+      <div class="st-card-title">
+        <h2>站访数据</h2>
+        <p>由 Umami 公开分享接口统计，指标范围为最近 30 天</p>
+      </div>
+    </header>
+    <div class="st-card-body">
+      <p class="st-umami-state" data-st-umami-state aria-live="polite">正在加载站访数据…</p>
+
+      <dl class="st-overview" data-st-umami-overview hidden>
+        <div class="st-metric">
+          <dt class="st-metric-label">总访问量</dt>
+          <dd class="st-metric-value" data-umami-value="visits">–</dd>
+          <dd class="st-metric-delta" data-umami-delta="visits" hidden></dd>
+        </div>
+        <div class="st-metric">
+          <dt class="st-metric-label">独立访客</dt>
+          <dd class="st-metric-value" data-umami-value="visitors">–</dd>
+          <dd class="st-metric-delta" data-umami-delta="visitors" hidden></dd>
+        </div>
+        <div class="st-metric">
+          <dt class="st-metric-label">浏览量</dt>
+          <dd class="st-metric-value" data-umami-value="pageviews">–</dd>
+          <dd class="st-metric-delta" data-umami-delta="pageviews" hidden></dd>
+        </div>
+        <div class="st-metric">
+          <dt class="st-metric-label">跳出率</dt>
+          <dd class="st-metric-value" data-umami-value="bounceRate">–</dd>
+          <dd class="st-metric-delta" data-umami-delta="bounceRate" hidden></dd>
+        </div>
+      </dl>
+
+      <div class="st-umami-grid" data-st-umami-grid hidden>
+        <div class="st-umami-panel">
+          <h3>访问趋势</h3>
+          <div class="st-umami-trend" data-st-umami-trend role="img" aria-label="最近 30 天访问趋势"></div>
+        </div>
+        <div class="st-umami-panel">
+          <h3>热门页面</h3>
+          <ol class="st-umami-top" data-st-umami-top></ol>
+        </div>
+      </div>
+    </div>
+    <footer class="st-card-foot">
+      <p class="st-note">数据来自 Umami 公开分享，仅覆盖已开启分享的时间范围。</p>
+    </footer>
+  </section>
+  {{ end }}
+
   <p class="st-note">
-    统计范围仅含「文章」列表下的内容，不含独立页面、说说与留言。
-    数据在构建时由 Hugo 计算，不依赖外部统计服务。
+    写作数据（文章数、字数、热力图等）在构建时由 Hugo 计算；
+    站访数据由 Umami 公开分享接口提供，仅反映已开启分享的时间范围。
   </p>
 </div>
 

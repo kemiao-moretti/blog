@@ -670,3 +670,286 @@ const initStatsOnce = async () => {
 
 initStats();
 document.addEventListener("solitude:afterNavigate", () => void initStats());
+
+type UmamiCfg = {
+  enable: boolean;
+  endpoint: string;
+  shareId: string;
+};
+
+type UmamiValue = { value: number; prev: number | undefined };
+type UmamiOverview = {
+  pageviews: UmamiValue;
+  visitors: UmamiValue;
+  visits: UmamiValue;
+  bounceRate: UmamiValue;
+};
+type UmamiTrendPoint = { x: string; y: number };
+type UmamiMetricRow = { x: string; y: number };
+type UmamiShareMeta = { websiteId?: string; token?: string };
+type UmamiStatsSnapshot = {
+  pageviews: number;
+  visitors: number;
+  visits: number;
+  bounces: number;
+  totaltime: number;
+  comparison?: UmamiStatsSnapshot;
+};
+
+const UMAMI_SEL = "[data-st-umami]";
+const UMAMI_STATE_SEL = "[data-st-umami-state]";
+const UMAMI_OVERVIEW_SEL = "[data-st-umami-overview]";
+const UMAMI_GRID_SEL = "[data-st-umami-grid]";
+const UMAMI_TREND_SEL = "[data-st-umami-trend]";
+const UMAMI_TOP_SEL = "[data-st-umami-top]";
+const UMAMI_DAYS = 30;
+const UMAMI_TOP_LIMIT = 8;
+const UMAMI_TIMEOUT = 8000;
+
+let umamiAbort: AbortController | null = null;
+
+const umamiConfig = (): UmamiCfg | null => {
+  const raw = (Solitude.config as any)?.stats?.umami;
+  if (!raw || typeof raw !== "object") return null;
+  return {
+    enable: raw.enable !== false,
+    endpoint: String(raw.endpoint ?? "").replace(/\/+$/, ""),
+    shareId: String(raw.shareId ?? raw.share_id ?? ""),
+  };
+};
+
+const fetchUmamiJson = async (
+  url: string,
+  signal: AbortSignal,
+  headers: Record<string, string> = {}
+): Promise<any> => {
+  const controller = new AbortController();
+  const onOuterAbort = () => controller.abort();
+  signal.addEventListener("abort", onOuterAbort, { once: true });
+  const timer = window.setTimeout(() => controller.abort(), UMAMI_TIMEOUT);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: "application/json", ...headers },
+    });
+    if (!response.ok) throw new Error(`Umami HTTP ${response.status}`);
+    return await response.json();
+  } finally {
+    window.clearTimeout(timer);
+    signal.removeEventListener("abort", onOuterAbort);
+  }
+};
+
+const umamiNumber = (value: number, fraction = 0): string =>
+  value.toLocaleString("zh-CN", { maximumFractionDigits: fraction });
+
+const umamiDeltaText = (value: number, prev: number): string => {
+  if (!Number.isFinite(prev) || prev <= 0) return "";
+  const diff = ((value - prev) / prev) * 100;
+  const sign = diff > 0 ? "↑" : diff < 0 ? "↓" : "→";
+  return `${sign} ${Math.abs(diff).toFixed(1)}%`;
+};
+
+const showUmamiState = (root: HTMLElement, text: string, kind: string) => {
+  const state = root.querySelector<HTMLElement>(UMAMI_STATE_SEL);
+  if (state) {
+    state.textContent = text;
+    state.hidden = false;
+    state.dataset.kind = kind;
+  }
+  root.querySelector(UMAMI_OVERVIEW_SEL)?.setAttribute("hidden", "");
+  root.querySelector(UMAMI_GRID_SEL)?.setAttribute("hidden", "");
+};
+
+const hideUmamiState = (root: HTMLElement) => {
+  root.querySelector(UMAMI_STATE_SEL)?.setAttribute("hidden", "");
+  root.querySelector(UMAMI_OVERVIEW_SEL)?.removeAttribute("hidden");
+  root.querySelector(UMAMI_GRID_SEL)?.removeAttribute("hidden");
+};
+
+const fillUmamiMetrics = (root: HTMLElement, overview: UmamiOverview) => {
+  const defs: Array<[string, number, number?]> = [
+    ["visits", overview.visits?.value ?? 0, 0],
+    ["visitors", overview.visitors?.value ?? 0, 0],
+    ["pageviews", overview.pageviews?.value ?? 0, 0],
+    ["bounceRate", overview.bounceRate?.value ?? 0, 1],
+  ];
+  for (const [key, value, fraction] of defs) {
+    const valueEl = root.querySelector<HTMLElement>(`[data-umami-value="${key}"]`);
+    if (valueEl) valueEl.textContent = umamiNumber(value, fraction);
+    const deltaEl = root.querySelector<HTMLElement>(`[data-umami-delta="${key}"]`);
+    if (!deltaEl) continue;
+    const prev = (overview as any)[key]?.prev;
+    const text = typeof prev === "number" ? umamiDeltaText(value, prev) : "";
+    deltaEl.textContent = text ? `较上期 ${text}` : "";
+    deltaEl.hidden = !text;
+    deltaEl.classList.toggle("is-up", text.startsWith("↑"));
+    deltaEl.classList.toggle("is-down", text.startsWith("↓"));
+  }
+};
+
+const pageLabelOf = (url: string): string => {
+  const path = url.split("?")[0].split("#")[0];
+  let label = "";
+  try {
+    label = decodeURIComponent(path);
+  } catch (error) {
+    label = path;
+  }
+  return label || "/";
+};
+
+const renderUmamiTrend = (root: HTMLElement, rows: UmamiTrendPoint[]) => {
+  const box = root.querySelector<HTMLElement>(UMAMI_TREND_SEL);
+  if (!box) return;
+  if (!rows.length) {
+    const empty = document.createElement("p");
+    empty.className = "st-umami-trend-empty";
+    empty.textContent = "暂无趋势数据";
+    box.replaceChildren(empty);
+    return;
+  }
+  const max = Math.max(1, ...rows.map((row) => row.y));
+  box.replaceChildren(
+    ...rows.map((row) => {
+      const cell = document.createElement("div");
+      cell.className = "st-umami-trend-cell";
+      const bar = document.createElement("div");
+      bar.className = "st-umami-bar";
+      bar.style.height = `${Math.round(Math.max(row.y / max, 0.04) * 100)}%`;
+      bar.title = `${row.x} · ${row.y} 次`;
+      cell.appendChild(bar);
+      return cell;
+    })
+  );
+};
+
+const renderUmamiTop = (root: HTMLElement, rows: UmamiMetricRow[]) => {
+  const list = root.querySelector<HTMLElement>(UMAMI_TOP_SEL);
+  if (!list) return;
+  list.replaceChildren(
+    ...rows.map((row, index) => {
+      const item = document.createElement("li");
+      item.className = "st-umami-top-item";
+      const rank = document.createElement("span");
+      rank.className = "st-umami-rank";
+      rank.textContent = String(index + 1);
+      const link = document.createElement("a");
+      link.className = "st-umami-url";
+      link.href = row.x;
+      link.textContent = pageLabelOf(row.x);
+      link.title = row.x;
+      if (row.x.startsWith("/")) {
+        link.addEventListener("click", (event: Event) => {
+          event.preventDefault();
+          if (typeof Solitude.navigate === "function") Solitude.navigate(row.x);
+          else window.location.assign(row.x);
+        });
+      }
+      const count = document.createElement("span");
+      count.className = "st-umami-count";
+      count.textContent = `${row.y} 次`;
+      item.append(rank, link, count);
+      return item;
+    })
+  );
+};
+
+const isUmamiEmpty = (overview: UmamiOverview): boolean =>
+  !overview ||
+  (!overview.visits?.value && !overview.pageviews?.value && !overview.visitors?.value);
+
+const initUmami = async () => {
+  const root = document.querySelector<HTMLElement>(UMAMI_SEL);
+  if (!root) return;
+
+  umamiAbort?.abort();
+  const controller = new AbortController();
+  umamiAbort = controller;
+
+  const cfg = umamiConfig();
+  if (!cfg || !cfg.enable) return;
+  if (!cfg.endpoint || !cfg.shareId) {
+    showUmamiState(
+      root,
+      "未配置公开分享数据：请在 Umami 后台为对应站点创建分享链接，并填写 share_id。",
+      "disabled"
+    );
+    return;
+  }
+
+  showUmamiState(root, "正在加载站访数据…", "loading");
+  const end = Date.now();
+  const start = end - UMAMI_DAYS * 86400000;
+
+  try {
+    const metaRes = (await fetchUmamiJson(
+      `${cfg.endpoint}/api/share/${encodeURIComponent(cfg.shareId)}`,
+      controller.signal
+    )) as UmamiShareMeta | null;
+    const websiteId = String(metaRes?.websiteId ?? "");
+    const token = String(metaRes?.token ?? "");
+    if (!websiteId || !token) throw new Error("Umami share metadata missing");
+
+    const authHeaders = { "x-umami-share-token": token, "x-umami-share-context": "1" };
+    const siteBase = `${cfg.endpoint}/api/websites/${encodeURIComponent(websiteId)}`;
+    const timezone = encodeURIComponent(
+      Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/GMT-8"
+    );
+
+    const [stats, trend, top] = await Promise.all([
+      fetchUmamiJson(
+        `${siteBase}/stats?startAt=${start}&endAt=${end}`,
+        controller.signal,
+        authHeaders
+      ),
+      fetchUmamiJson(
+        `${siteBase}/pageviews?startAt=${start}&endAt=${end}&unit=day&timezone=${timezone}`,
+        controller.signal,
+        authHeaders
+      ),
+      fetchUmamiJson(
+        `${siteBase}/metrics?startAt=${start}&endAt=${end}&type=path&limit=${UMAMI_TOP_LIMIT}&timezone=${timezone}`,
+        controller.signal,
+        authHeaders
+      ),
+    ]);
+
+    if (controller.signal.aborted || !root.isConnected) return;
+
+    const snap = (stats ?? {}) as UmamiStatsSnapshot;
+    const overview: UmamiOverview = {
+      visits: { value: snap.visits ?? 0, prev: snap.comparison?.visits },
+      visitors: { value: snap.visitors ?? 0, prev: snap.comparison?.visitors },
+      pageviews: { value: snap.pageviews ?? 0, prev: snap.comparison?.pageviews },
+      bounceRate: {
+        value: snap.visits ? (snap.bounces / snap.visits) * 100 : 0,
+        prev: snap.comparison?.visits
+          ? (snap.comparison.bounces / snap.comparison.visits) * 100
+          : undefined,
+      },
+    };
+
+    if (isUmamiEmpty(overview)) {
+      showUmamiState(root, "最近 30 天还没有访问数据。", "empty");
+      return;
+    }
+
+    fillUmamiMetrics(root, overview);
+    renderUmamiTrend(root, Array.isArray(trend?.pageviews) ? trend.pageviews : []);
+    renderUmamiTop(root, Array.isArray(top) ? top : []);
+    hideUmamiState(root);
+
+    Solitude.onPageCleanup(() => {
+      controller.abort();
+      if (umamiAbort === controller) umamiAbort = null;
+    });
+  } catch (error) {
+    if (controller.signal.aborted) return;
+    console.error("Failed to load Umami stats:", error);
+    showUmamiState(root, "站访数据暂时不可用，请稍后再试。", "error");
+  }
+};
+
+initUmami();
+document.addEventListener("solitude:afterNavigate", () => void initUmami());
