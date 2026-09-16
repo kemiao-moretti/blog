@@ -17,6 +17,7 @@
   --candy-radius-lg: calc(var(--candy-radius) + 4px);
   --candy-code-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 var(--candy-nav-border, var(--efu-card-border));
   --candy-code-surface: var(--solitude-candy-code-surface, #202327);
+  --candy-nav-active-surface: var(--efu-theme);
 
   /* 覆盖上游圆角 */
   --radius: var(--candy-radius);

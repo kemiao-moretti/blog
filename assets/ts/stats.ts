@@ -91,7 +91,7 @@ const textWidth = (text: string, fontSize: number): number =>
 
 /** 星期标注需要的左侧留白；不显示时是 0，网格就能贴到画布左缘 */
 const dayLabelGutter = (data: StatsData, fontSize: number): number => {
-  const { show, names } = data.dayLabel;
+  const { show, names } = data.dayLabel ?? { show: false, names: [] };
   if (!show || !names.length) return 0;
   const widest = Math.max(...names.map((name) => textWidth(name, fontSize)));
   return Math.ceil(widest) + DAY_LABEL_MARGIN + DAY_LABEL_SAFE;
@@ -237,7 +237,7 @@ const heatmapOption = (t: Tokens, data: StatsData, year: string, layout: HeatLay
   const rows = data.daily.filter((d) => d.date.startsWith(year));
   const max = Math.max(1, ...rows.map((d) => d.count));
   const scale = [themeMix(28), themeMix(52), themeMix(76), t.theme].filter(Boolean);
-  const { show, firstDay, names } = data.dayLabel;
+  const { show, firstDay, names } = data.dayLabel ?? { show: false, firstDay: 0, names: [] };
   const withDayLabel = show && names.length > 0;
 
   return {

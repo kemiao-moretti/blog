@@ -157,9 +157,9 @@ code:not(.code-block code) {
 
 #nav .menus_items .menus_item > .site-page:hover,
 #nav .menus_items .menus_item:hover > .site-page {
-  background: var(--candy-nav-hover-surface, var(--efu-main-op-light));
-  color: var(--efu-fontcolor);
-  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  border-color: var(--efu-theme);
   box-shadow: none;
   transform: translateY(-1px);
 }
