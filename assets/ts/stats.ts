@@ -583,6 +583,17 @@ const waitForECharts = async (timeout = 6000): Promise<any> => {
   return null;
 };
 
+const ensureECharts = async () => {
+  if ((window as any).echarts) return;
+  const url = Solitude.config?.cdn?.echarts;
+  if (!url) return;
+  try {
+    await Solitude.loadScript(url);
+  } catch (error) {
+    console.error("Failed to load ECharts:", error);
+  }
+};
+
 const initStats = async () => {
   const shell = document.querySelector<HTMLElement>(SHELL_SEL);
   const holder = document.getElementById(DATA_ID);
@@ -602,6 +613,7 @@ const initStats = async () => {
   }
   if (!Array.isArray(data?.daily) || data.daily.length === 0) return;
 
+  await ensureECharts();
   const library = await waitForECharts();
   if (!library) return;
 
