@@ -1,11 +1,12 @@
 import { Solitude } from "./core/api";
 
 /**
- * 说说页（/shuoshuo/）：从自托管 Ech0 实时拉取数据并渲染瀑布流卡片。
+ * 说说页（/shuoshuo/）：按配置在自托管 Ech0 与 Memos 之间切换数据源渲染瀑布流卡片。
  * - 数据源与开关全部来自页面容器的 data-* 属性（Hugo 模板注入）
+ * - ech0：实时分页拉取；memos：游标分页全量拉取 + 本地数字分页切片
  * - Markdown 用 marked 渲染、DOMPurify 净化（懒加载，仅本页需要）
  * - 图片统一交给主题 fancybox 灯箱
- * - 点赞走 Ech0 PUT /echo/like/{id}，本地记录防重复
+ * - 点赞（Ech0 PUT /echo/like/{id}）本地记录防重复；Memos reactions 只读展示
  */
 
 interface EchoFile {
@@ -39,6 +40,35 @@ interface EchoItem {
   created_at?: number;
 }
 
+interface MemosAttachment {
+  name?: string;
+  filename?: string;
+  type?: string;
+  size?: string;
+  externalLink?: string;
+}
+
+interface MemosReaction {
+  reactionType?: string;
+}
+
+interface MemosLocation {
+  placeholder?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+interface MemosItem {
+  name?: string;
+  content?: string;
+  createTime?: string;
+  tags?: string[];
+  attachments?: MemosAttachment[];
+  reactions?: MemosReaction[];
+  location?: MemosLocation;
+  pinned?: boolean;
+}
+
 interface PageConfig {
   api: string;
   pageSize: number;
@@ -50,6 +80,9 @@ interface PageConfig {
   extensions: Record<string, boolean>;
   markedUrl: string;
   dompurifyUrl: string;
+  source: "ech0" | "memos";
+  creator: string;
+  publicOnly: boolean;
 }
 
 const LIKED_KEY = "solitude-shuoshuo-liked";
@@ -86,6 +119,9 @@ const readConfig = (root: HTMLElement): PageConfig => ({
   },
   markedUrl: root.dataset.marked || "",
   dompurifyUrl: root.dataset.dompurify || "",
+  source: root.dataset.source === "memos" ? "memos" : "ech0",
+  creator: root.dataset.creator || "",
+  publicOnly: root.dataset.publicOnly === "true",
 });
 
 /* ---------------- 工具 ---------------- */
@@ -350,6 +386,207 @@ const buildCard = async (config: PageConfig, item: EchoItem) => {
   return card;
 };
 
+/* ---------------- Memos 卡片渲染 ---------------- */
+
+const formatBytes = (size?: string | number) => {
+  const bytes = Number(size);
+  if (!Number.isFinite(bytes) || bytes <= 0) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let index = 0;
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index += 1;
+  }
+  return `${index === 0 ? Math.round(value) : `${value >= 100 ? Math.round(value) : value.toFixed(1)}`} ${units[index]}`;
+};
+
+const memosAttachmentUrl = (config: PageConfig, attachment: MemosAttachment) => {
+  const raw = attachment.externalLink || attachment.name || "";
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return `${config.api}/file/${raw.replace(/^\/+/, "")}`;
+};
+
+const isImageMemos = (attachment: MemosAttachment) => {
+  const type = (attachment.type || "").toLowerCase();
+  const name = (attachment.filename || "").toLowerCase();
+  if (type.startsWith("image/")) return true;
+  return /\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|$)/i.test(name);
+};
+
+const deriveLinkCard = (content: string) => {
+  const mdLink = content.match(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/);
+  const url = mdLink
+    ? mdLink[2]
+    : content.match(/https?:\/\/[^\s"'<>（）()]+/)?.[0] || "";
+  if (!url) return null;
+  return {
+    url: url.replace(/[.,;:!?，。；：！？]+$/, ""),
+    title: mdLink ? mdLink[1].trim() : "",
+  };
+};
+
+const buildMemosExtensions = (config: PageConfig, item: MemosItem) => {
+  const parts: string[] = [];
+
+  if (config.extensions.LOCATION && item.location?.placeholder) {
+    const place = item.location.placeholder;
+    const lat = typeof item.location.latitude === "number" ? String(item.location.latitude) : "";
+    const lng = typeof item.location.longitude === "number" ? String(item.location.longitude) : "";
+    const mapUrl = lat && lng ? `https://uri.amap.com/marker?position=${lng},${lat}` : "";
+    const inner = `<i class="solitude fas fa-location-dot" aria-hidden="true"></i><span>${escapeHtml(place)}</span>`;
+    parts.push(mapUrl
+      ? `<a class="shuoshuo-ext ext-location" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+      : `<div class="shuoshuo-ext ext-location">${inner}</div>`);
+  }
+
+  if (config.extensions.WEBSITE) {
+    const derived = deriveLinkCard(item.content || "");
+    if (derived) {
+      const domain = domainOf(derived.url);
+      parts.push(`<a class="shuoshuo-ext ext-website" href="${escapeHtml(derived.url)}" target="_blank" rel="noopener noreferrer">
+        <i class="solitude fas fa-link" aria-hidden="true"></i>
+        <span class="ext-website-title">${escapeHtml(derived.title || domain)}</span>
+        <span class="ext-website-domain">${escapeHtml(domain)}</span>
+      </a>`);
+    }
+  }
+
+  return parts.join("");
+};
+
+const buildMemosReactions = (reactions?: MemosReaction[]) => {
+  if (!reactions?.length) return "";
+  const counts = new Map<string, number>();
+  reactions.forEach((reaction) => {
+    const type = (reaction.reactionType || "").trim();
+    if (!type) return;
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+  if (!counts.size) return "";
+  const inner = [...counts.entries()]
+    .map(([emoji, count]) =>
+      `<span class="shuoshuo-reaction"><span class="shuoshuo-reaction-emoji">${escapeHtml(emoji)}</span><span class="shuoshuo-reaction-count">${count}</span></span>`)
+    .join("");
+  return `<div class="shuoshuo-reactions">${inner}</div>`;
+};
+
+const buildMemosCard = async (config: PageConfig, item: MemosItem) => {
+  const card = document.createElement("article");
+  card.className = "shuoshuo-card";
+  card.dataset.id = item.name || "";
+
+  const createdStamp = parseMemosTime(item.createTime);
+  const header = document.createElement("div");
+  header.className = "shuoshuo-card-header";
+  header.innerHTML = `<img class="shuoshuo-avatar no-lightbox" src="${escapeHtml(config.authorAvatar)}" alt="" loading="lazy">
+    <div class="shuoshuo-author">
+      <span class="shuoshuo-name">${escapeHtml(config.authorName)}</span>
+      <time class="shuoshuo-time" datetime="${escapeHtml(formatTime(createdStamp))}">${escapeHtml(formatTime(createdStamp))}</time>
+    </div>`;
+  card.append(header);
+
+  const body = document.createElement("div");
+  body.className = "shuoshuo-card-body";
+  const html = await renderMarkdown(config, item.content || "");
+  body.innerHTML = html || "";
+  card.append(body);
+
+  const attachments = item.attachments || [];
+  const imageFiles = attachments.filter(isImageMemos);
+  const fileFiles = attachments.filter((attachment) => !isImageMemos(attachment));
+
+  if (imageFiles.length) {
+    const gallery = document.createElement("div");
+    gallery.className = "shuoshuo-gallery";
+    imageFiles.forEach((attachment) => {
+      const url = memosAttachmentUrl(config, attachment);
+      if (!url) return;
+      const link = document.createElement("a");
+      link.className = "shuoshuo-image";
+      link.href = url;
+      link.setAttribute("data-fancybox", "shuoshuo-gallery");
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "";
+      img.loading = "lazy";
+      img.addEventListener("error", () => link.classList.add("is-broken"), { once: true });
+      link.append(img);
+      gallery.append(link);
+    });
+    if (gallery.childElementCount) card.append(gallery);
+  }
+
+  if (fileFiles.length) {
+    const wrap = document.createElement("div");
+    wrap.className = "shuoshuo-ext-wrap";
+    wrap.innerHTML = fileFiles
+      .map((file) => {
+        const url = memosAttachmentUrl(config, file);
+        const size = formatBytes(file.size);
+        const name = file.filename || "附件";
+        const inner = `<i class="solitude fas fa-paperclip" aria-hidden="true"></i>
+          <span class="ext-file-name">${escapeHtml(name)}</span>
+          ${size ? `<span class="ext-file-size">${escapeHtml(size)}</span>` : ""}`;
+        return url
+          ? `<a class="shuoshuo-ext ext-file" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+          : `<div class="shuoshuo-ext ext-file">${inner}</div>`;
+      })
+      .join("");
+    card.append(wrap);
+  }
+
+  const extensions = buildMemosExtensions(config, item);
+  if (extensions) {
+    const wrap = document.createElement("div");
+    wrap.className = "shuoshuo-ext-wrap";
+    wrap.innerHTML = extensions;
+    card.append(wrap);
+  }
+
+  const footer = document.createElement("div");
+  footer.className = "shuoshuo-card-footer";
+
+  const tags = document.createElement("div");
+  tags.className = "shuoshuo-card-tags";
+  (item.tags || []).forEach((tag) => {
+    if (!tag) return;
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "shuoshuo-tag";
+    chip.dataset.tag = tag;
+    chip.textContent = `#${tag}`;
+    tags.append(chip);
+  });
+  if (tags.childElementCount) footer.append(tags);
+
+  const actions = document.createElement("div");
+  actions.className = "shuoshuo-actions";
+
+  const quote = document.createElement("button");
+  quote.type = "button";
+  quote.className = "shuoshuo-quote";
+  quote.dataset.solitudeAction = "toTalk";
+  quote.dataset.solitudeValue = (item.content || "").slice(0, 200);
+  quote.title = "引用并评论";
+  quote.innerHTML = `<i class="solitude fas fa-comment-dots" aria-hidden="true"></i><span>引用</span>`;
+  actions.append(quote);
+
+  footer.append(actions);
+  card.append(footer);
+
+  const reactions = buildMemosReactions(item.reactions);
+  if (reactions) {
+    const wrap = document.createElement("div");
+    wrap.className = "shuoshuo-reactions-wrap";
+    wrap.innerHTML = reactions;
+    card.append(wrap);
+  }
+
+  return card;
+};
+
 /* ---------------- 数据 ---------------- */
 
 const cacheKey = (config: PageConfig, page: number, tagId: string) =>
@@ -395,6 +632,62 @@ const fetchPage = async (config: PageConfig, page: number, tagId: string) => {
   return data;
 };
 
+/* ---------------- Memos 数据 ---------------- */
+
+const memosCacheKey = (config: PageConfig) =>
+  `solitude-shuoshuo:memos:v1:${config.api}:${config.creator}:${config.publicOnly}`;
+
+const parseMemosTime = (iso?: string) => {
+  if (!iso) return 0;
+  const ms = new Date(iso).getTime();
+  return Number.isFinite(ms) ? ms : 0;
+};
+
+const fetchMemosAll = async (config: PageConfig): Promise<MemosItem[]> => {
+  const key = memosCacheKey(config);
+  const ttl = config.cacheMinutes * 60 * 1000;
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const cached = JSON.parse(raw) as { time: number; data: MemosItem[] };
+      if (Date.now() - cached.time < ttl) return cached.data;
+    }
+  } catch {
+    /* ignore */
+  }
+
+  const conditions: string[] = [];
+  if (config.creator) conditions.push(`creator == "${config.creator}"`);
+  if (config.publicOnly) conditions.push(`visibility == "PUBLIC"`);
+  const filter = conditions.join(" && ");
+
+  const items: MemosItem[] = [];
+  let pageToken = "";
+  // 沿 nextPageToken 遍历（每页 100 条），空串即末页；guard 为防异常循环的安全上限
+  for (let guard = 0; guard < 100; guard += 1) {
+    const params = new URLSearchParams({
+      pageSize: "100",
+      orderBy: "pinned desc, create_time desc",
+    });
+    if (filter) params.set("filter", filter);
+    if (pageToken) params.set("pageToken", pageToken);
+    const response = await fetch(`${config.api}/api/v1/memos?${params.toString()}`);
+    if (!response.ok) throw new Error(`Memos 请求失败：HTTP ${response.status}`);
+    const payload = await response.json();
+    const pageItems = (payload?.memos || []) as MemosItem[];
+    items.push(...pageItems);
+    pageToken = payload?.nextPageToken || "";
+    if (!pageToken || !pageItems.length) break;
+  }
+
+  try {
+    localStorage.setItem(key, JSON.stringify({ time: Date.now(), data: items }));
+  } catch {
+    /* ignore */
+  }
+  return items;
+};
+
 /* ---------------- 页面初始化 ---------------- */
 
 const initShuoshuo = async () => {
@@ -411,6 +704,11 @@ const initShuoshuo = async () => {
   let page = 1;
   let activeTag = "";
   let activeTagId = "";
+  let memosPromise: Promise<MemosItem[]> | null = null;
+  const loadMemos = () => {
+    if (!memosPromise) memosPromise = fetchMemosAll(config);
+    return memosPromise;
+  };
 
   const setStatus = (message: string, state: string) => {
     if (!loading) return;
@@ -424,19 +722,36 @@ const initShuoshuo = async () => {
   const loadTags = async () => {
     if (!tagBar || !config.tags) return;
     try {
-      const response = await fetch(`${config.api}/api/tags`);
-      if (!response.ok) return;
-      const payload = await response.json();
-      const tags = (payload?.data || []) as EchoTag[];
+      const tags: { name: string; id?: string }[] = [];
+      if (config.source === "memos") {
+        // memos 没有标签接口：从全量集合本地聚合去重
+        const all = await loadMemos();
+        const seen = new Set<string>();
+        all.forEach((item) => {
+          (item.tags || []).forEach((tag) => {
+            if (tag && !seen.has(tag)) {
+              seen.add(tag);
+              tags.push({ name: tag });
+            }
+          });
+        });
+      } else {
+        const response = await fetch(`${config.api}/api/tags`);
+        if (!response.ok) return;
+        const payload = await response.json();
+        (payload?.data || []).forEach((tag: EchoTag) => {
+          if (!tag.name) return;
+          tags.push({ name: tag.name, id: tag.id || "" });
+        });
+      }
       if (!tags.length) return;
       const fragment = document.createDocumentFragment();
       tags.forEach((tag) => {
-        if (!tag.name) return;
         const chip = document.createElement("button");
         chip.type = "button";
         chip.className = "shuoshuo-tag";
         chip.dataset.tag = tag.name;
-        chip.dataset.tagId = tag.id || "";
+        if (tag.id) chip.dataset.tagId = tag.id;
         chip.textContent = `#${tag.name}`;
         chip.addEventListener("click", () => {
           const isActive = activeTag === tag.name;
@@ -444,7 +759,7 @@ const initShuoshuo = async () => {
           activeTagId = isActive ? "" : tag.id || "";
           page = 1;
           tagBar.querySelectorAll(".shuoshuo-tag").forEach((node) => node.classList.toggle("active", node === chip && !isActive));
-          void render();
+          void render().then(scrollToList);
         });
         fragment.append(chip);
       });
@@ -468,7 +783,7 @@ const initShuoshuo = async () => {
           activeTagId = chip.dataset.tagId || "";
         }
         page = 1;
-        void render();
+        void render().then(scrollToList);
       });
     });
 
@@ -520,6 +835,11 @@ const initShuoshuo = async () => {
     if (inline.length) Solitude.lightbox?.(inline);
   };
 
+  const scrollToList = () => {
+    const listTop = Math.max(0, list.getBoundingClientRect().top + window.scrollY);
+    window.scrollTo({ top: listTop, left: 0, behavior: "instant" });
+  };
+
   const buildPagination = (total: number) => {
     if (!pagination) return;
     const totalPages = Math.max(1, Math.ceil(total / config.pageSize));
@@ -539,7 +859,7 @@ const initShuoshuo = async () => {
       button.addEventListener("click", () => {
         if (index === page) return;
         page = index;
-        void render();
+        void render().then(scrollToList);
       });
       fragment.append(button);
     }
@@ -549,21 +869,39 @@ const initShuoshuo = async () => {
   const render = async () => {
     setStatus(`<i class="solitude fas fa-spinner fa-spin" aria-hidden="true"></i><span>加载中</span>`, "loading");
     try {
-      const data = await fetchPage(config, page, activeTagId);
-      if (!data.items.length) {
-        setStatus('<span>还没有说说</span>', "empty");
-        if (pagination) pagination.hidden = true;
-        return;
-      }
-      if (loading) loading.hidden = true;
       const fragment = document.createDocumentFragment();
-      for (const item of data.items) {
-        fragment.append(await buildCard(config, item));
+      let total = 0;
+      if (config.source === "memos") {
+        const all = await loadMemos();
+        const filtered = activeTag ? all.filter((item) => (item.tags || []).includes(activeTag)) : all;
+        total = filtered.length;
+        const slice = filtered.slice((page - 1) * config.pageSize, page * config.pageSize);
+        if (!slice.length) {
+          setStatus('<span>还没有说说</span>', "empty");
+          if (pagination) pagination.hidden = true;
+          return;
+        }
+        if (loading) loading.hidden = true;
+        for (const item of slice) {
+          fragment.append(await buildMemosCard(config, item));
+        }
+      } else {
+        const data = await fetchPage(config, page, activeTagId);
+        if (!data.items.length) {
+          setStatus('<span>还没有说说</span>', "empty");
+          if (pagination) pagination.hidden = true;
+          return;
+        }
+        if (loading) loading.hidden = true;
+        for (const item of data.items) {
+          fragment.append(await buildCard(config, item));
+        }
+        total = data.total;
       }
       list.replaceChildren(fragment);
       bindActions();
       applyGallery();
-      buildPagination(data.total);
+      buildPagination(total);
       window.lazyLoadInstance?.update?.();
     } catch (error) {
       console.error("[shuoshuo]", error);

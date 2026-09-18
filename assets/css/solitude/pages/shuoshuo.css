@@ -235,6 +235,21 @@
   font-weight: 600;
 }
 
+.ext-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ext-file-size {
+  flex: none;
+  font-size: 12px;
+  color: var(--efu-secondtext);
+}
+
 .shuoshuo-ext.ext-video {
   padding: 0;
   overflow: hidden;
@@ -248,6 +263,39 @@
   aspect-ratio: 16 / 9;
   border-radius: var(--efu-radius-md, 12px);
   display: block;
+}
+
+/* ---- reactions (read-only) ---- */
+.shuoshuo-reactions-wrap {
+  padding-top: var(--efu-space-2, 8px);
+  border-top: 1px solid var(--efu-card-border);
+}
+
+.shuoshuo-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shuoshuo-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--efu-radius-pill, 999px);
+  border: 1px solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+  font-size: 13px;
+}
+
+.shuoshuo-reaction-emoji {
+  line-height: 1;
+}
+
+.shuoshuo-reaction-count {
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- card footer ---- */

@@ -1,13 +1,19 @@
 {{ $cfg := site.Params.solitude.shuoshuo }}
 {{ if $cfg.enable }}
+{{- $source := $cfg.source | default "ech0" -}}
+{{- $api := $cfg.api -}}
+{{- if eq $source "memos" }}{{ with $cfg.memos.api }}{{ $api = . }}{{ end }}{{ end -}}
 <div class="shuoshuo-page" id="shuoshuo"
-  data-api="{{ $cfg.api }}"
+  data-source="{{ $source }}"
+  data-api="{{ $api }}"
   data-page-size="{{ $cfg.page_size | default 30 }}"
   data-cache-minutes="{{ $cfg.cache_minutes | default 30 }}"
   data-author-name="{{ site.Params.author.name | default site.Title }}"
   data-author-avatar="{{ $cfg.author.avatar | default (site.Params.solitude.aside.my_card.author.img) | relURL }}"
   data-like="{{ cond $cfg.like true false }}"
   data-tags="{{ cond $cfg.tags.enable true false }}"
+  data-creator="{{ with $cfg.memos }}{{ .creator }}{{ end }}"
+  data-public-only="{{ with $cfg.memos }}{{ if .public_only }}true{{ else }}false{{ end }}{{ end }}"
   data-ext-github="{{ cond $cfg.extensions.github true false }}"
   data-ext-website="{{ cond $cfg.extensions.website true false }}"
   data-ext-music="{{ cond $cfg.extensions.music true false }}"
