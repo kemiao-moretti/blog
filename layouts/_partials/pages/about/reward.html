@@ -8,9 +8,10 @@
           {{ with .title }}<h2 class="author-content-item-title">{{ . }}</h2>{{ end }}
           {{ with .description }}<p class="about-card-copy">{{ . }}</p>{{ end }}
           {{- with .sponsor_notice -}}
+            {{- $url := .url | default "" -}}
             {{- $email := .email | default "" -}}
             <p class="reward-sponsor-notice">
-              {{ .prefix }}{{ if $email }}<a class="reward-sponsor-mail" href="mailto:{{ $email }}">{{ .label | default $email }}</a>{{ else }}{{ .label }}{{ end }}{{ .suffix }}
+              {{ .prefix }}{{ if $url }}<a class="reward-sponsor-mail" href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ .label | default $url }}</a>{{ else if $email }}<a class="reward-sponsor-mail" href="mailto:{{ $email }}">{{ .label | default $email }}</a>{{ else }}{{ .label }}{{ end }}{{ .suffix }}
             </p>
           {{- end -}}
         </div>
