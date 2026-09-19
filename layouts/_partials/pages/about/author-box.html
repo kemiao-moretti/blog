@@ -1,0 +1,20 @@
+{{- $box := .author_box -}}
+{{- with $box -}}
+  {{- $image := .image | default "/img/logo.png" -}}
+  {{- $alt := .alt | default "站主头像" -}}
+  {{- $status := .status | default "online" -}}
+  {{- $statusLabel := $status -}}
+  {{- if eq $status "online" }}{{ $statusLabel = "在线" }}{{ else if eq $status "offline" }}{{ $statusLabel = "离线" }}{{ end -}}
+  <div class="author-content about-row about-row--author-box">
+    <div class="author-box-side">
+      {{ with .tags_left }}<ul class="author-box-tags author-box-tags--left" aria-label="作者标签">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+    </div>
+    <figure class="author-box-avatar">
+      <img class="author-box-avatar-img nolazyload" src="{{ $image | relURL }}" alt="{{ $alt }}">
+      <span class="author-box-status-dot" role="img" aria-label="{{ $statusLabel }}" data-status="{{ $status }}"></span>
+    </figure>
+    <div class="author-box-side">
+      {{ with .tags_right }}<ul class="author-box-tags author-box-tags--right" aria-label="作者标签">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>{{ end }}
+    </div>
+  </div>
+{{- end -}}

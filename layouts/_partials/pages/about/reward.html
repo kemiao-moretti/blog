@@ -1,0 +1,122 @@
+{{- $reward := .reward -}}
+{{- with $reward -}}
+  <div class="author-content about-row about-row--reward">
+    <article class="author-content-item reward-card">
+      <div class="reward-card-header">
+        <div class="reward-card-heading">
+          {{ with .tip }}<span class="reward-card-tip">{{ . }}</span>{{ end }}
+          {{ with .title }}<h2 class="author-content-item-title">{{ . }}</h2>{{ end }}
+          {{ with .description }}<p class="about-card-copy">{{ . }}</p>{{ end }}
+          {{- with .sponsor_notice -}}
+            {{- $email := .email | default "" -}}
+            <p class="reward-sponsor-notice">
+              {{ .prefix }}{{ if $email }}<a class="reward-sponsor-mail" href="mailto:{{ $email }}">{{ .label | default $email }}</a>{{ else }}{{ .label }}{{ end }}{{ .suffix }}
+            </p>
+          {{- end -}}
+        </div>
+      </div>
+      {{- $mobileText := .mobile_action_text | default .action_text -}}
+      {{- with $mobileText -}}
+        <button type="button" class="about-card-button reward-mobile-button" data-reward-open>
+          <span class="reward-mobile-icon" aria-hidden="true">ϟ</span><span>{{ . }}</span>
+        </button>
+      {{- end -}}
+      {{- if .donations -}}
+        <div class="reward-list" aria-label="赞赏记录">
+          {{- range .donations -}}
+            <div class="reward-list-item">
+              <strong class="reward-list-name">{{ .name }}</strong>
+              <div class="reward-list-meta">
+                {{ with .amount }}<span class="reward-list-amount">{{ . }}</span>{{ end }}
+                {{ with .date }}<time>{{ . }}</time>{{ end }}
+              </div>
+            </div>
+          {{- end -}}
+        </div>
+      {{- else -}}
+        {{ with .empty_text }}<p class="reward-empty-text">{{ . }}</p>{{ end }}
+      {{- end -}}
+      <div class="about-reward-animation" aria-label="赞赏入口，点击展示打赏二维码">
+        <div class="about-reward-button-wrap">
+          {{ with .action_text }}<button type="button" class="about-card-button reward-action-button" data-reward-open><span class="reward-action-icon" aria-hidden="true">ϟ</span><span>{{ . }}</span></button>{{ end }}
+        </div>
+        <div class="about-reward-tube" aria-hidden="true">
+          <svg class="about-reward-line about-reward-line--base" viewBox="0 0 1028 385" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 77H234.226L307.006 24H790" stroke="var(--reward-line-color)" stroke-width="20" />
+            <path d="M0 140H233.035L329.72 71H1028" stroke="var(--reward-line-color)" stroke-width="20" />
+            <path d="M1 255H234.226L307.006 307H790" stroke="var(--reward-line-color)" stroke-width="20" />
+            <path d="M0 305H233.035L329.72 375H1028" stroke="var(--reward-line-color)" stroke-width="20" />
+            <rect y="186" width="236" height="24" fill="var(--reward-line-color)" />
+            <ellipse cx="790" cy="25.5" rx="25" ry="25.5" fill="var(--reward-line-color)" />
+            <circle cx="790" cy="25" r="14" fill="var(--efu-card-bg)" />
+            <ellipse cx="790" cy="307.5" rx="25" ry="25.5" fill="var(--reward-line-color)" />
+            <circle cx="790" cy="308" r="14" fill="var(--efu-card-bg)" />
+          </svg>
+          <div class="about-reward-mask">
+            <svg class="about-reward-line about-reward-line--theme" viewBox="0 0 1028 385" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 77H234.226L307.006 24H790" stroke="var(--efu-theme)" stroke-width="20" />
+              <path d="M0 140H233.035L329.72 71H1028" stroke="var(--efu-theme)" stroke-width="20" />
+              <path d="M1 255H234.226L307.006 307H790" stroke="var(--efu-theme)" stroke-width="20" />
+              <path d="M0 305H233.035L329.72 375H1028" stroke="var(--efu-theme)" stroke-width="20" />
+              <rect y="186" width="236" height="24" fill="var(--efu-theme)" />
+              <ellipse cx="790" cy="25.5" rx="25" ry="25.5" fill="var(--efu-theme)" />
+              <circle cx="790" cy="25" r="14" fill="var(--efu-card-bg)" />
+              <ellipse cx="790" cy="307.5" rx="25" ry="25.5" fill="var(--efu-theme)" />
+              <circle cx="790" cy="308" r="14" fill="var(--efu-card-bg)" />
+            </svg>
+          </div>
+          <div class="about-reward-highlight-mask">
+            <svg class="about-reward-line about-reward-line--highlight" viewBox="0 0 1028 385" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 77H234.226L307.006 24H790" stroke="var(--reward-highlight-color)" stroke-width="20" />
+              <path d="M0 140H233.035L329.72 71H1028" stroke="var(--reward-highlight-color)" stroke-width="20" />
+              <path d="M1 255H234.226L307.006 307H790" stroke="var(--reward-highlight-color)" stroke-width="20" />
+              <path d="M0 305H233.035L329.72 375H1028" stroke="var(--reward-highlight-color)" stroke-width="20" />
+              <rect y="186" width="236" height="24" fill="var(--reward-highlight-color)" />
+              <ellipse cx="790" cy="25.5" rx="25" ry="25.5" fill="var(--reward-highlight-color)" />
+              <circle cx="790" cy="25" r="14" fill="var(--efu-card-bg)" />
+              <ellipse cx="790" cy="307.5" rx="25" ry="25.5" fill="var(--reward-highlight-color)" />
+              <circle cx="790" cy="308" r="14" fill="var(--efu-card-bg)" />
+            </svg>
+          </div>
+        </div>
+        <p class="about-reward-people">共<b>{{ len .donations }}</b>人</p>
+      </div>
+    </article>
+  </div>
+  {{- with .dialog -}}
+    {{- $wechat := .wechat | default dict -}}
+    {{- $alipay := .alipay | default dict -}}
+    {{- $wxImage := $wechat.image | default "" -}}
+    {{- $aliImage := $alipay.image | default "" -}}
+    <div class="reward-dialog-overlay" data-reward-dialog>
+      <div class="reward-dialog" role="dialog" aria-modal="true" aria-labelledby="reward-dialog-title">
+        <div class="reward-dialog-header">
+          <h3 class="reward-dialog-title" id="reward-dialog-title">{{ .title | default "打赏支持" }}</h3>
+          <button type="button" class="reward-dialog-close" data-reward-close aria-label="关闭">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div class="reward-dialog-body">
+          {{ with .tips }}<p class="reward-tips">{{ . }}</p>{{ end }}
+          <div class="qr-codes">
+            {{- if $wxImage -}}
+              <div class="qr-code-item">
+                <img class="qr-image" src="{{ $wxImage }}" alt="{{ $wechat.label | default "微信" }}赞赏二维码" loading="lazy" />
+                <div class="qr-label">{{ $wechat.label | default "微信" }}</div>
+              </div>
+            {{- end -}}
+            {{- if $aliImage -}}
+              <div class="qr-code-item">
+                <img class="qr-image" src="{{ $aliImage }}" alt="{{ $alipay.label | default "支付宝" }}赞赏二维码" loading="lazy" />
+                <div class="qr-label">{{ $alipay.label | default "支付宝" }}</div>
+              </div>
+            {{- end -}}
+            {{- if and (not $wxImage) (not $aliImage) -}}
+              <p class="no-qr">暂未配置打赏二维码</p>
+            {{- end -}}
+          </div>
+        </div>
+      </div>
+    </div>
+  {{- end -}}
+{{- end -}}

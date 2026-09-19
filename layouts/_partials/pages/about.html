@@ -4,6 +4,11 @@
 {{- end -}}
 {{- $allowed := slice "intro" "skills_career" "personality_photo" "values" "interests" "stats_profile" "story" -}}
 <section id="about-page" aria-labelledby="about-page-title">
+  {{- with $data.author_box -}}
+    {{- if .enabled | default true -}}
+      {{- partial "pages/about/author-box.html" (dict "author_box" . "page" $) -}}
+    {{- end -}}
+  {{- end -}}
   <h1 class="about-page-title" id="about-page-title">{{ $data.title | default .Title }}</h1>
   <div class="author-page-content">
     {{- range $index, $section := $data.sections -}}
@@ -17,6 +22,11 @@
           {{- $partial := printf "pages/about/%s.html" (replace $type "_" "-") -}}
           {{- partial $partial (dict "section" $section "page" $ "index" $index) -}}
         {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    {{- with $data.reward -}}
+      {{- if .enabled | default true -}}
+        {{- partial "pages/about/reward.html" (dict "reward" . "page" $) -}}
       {{- end -}}
     {{- end -}}
   </div>

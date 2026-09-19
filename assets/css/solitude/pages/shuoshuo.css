@@ -153,12 +153,29 @@
 /* ---- gallery ---- */
 .shuoshuo-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
+}
+
+.shuoshuo-gallery.is-single {
+  grid-template-columns: 1fr;
+}
+
+.shuoshuo-gallery.is-pair {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.shuoshuo-gallery.is-single .shuoshuo-image img {
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  aspect-ratio: auto;
+  object-fit: cover;
 }
 
 .shuoshuo-image {
   display: block;
+  position: relative;
   border-radius: var(--efu-radius-sm, 8px);
   overflow: hidden;
 }
@@ -179,6 +196,63 @@
 .shuoshuo-image.is-broken img,
 .shuoshuo-inline-image.is-broken img {
   display: none;
+}
+
+.shuoshuo-image.is-broken::after {
+  content: "图片已失效";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 12px;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  background: var(--efu-secondbg);
+}
+
+/* ---- gallery 折叠 / 展开 ---- */
+.shuoshuo-gallery-more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.42);
+  color: var(--efu-white);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.shuoshuo-gallery-extra {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.shuoshuo-gallery-extra[hidden] {
+  display: none;
+}
+
+.shuoshuo-gallery-toggle {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin-top: 4px;
+  padding: 4px 14px;
+  border: 1px solid var(--efu-card-border);
+  border-radius: var(--efu-radius-pill, 999px);
+  background: transparent;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+
+.shuoshuo-gallery-toggle:hover {
+  color: var(--efu-main);
+  border-color: var(--efu-main);
 }
 
 /* ---- extension cards ---- */
@@ -445,6 +519,6 @@
   }
 
   .shuoshuo-gallery {
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 4px;
   }
 }

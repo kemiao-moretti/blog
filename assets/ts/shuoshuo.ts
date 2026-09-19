@@ -314,28 +314,14 @@ const buildCard = async (config: PageConfig, item: EchoItem) => {
     card.append(wrap);
   }
 
-  // 图片（含正文内嵌图 + echo_files）
-  const images = (item.echo_files || []).filter(isImageFile).map((file) => fileUrl(config, file));
-  const inlineImages = [...body.querySelectorAll("img")].map((img) => img.getAttribute("src") || "");
-  const allImages = [...new Set([...inlineImages, ...images])].filter(Boolean);
-  if (images.length) {
-    const gallery = document.createElement("div");
-    gallery.className = "shuoshuo-gallery";
-    images.forEach((url) => {
-      const link = document.createElement("a");
-      link.className = "shuoshuo-image";
-      link.href = url;
-      link.setAttribute("data-fancybox", "shuoshuo-gallery");
-      const img = document.createElement("img");
-      img.src = url;
-      img.alt = "";
-      img.loading = "lazy";
-      img.addEventListener("error", () => link.classList.add("is-broken"), { once: true });
-      link.append(img);
-      gallery.append(link);
-    });
-    card.append(gallery);
-  }
+  // 图片（正文内联图 + echo_files）统一进智能网格
+  const inlineImages = collectCardImages(config, body);
+  const attachmentImages = (item.echo_files || [])
+    .filter(isImageFile)
+    .map((file) => fileUrl(config, file))
+    .filter(Boolean);
+  const gallery = buildSmartGallery([...inlineImages, ...attachmentImages]);
+  if (gallery) card.append(gallery);
 
   const footer = document.createElement("div");
   footer.className = "shuoshuo-card-footer";
@@ -382,7 +368,7 @@ const buildCard = async (config: PageConfig, item: EchoItem) => {
   card.append(footer);
 
   // 记录图片供灯箱使用（卡片插入后再统一初始化）
-  card.dataset.imageCount = String(allImages.length);
+  card.dataset.imageCount = String(gallery ? gallery.querySelectorAll(".shuoshuo-image").length : 0);
   return card;
 };
 
@@ -472,6 +458,122 @@ const buildMemosReactions = (reactions?: MemosReaction[]) => {
   return `<div class="shuoshuo-reactions">${inner}</div>`;
 };
 
+/* ---------------- 多图智能网格 ---------------- */
+
+const resolveImageUrl = (config: PageConfig, raw: string) => {
+  if (/^(https?:)?\/\//i.test(raw) || /^(data|blob):/i.test(raw)) return raw;
+  const base = config.api;
+  return `${base}${raw.startsWith("/") ? "" : "/"}${raw}`;
+};
+
+const collectCardImages = (config: PageConfig, body: HTMLElement): string[] => {
+  const urls: string[] = [];
+  body.querySelectorAll<HTMLImageElement>("img:not(.no-lightbox)").forEach((img) => {
+    if (img.closest("a")) return;
+    const raw = img.currentSrc || img.src || "";
+    if (!raw) return;
+    urls.push(resolveImageUrl(config, raw));
+    img.remove();
+  });
+  return urls;
+};
+
+const SMART_GRID_LIMIT = 9;
+
+const buildSmartGallery = (rawUrls: string[]) => {
+  const urls = [...new Set(rawUrls.map((u) => (u || "").trim()).filter(Boolean))];
+  if (!urls.length) return null;
+
+  const gallery = document.createElement("div");
+  gallery.className = "shuoshuo-gallery";
+  if (urls.length === 1) gallery.classList.add("is-single");
+  else if (urls.length === 2) gallery.classList.add("is-pair");
+
+  const createLink = (url: string) => {
+    const link = document.createElement("a");
+    link.className = "shuoshuo-image";
+    link.href = url;
+    link.setAttribute("data-fancybox", "shuoshuo-gallery");
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "";
+    img.loading = "lazy";
+    img.addEventListener("error", () => link.classList.add("is-broken"), { once: true });
+    link.append(img);
+    return link;
+  };
+
+  const collapsed = urls.length > SMART_GRID_LIMIT;
+  const visibleLinks = urls.slice(0, SMART_GRID_LIMIT).map(createLink);
+  const hiddenLinks = urls.slice(SMART_GRID_LIMIT).map(createLink);
+
+  const hiddenBox = document.createElement("div");
+  hiddenBox.className = "shuoshuo-gallery-extra";
+  hiddenBox.hidden = true;
+  hiddenLinks.forEach((link) => hiddenBox.append(link));
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "shuoshuo-gallery-toggle";
+
+  let isExpanded = false;
+  const lastCell = collapsed ? visibleLinks[visibleLinks.length - 1] : null;
+  const overlay = collapsed
+    ? Object.assign(document.createElement("span"), {
+        className: "shuoshuo-gallery-more",
+        textContent: `+${hiddenLinks.length}`,
+      })
+    : null;
+
+  const setExpanded = (next: boolean) => {
+    isExpanded = next;
+    hiddenBox.hidden = !isExpanded;
+    gallery.classList.toggle("is-expanded", isExpanded);
+    if (overlay) overlay.remove();
+    toggle.textContent = isExpanded ? "收起" : `展开全部 ${urls.length} 张`;
+    if (!isExpanded && collapsed && lastCell && overlay) lastCell.append(overlay);
+  };
+
+  if (overlay && lastCell) {
+    overlay.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setExpanded(true);
+    });
+    lastCell.append(overlay);
+  }
+  toggle.addEventListener("click", () => setExpanded(!isExpanded));
+
+  visibleLinks.forEach((link) => gallery.append(link));
+  gallery.append(hiddenBox);
+  if (collapsed) gallery.append(toggle);
+  setExpanded(false);
+  return gallery;
+};
+
+const stripInlineTags = (content: string, tags?: string[]) => {
+  let text = content || "";
+  const tagSet = new Set(
+    (tags || []).map((tag) => String(tag).trim().toLowerCase()).filter(Boolean)
+  );
+  if (!text || !tagSet.size) return text;
+  const isTag = (name: string) => tagSet.has(name.trim().toLowerCase());
+
+  let match = text.match(/^\s*#([^\s#]+)\s*/);
+  while (match && isTag(match[1])) {
+    text = text.slice(match[0].length);
+    match = text.match(/^\s*#([^\s#]+)\s*/);
+  }
+
+  match = text.match(/\s*#([^\s#]+)\s*$/);
+  while (match && isTag(match[1])) {
+    text = text.slice(0, text.length - match[0].length);
+    match = text.match(/\s*#([^\s#]+)\s*$/);
+  }
+
+  return text.trim();
+};
+
 const buildMemosCard = async (config: PageConfig, item: MemosItem) => {
   const card = document.createElement("article");
   card.className = "shuoshuo-card";
@@ -489,34 +591,22 @@ const buildMemosCard = async (config: PageConfig, item: MemosItem) => {
 
   const body = document.createElement("div");
   body.className = "shuoshuo-card-body";
-  const html = await renderMarkdown(config, item.content || "");
-  body.innerHTML = html || "";
-  card.append(body);
+  const strippedContent = stripInlineTags(item.content || "", item.tags);
+  const html = await renderMarkdown(config, strippedContent);
+  if (html) {
+    body.innerHTML = html;
+    card.append(body);
+  }
 
   const attachments = item.attachments || [];
-  const imageFiles = attachments.filter(isImageMemos);
   const fileFiles = attachments.filter((attachment) => !isImageMemos(attachment));
-
-  if (imageFiles.length) {
-    const gallery = document.createElement("div");
-    gallery.className = "shuoshuo-gallery";
-    imageFiles.forEach((attachment) => {
-      const url = memosAttachmentUrl(config, attachment);
-      if (!url) return;
-      const link = document.createElement("a");
-      link.className = "shuoshuo-image";
-      link.href = url;
-      link.setAttribute("data-fancybox", "shuoshuo-gallery");
-      const img = document.createElement("img");
-      img.src = url;
-      img.alt = "";
-      img.loading = "lazy";
-      img.addEventListener("error", () => link.classList.add("is-broken"), { once: true });
-      link.append(img);
-      gallery.append(link);
-    });
-    if (gallery.childElementCount) card.append(gallery);
-  }
+  const inlineImages = collectCardImages(config, body);
+  const attachmentImages = attachments
+    .filter(isImageMemos)
+    .map((attachment) => memosAttachmentUrl(config, attachment))
+    .filter(Boolean);
+  const gallery = buildSmartGallery([...inlineImages, ...attachmentImages]);
+  if (gallery) card.append(gallery);
 
   if (fileFiles.length) {
     const wrap = document.createElement("div");
