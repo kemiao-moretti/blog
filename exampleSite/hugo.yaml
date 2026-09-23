@@ -67,7 +67,7 @@ menus:
       weight: 10
       params:
         icon: fas fa-cogs
-    - name: 关于主题
+    - name: 关于我
       pageRef: /about
       parent: personal
       weight: 20
@@ -176,7 +176,7 @@ params:
         关于:
           - name: 友链
             url: /links/
-          - name: 关于主题
+          - name: 关于我
             url: /about/
       links:
         - name: 订阅
