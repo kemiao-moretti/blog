@@ -197,3 +197,9 @@ cookieConsentDescription: {other: This site uses essential cookies to save theme
 cookieConsentPrivacy: {other: Privacy details}
 cookieConsentReject: {other: Reject non-essential}
 cookieConsentAccept: {other: Accept all}
+
+# Post reward
+postRewardButton: {other: Tip}
+postRewardTitle: {other: Enjoyed this post? Buy me a coffee}
+postRewardQrcode: {other: ' payment QR code'}
+postRewardLinkText: {other: Join the supporters list}

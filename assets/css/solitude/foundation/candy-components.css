@@ -1616,3 +1616,70 @@ figure table td.gutter pre {
   box-shadow: var(--card-hover-box-shadow);
   transform: translate(-2px, -2px);
 }
+
+/* ---------- 文末打赏 ---------- */
+/* 基础尺寸沿用上游 pages/post.css 的 .post-reward 区块，这里补四件事：
+   按钮换成 <button> 后的复位、展开入口、上游引用了未分发的 /img/flower.gif、
+   以及窄屏把弹层收到视口内（上游 left:-96px 会溢出）。
+   弹层统一用 display:flex 展开：块级下 width:fit-content 会被收缩，
+   两个二维码会竖排堆成一条长条。 */
+.post-reward .reward-button {
+  border: 0;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.post-reward .reward-main .reward-all,
+.post-reward .reward-main .reward-all .reward-group .reward-item .post-qr-code-img {
+  border-radius: var(--candy-radius);
+}
+
+/* 上游 hover 的背景图没随主题分发，去掉它，保留换色与硬阴影 */
+.post-reward .reward-main .reward-all .reward-main-btn:hover {
+  background-image: none;
+}
+
+/* 触屏点击会把 :hover 粘住，上游写在 post.css（pages 层）里的那条 hover 展开规则
+   必须显式屏蔽；本文件无 layer，优先级更高，放在 .is-open 之前可保证展开态仍能压过它。
+   :focus-within 同理会让同一次点击关不上，所以只在真 hover 设备上接管。 */
+@media (hover: none) {
+  .post-reward:hover > .reward-main {
+    display: none;
+  }
+}
+
+.post-reward.is-open > .reward-main {
+  display: flex;
+  justify-content: left;
+}
+
+@media (hover: hover) {
+  .post-reward:hover > .reward-main,
+  .post-reward:focus-within > .reward-main {
+    display: flex;
+    justify-content: left;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  /* 用 translate 而不是 transform：弹层带了 donate_effcet 动画，
+     动画的 transform 会盖掉静态 transform，居中会失效。
+     width 用 max-content：绝对定位下 fit-content 会被包含块（按钮宽度）收缩，
+     两个二维码就被压成竖排长条。 */
+  .post-reward .reward-main {
+    left: 50%;
+    translate: -50% 0;
+    width: max-content;
+    max-width: 100vw;
+    justify-content: center;
+  }
+
+  .post-reward .reward-main .reward-all {
+    max-width: calc(100vw - 2rem);
+  }
+
+  .post-reward .reward-main .reward-all .reward-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

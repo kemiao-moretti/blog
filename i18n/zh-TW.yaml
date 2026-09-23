@@ -197,3 +197,9 @@ cookieConsentDescription: {other: 本站會使用必要的 Cookie 儲存主題�
 cookieConsentPrivacy: {other: 了解隱私說明}
 cookieConsentReject: {other: 拒絕非必要}
 cookieConsentAccept: {other: 接受全部}
+
+# 文末打賞
+postRewardButton: {other: 贊助}
+postRewardTitle: {other: 喜歡這篇文章，就請我喝杯奶茶吧}
+postRewardQrcode: {other: 收款碼}
+postRewardLinkText: {other: 申請加入贊助名單}

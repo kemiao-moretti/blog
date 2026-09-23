@@ -1,0 +1,40 @@
+{{- $cfg := site.Params.solitude -}}
+{{- with $cfg.post.award -}}
+  {{- $award := . -}}
+  {{- $list := $award.list | default (slice) -}}
+  {{- if and $award.enable (gt (len $list) 0) -}}
+    {{- $button := $award.button | default (i18n "postRewardButton") -}}
+    {{- $title := $award.title | default (i18n "postRewardTitle") -}}
+    <div class="post-tools">
+      <div class="post-tools-left">
+        <div class="post-reward">
+          <button class="reward-button" type="button" data-reward-toggle aria-expanded="false" aria-controls="post-reward-main">
+            <i class="solitude fas fa-qrcode" aria-hidden="true"></i><span>{{ $button }}</span>
+          </button>
+          <div class="reward-main" id="post-reward-main">
+            <div class="reward-all">
+              {{- with $title }}<div class="reward-title">{{ . }}</div>{{ end }}
+              <div class="reward-group">
+                {{- range $list }}
+                  {{- $name := .name | default "" -}}
+                  {{- with .qrcode }}
+                    <div class="reward-item">
+                      <img class="post-qr-code-img" src="{{ . | relURL }}" alt="{{ $name }}{{ i18n "postRewardQrcode" }}" loading="lazy" width="130" height="130">
+                      {{- with $name }}<div class="post-qr-code-desc">{{ . }}</div>{{ end }}
+                    </div>
+                  {{- end }}
+                {{- end }}
+              </div>
+              {{- with $award.link }}
+                <a class="reward-main-btn" href="{{ . }}" target="_blank" rel="noopener noreferrer">
+                  <span class="reward-text">{{ $award.link_text | default (i18n "postRewardLinkText") }}</span>
+                  {{- with $award.link_desc }}<span class="reward-dec">{{ . }}</span>{{ end }}
+                </a>
+              {{- end }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {{- end -}}
+{{- end -}}

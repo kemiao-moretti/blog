@@ -6,6 +6,7 @@
       {{ partial "ai-summary.html" . }}
       <article class="post-content article-container">{{ .Content }}</article>
       {{ partial "post-copyright.html" . }}
+      {{ partial "post-reward.html" . }}
       <div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list">{{ range .GetTerms "tags" }}<a class="post-meta__tags" href="{{ .RelPermalink }}"><span class="tags-punctuation"><i class="solitude fas fa-hashtag"></i>{{ .LinkTitle }}<span class="tagsPageCount">{{ len .Pages }}</span></span></a>{{ end }}</div></div></div>
       {{ partial "post-nav.html" . }}{{ partial "related.html" . }}{{ partial "comments.html" . }}
     </div>

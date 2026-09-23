@@ -188,3 +188,9 @@ cookieConsentDescription: {other: Este sitio utiliza cookies esenciales para gua
 cookieConsentPrivacy: {other: Detalles de privacidad}
 cookieConsentReject: {other: Rechazar no esenciales}
 cookieConsentAccept: {other: Aceptar todas}
+
+# Apoyo al artículo
+postRewardButton: {other: Apoyar}
+postRewardTitle: {other: '¿Te gustó este artículo? Invítame a un café'}
+postRewardQrcode: {other: ' código QR de pago'}
+postRewardLinkText: {other: Únete a la lista de patrocinadores}

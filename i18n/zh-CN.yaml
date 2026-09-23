@@ -197,3 +197,9 @@ cookieConsentDescription: {other: 本站会使用必要的 Cookie 保存主题�
 cookieConsentPrivacy: {other: 了解隐私说明}
 cookieConsentReject: {other: 拒绝非必要}
 cookieConsentAccept: {other: 接受全部}
+
+# 文末打赏
+postRewardButton: {other: 赞赏}
+postRewardTitle: {other: 喜欢这篇文章，就请我喝杯奶茶吧}
+postRewardQrcode: {other: 收款码}
+postRewardLinkText: {other: 申请加入赞赏名单}

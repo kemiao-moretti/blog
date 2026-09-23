@@ -8,6 +8,7 @@ import "./shuoshuo";
 import "./fcircle";
 import "./changelog";
 import "./about-reward";
+import "./post-reward";
 import "./stats";
 import "./clock";
 import "./ip-welcome";
