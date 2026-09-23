@@ -1,6 +1,9 @@
 home: {other: 首页}
 startReading: {other: 开始阅读}
 backHome: {other: 返回首页}
+errorBack: {other: 返回上一页}
+errorRecommendTitle: {other: 也许你会喜欢}
+errorRecommendLead: {other: 从最近的内容继续逛逛}
 pageNotFound: {other: 页面未找到}
 backTop: {other: 返回顶部}
 homeSticky: {other: 置顶}
@@ -187,3 +190,10 @@ ipWelcomeFrom: {other: 欢迎来自}
 ipWelcomeFriend: {other: 的朋友}
 ipWelcomeDistance: {other: 距站长约 %s 公里}
 ipWelcomeUnknownPlace: {other: 远方}
+
+# Cookie 同意弹窗
+cookieConsentTitle: {other: Cookie 使用说明}
+cookieConsentDescription: {other: 本站会使用必要的 Cookie 保存主题偏好和基础功能状态。你可以选择接受或拒绝非必要 Cookie。}
+cookieConsentPrivacy: {other: 了解隐私说明}
+cookieConsentReject: {other: 拒绝非必要}
+cookieConsentAccept: {other: 接受全部}

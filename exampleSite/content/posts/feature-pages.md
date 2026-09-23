@@ -73,7 +73,7 @@ links:
     link_list:
       - name: Solitude Docs
         link: https://solitude.js.org/
-        avatar: /img/logo.png
+        avatar: /img/avatar.png
         topimg: /img/demo/cover-getting-started-v2.webp
         descr: Solitude 的安装、配置与迁移文档
 ```

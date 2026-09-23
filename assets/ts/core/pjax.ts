@@ -63,7 +63,11 @@ const initPjax = () => {
     if (window.globalFn) (window.globalFn as any).pjax = {};
   });
   document.addEventListener("pjax:complete", async () => {
-    await Solitude.refresh?.();
+    try {
+      await Solitude.refresh?.();
+    } catch (error) {
+      console.debug("Solitude page refresh kept the new page despite an optional module failure.", error);
+    }
     rerunPjaxScripts();
     if (Solitude.config.lazyload.enable) window.lazyLoadInstance?.update?.();
     document.dispatchEvent(new CustomEvent("solitude:afterNavigate", { detail: { page: Solitude.page } }));

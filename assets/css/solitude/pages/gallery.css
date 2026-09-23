@@ -23,7 +23,7 @@
   margin: 0;
   padding: 0.4rem 1.4rem;
   background: var(--efu-theme);
-  color: var(--efu-card-bg);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
   border: var(--style-border-always);
   border-radius: var(--candy-radius-sm);
   box-shadow: 3px 3px 0 var(--efu-card-border);
@@ -247,7 +247,7 @@
   margin: 0 0 1rem;
   padding: 0.25rem 1rem;
   background: var(--efu-theme);
-  color: var(--efu-card-bg);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
   border: var(--style-border-always);
   border-radius: var(--candy-radius-sm);
   box-shadow: 2px 2px 0 var(--efu-card-border);

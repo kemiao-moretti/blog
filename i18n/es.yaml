@@ -1,6 +1,9 @@
 home: {other: Inicio}
 startReading: {other: Empezar a leer}
 backHome: {other: Volver al inicio}
+errorBack: {other: Volver atrás}
+errorRecommendTitle: {other: Quizá te interese}
+errorRecommendLead: {other: Continúa con las últimas entradas}
 pageNotFound: {other: Página no encontrada}
 backTop: {other: Volver arriba}
 homeSticky: {other: Fijado}
@@ -178,3 +181,10 @@ clockWeek4: {other: Mié}
 clockWeek5: {other: Jue}
 clockWeek6: {other: Vie}
 clockWeek7: {other: Sáb}
+
+# Consentimiento de cookies
+cookieConsentTitle: {other: Aviso de cookies}
+cookieConsentDescription: {other: Este sitio utiliza cookies esenciales para guardar las preferencias del tema y el estado de las funciones básicas. Puedes aceptar o rechazar las cookies no esenciales.}
+cookieConsentPrivacy: {other: Detalles de privacidad}
+cookieConsentReject: {other: Rechazar no esenciales}
+cookieConsentAccept: {other: Aceptar todas}

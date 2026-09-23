@@ -13,6 +13,7 @@
     "skipLibCheck": true
   },
   "files": [
+    "assets/ts/ai-news.ts",
     "assets/ts/comments.ts",
     "assets/ts/global.d.ts",
     "assets/ts/types.ts"

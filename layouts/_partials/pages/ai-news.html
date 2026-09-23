@@ -1,0 +1,50 @@
+{{ $cfg := site.Params.solitude.ai_news }}
+{{ if $cfg.enable }}
+{{ $cacheMinutes := 60 }}
+{{ $timeoutMs := 8000 }}
+{{ if isset $cfg "cache_minutes" }}{{ $cacheMinutes = $cfg.cache_minutes }}{{ end }}
+{{ if isset $cfg "timeout_ms" }}{{ $timeoutMs = $cfg.timeout_ms }}{{ end }}
+{{ $rangeDays := 7 }}
+{{ $timezone := "Asia/Shanghai" }}
+{{ $groupByDate := true }}
+{{ if isset $cfg "range_days" }}{{ $rangeDays = $cfg.range_days }}{{ end }}
+{{ if isset $cfg "timezone" }}{{ $timezone = $cfg.timezone }}{{ end }}
+{{ if isset $cfg "group_by_date" }}{{ $groupByDate = $cfg.group_by_date }}{{ end }}
+<div class="ai-news-page" id="ai-news"
+  data-api="{{ $cfg.api }}"
+  data-cache-minutes="{{ $cacheMinutes }}"
+  data-timeout-ms="{{ $timeoutMs }}"
+  data-range-days="{{ $rangeDays }}"
+  data-timezone="{{ $timezone }}"
+  data-group-by-date="{{ $groupByDate }}"
+  data-label-title="{{ $cfg.title | default "AI 日报" }}"
+  data-label-description="{{ $cfg.description }}"
+  data-label-loading="{{ $cfg.loading | default "正在获取今日 AI 资讯…" }}"
+  data-label-empty="{{ $cfg.empty | default "" }}"
+  data-label-error="{{ $cfg.error | default "AI 日报暂时无法更新，将优先展示最近一期内容。" }}"
+  data-label-error-empty="{{ $cfg.error_empty | default "AI 日报更新失败，请稍后重试或刷新页面。" }}"
+  data-label-retry="{{ $cfg.retry | default "重试" }}"
+  data-label-malformed="{{ $cfg.malformed | default "今日数据格式异常，请稍后重试或刷新页面。" }}"
+  data-label-previous="{{ $cfg.previous | default "上一期日报" }}"
+  data-label-updated="{{ $cfg.updated | default "数据更新时间" }}"
+  data-label-source="{{ $cfg.source | default "来源" }}"
+  data-label-detail="{{ $cfg.detail | default "摘要" }}"
+  data-label-link="{{ $cfg.link | default "阅读原文" }}"
+  data-label-no-link="{{ $cfg.no_link | default "暂无原文链接" }}">
+  <header class="ai-news-header">
+    <p class="ai-news-kicker"><i class="solitude fas fa-sparkles" aria-hidden="true"></i> AI DAILY</p>
+    <h1>{{ $cfg.title | default .Title }}</h1>
+    <p class="ai-news-description">{{ $cfg.description | default .Description }}</p>
+  </header>
+  <div class="ai-news-status" id="ai-news-status" role="status" aria-live="polite">
+    <i class="solitude fas fa-spinner fa-spin ai-news-loading-icon" aria-hidden="true"></i>
+    <span>{{ $cfg.loading | default "正在获取今日 AI 资讯…" }}</span>
+  </div>
+  <section class="ai-news-content" aria-labelledby="ai-news-summary">
+    <div class="ai-news-summary" id="ai-news-summary" aria-live="polite"></div>
+    <div class="ai-news-days" id="ai-news-days"></div>
+  </section>
+</div>
+{{ else }}
+<div class="ai-news-page ai-news-page-disabled"><p>AI 日报暂未开启。</p></div>
+{{ end }}

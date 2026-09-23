@@ -54,5 +54,5 @@
 <script>window.Solitude=window.Solitude||{};window.globalFn=window.globalFn||{};</script>
 <template id="site-config">{{ $global | jsonify | safeHTML }}</template>
 {{ $pageType := cond .IsHome "solitude" (cond (and .IsPage (eq .Section "posts")) "post" (or .Params.type .Kind)) }}
-{{ $pageConfig := dict "is_post" (and .IsPage (eq .Section "posts")) "is_page" (and .IsPage (ne .Section "posts")) "is_home" .IsHome "page" $pageType "toc" (and .IsPage (ne .TableOfContents "")) "comment" (ne .Params.comment false) "color" (.Params.color | default false) }}
+{{ $pageConfig := dict "is_post" (and .IsPage (eq .Section "posts")) "is_page" (and .IsPage (ne .Section "posts")) "is_home" .IsHome "page" $pageType "toc" (and .IsPage (ne .TableOfContents "") (ne (lower (or .Params.type .Layout)) "privacy")) "comment" (ne .Params.comment false) "color" (.Params.color | default false) }}
 <template id="config-diff">{{ $pageConfig | jsonify | safeHTML }}</template>

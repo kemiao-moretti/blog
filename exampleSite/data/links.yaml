@@ -5,13 +5,13 @@ links:
     link_list:
       - name: Solitude Docs
         link: https://solitude.js.org/
-        avatar: /img/logo.png
+        avatar: /img/avatar.png
         topimg: /img/demo/cover-getting-started-v2.webp
         descr: Solitude 的安装、配置、迁移与常见问题文档
         tag: 文档
       - name: Solitude GitHub
         link: https://github.com/everfu/hugo-solitude
-        avatar: /img/logo.png
+        avatar: /img/avatar.png
         topimg: /img/demo/cover-shortcodes-v2.webp
         descr: 主题源码、版本记录与问题反馈
         tag: 源码

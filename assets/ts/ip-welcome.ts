@@ -2,7 +2,7 @@
  * 侧边栏访客欢迎卡（ipWelcome）：定位访客大致位置并展示欢迎语。
  *
  * 数据链（全部浏览器直连，无需 Key，任一步失败继续降级）：
- *   1. 主源 https://api.ip.sb/geoip        一次拿到 ip / 国家 / 省市 / 经纬度
+ *   1. 主源 https://60s-api.518339.xyz/v2/ip  一次拿到 ip / 国家 / 省市 / 经纬度
  *   2. 备用取 IP：api.ipify.org、icanhazip.com
  *   3. 备用查位置：ipapi.co/{ip}/json/
  *   4. 全部失败 → 显示兜底欢迎语
@@ -288,17 +288,27 @@ const pickNum = (o: Record<string, unknown>, ...keys: string[]): number => {
   return 0;
 };
 
-/** 主源：ip.sb（ip / country / province / city / latitude / longitude） */
-async function fromPrimary(cfg: IpWelcomeConfig): Promise<Located | null> {
-  if (!cfg.primaryApi) return null;
-  const d = await fetchJson(cfg.primaryApi, cfg.timeoutMs);
+function responseData(data: Record<string, unknown>): Record<string, unknown> {
+  return data.data && typeof data.data === "object" && !Array.isArray(data.data)
+    ? data.data as Record<string, unknown>
+    : data;
+}
+
+function toLocated(data: Record<string, unknown>): Located | null {
+  const d = responseData(data);
   const lat = pickNum(d, "latitude", "lat");
   const lng = pickNum(d, "longitude", "lng", "lon");
   const country = pick(d, "country", "country_name");
-  const province = pick(d, "region", "province", "region_name");
+  const province = pick(d, "region", "province", "region_name", "prov");
   const city = pick(d, "city");
   if (!lat || !lng || !country) return null;
   return { country, province, city, lat, lng };
+}
+
+/** 主源：返回 ip / 国家 / 省市 / 经纬度，兼容顶层和 data 包装响应 */
+async function fromPrimary(cfg: IpWelcomeConfig): Promise<Located | null> {
+  if (!cfg.primaryApi) return null;
+  return toLocated(await fetchJson(cfg.primaryApi, cfg.timeoutMs));
 }
 
 /** 备用链：先取 IP，再查 ipapi.co */
@@ -318,13 +328,7 @@ async function fromFallback(cfg: IpWelcomeConfig): Promise<Located | null> {
   }
   if (!ip || !cfg.fallbackApi) return null;
   const d = await fetchJson(cfg.fallbackApi.replace("%s", encodeURIComponent(ip)), cfg.timeoutMs);
-  const lat = pickNum(d, "latitude", "lat");
-  const lng = pickNum(d, "longitude", "lng", "lon");
-  const country = pick(d, "country_name", "country");
-  const province = pick(d, "region", "province");
-  const city = pick(d, "city");
-  if (!lat || !lng || !country) return null;
-  return { country, province, city, lat, lng };
+  return toLocated(d);
 }
 
 /** 球面距离（公里） */

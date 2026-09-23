@@ -48,24 +48,69 @@ blockquote {
   box-shadow: 2px 2px 0 color-mix(in srgb, var(--efu-theme-op-deep) 55%, transparent);
 }
 
-/* ---------- 代码块 ---------- */
+/* ---------- 代码块：无细框糖果屋代码卡 ---------- */
+.code-block,
 .highlight,
-.highlight pre,
 figure.highlight {
-  border: var(--style-border-always);
+  position: relative;
+  border: 0;
   border-radius: var(--candy-radius);
-  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 color-mix(in srgb, var(--efu-card-border) 45%, transparent);
+  background: var(--code-block-bg, var(--efu-hl-bg));
+  box-shadow: var(--candy-code-shadow);
+}
+
+.code-block::before,
+figure.highlight::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: var(--candy-border-width);
+  background: var(--efu-theme);
+  content: "";
+  pointer-events: none;
+  z-index: 2;
+}
+
+.highlight pre,
+figure.highlight pre,
+.code-block pre,
+.code-block__viewport,
+.code-block__fallback,
+.code-block .shiki {
+  border: 0;
+  box-shadow: none;
 }
 
 .highlight .code-tools,
-.highlight figcaption {
-  border-bottom: var(--style-border-always);
+.highlight figcaption,
+figure.highlight .highlight-tools,
+figure.highlight .code-expand-btn,
+.highlight .code-tools,
+.highlight .code-expand-btn,
+figure table td.gutter pre {
+  border: 0;
 }
 
-/* 行内代码：糖果描边 */
-code:not(.code-block code) {
-  border: 1px solid var(--efu-theme-op-deep);
+/* ---------- 行内代码：迷你代码块 ----------
+   代码块的语言是「左竖条 + 底色 + 硬阴影」，行内代码复用前两件事，
+   读者一眼就能把两者归成一族。左条之所以用 3px 而不是代码块的 2px，
+   是因为行内代码字号只有 .88em，同宽度的视觉权重会被压没。
+   这是全站行内代码的唯一出处：所有上下文共用一条规则，不再各写各的。 */
+.article-container :not(pre) > code:not([class*="language-"]),
+.cl-entry-md :not(pre) > code {
+  display: inline;
+  padding: 0.2em 0.45em;
+  border: 0;
+  border-inline-start: var(--efu-code-inline-bar-width) solid var(--efu-code-inline-bar);
   border-radius: var(--candy-radius-sm);
+  background: var(--efu-code-inline-bg);
+  color: var(--efu-fontcolor);
+  font-family: var(--efu-code-font-family);
+  font-size: 0.88em;
+  overflow-wrap: break-word;
+  box-shadow: none;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 /* ---------- 分页 ---------- */
@@ -79,7 +124,7 @@ code:not(.code-block code) {
 
 #pagination:not(.pagination-post) .page-number.current {
   background: var(--efu-theme);
-  color: var(--efu-card-bg);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
   border-color: var(--efu-card-border);
   box-shadow: 2px 2px 0 var(--efu-card-border);
 }
@@ -486,6 +531,8 @@ code:not(.code-block code) {
 
 [data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item:hover > .site-page span,
 [data-theme="dark"] #page-header.nav-fixed #nav #menus > .menus_items > .menus_item:hover > .site-page i,
+[data-theme="dark"] #page-header.nav-fixed #nav #site-name:hover span,
+[data-theme="dark"] #page-header.nav-fixed #nav #site-name:hover i,
 [data-theme="dark"] #page-header.nav-fixed #nav #page-name-text:hover {
   color: var(--candy-nav-active-text, #241A12) !important;
   -webkit-text-fill-color: var(--candy-nav-active-text, #241A12);
@@ -745,6 +792,8 @@ code:not(.code-block code) {
 /* 深色模式全部橙色导航状态保持清晰字色（同上：仅限橙底项，父级菜单项按状态分治） */
 [data-theme="dark"] #page-header #nav .menus_items .menus_item .menus_item_child li a:hover,
 [data-theme="dark"] #page-header #nav .back-home-button:hover,
+[data-theme="dark"] #page-header #nav #site-name:hover span,
+[data-theme="dark"] #page-header #nav #site-name:hover i,
 [data-theme="dark"] #page-header #nav .back-menu-item:hover,
 [data-theme="dark"] #category-bar .category-bar-item.select a,
 [data-theme="dark"] #tag #tag-page-tags a.select,
@@ -752,6 +801,12 @@ code:not(.code-block code) {
 [data-theme="dark"] #console .button-group .console-btn-item:hover :is(span, button) {
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
   -webkit-text-fill-color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+}
+
+[data-theme="dark"] #page-header #nav #site-name:hover {
+  background: var(--efu-theme);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  box-shadow: none;
 }
 
 /* 深色子级导航仍使用橙色高亮，但硬阴影改为深墨色，避免橙底与橙色阴影融成一块。 */
@@ -1324,22 +1379,29 @@ code:not(.code-block code) {
   color: var(--efu-fontcolor);
 }
 
+/* 暗色待机态必须避开 hover/focus 伪类竞争。
+   `[data-theme="dark"] #rightside button` 与 `#rightside button:hover` 的特异度
+   都是 (1,1,1)，前者写在后面就会永远压住 hover 的背景色 —— 而上方
+   「橙底深可可字」的 !important 只改 -webkit-text-fill-color，
+   结果是深可可图标压在深可可按钮上，暗色下 hover 等于看不见。
+   这里把待机态限定在未交互状态，hover/focus 由下方规则独占。 */
+[data-theme="dark"] #rightside button:not(:hover):not(:focus-visible) {
+  border-color: var(--candy-nav-border, var(--efu-card-border));
+  background: var(--candy-nav-surface, var(--efu-card-bg));
+}
+
 #rightside button:hover,
 #rightside button:focus-visible {
   background: var(--efu-theme);
   border-color: var(--efu-theme);
   box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
   color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  -webkit-text-fill-color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
 }
 
 #rightside button:active {
   box-shadow: none;
   transform: translate(2px, 2px) scale(0.96);
-}
-
-[data-theme="dark"] #rightside button {
-  border-color: var(--candy-nav-border, var(--efu-card-border));
-  background: var(--candy-nav-surface, var(--efu-card-bg));
 }
 
 @media screen and (max-width: 768px) {

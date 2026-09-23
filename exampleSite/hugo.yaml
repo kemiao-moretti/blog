@@ -89,10 +89,10 @@ params:
         项目:
           - name: Solitude
             url: https://github.com/everfu/hugo-solitude
-            icon: /img/logo.png
+            icon: /img/avatar.png
           - name: 官方文档
             url: https://solitude.js.org/
-            icon: /img/logo.png
+            icon: /img/avatar.png
     hometop:
       banner:
         title: 用 Solitude<br>记录与创造
@@ -151,7 +151,7 @@ params:
         list: []
     footer:
       information:
-        author: /img/logo.png
+        author: /img/avatar.png
         left:
           - name: GitHub
             url: https://github.com/everfu/hugo-solitude

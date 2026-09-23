@@ -1,6 +1,9 @@
 home: {other: Home}
 startReading: {other: Start reading}
 backHome: {other: Back home}
+errorBack: {other: Go back}
+errorRecommendTitle: {other: You might like}
+errorRecommendLead: {other: Continue from recent posts}
 pageNotFound: {other: Page not found}
 backTop: {other: Back to top}
 homeSticky: {other: Sticky}
@@ -187,3 +190,10 @@ ipWelcomeFrom: {other: 'Welcome, friend from'}
 ipWelcomeFriend: {other: ' '}
 ipWelcomeDistance: {other: "%s km from the author"}
 ipWelcomeUnknownPlace: {other: somewhere far away}
+
+# Cookie consent
+cookieConsentTitle: {other: Cookie notice}
+cookieConsentDescription: {other: This site uses essential cookies to save theme preferences and basic feature states. You can accept or reject non-essential cookies.}
+cookieConsentPrivacy: {other: Privacy details}
+cookieConsentReject: {other: Reject non-essential}
+cookieConsentAccept: {other: Accept all}

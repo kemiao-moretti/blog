@@ -19,6 +19,12 @@
   --candy-code-surface: var(--solitude-candy-code-surface, #202327);
   --candy-nav-active-surface: var(--efu-theme);
 
+  /* 行内代码 → 「迷你代码块」：左竖条 + 加深底色，与代码块同族。
+     取值引用按主题分区的令牌，所以这两个变量无需再写一套明暗分支。 */
+  --efu-code-inline-bg: var(--efu-card-btn-bg, #FFE0A3);
+  --efu-code-inline-bar: var(--efu-theme, #FFA000);
+  --efu-code-inline-bar-width: var(--solitude-candy-code-bar-width, 3px);
+
   /* 覆盖上游圆角 */
   --radius: var(--candy-radius);
   --efu-radius-sm: var(--candy-radius-sm);

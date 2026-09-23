@@ -1,0 +1,111 @@
+/* AI 摘要：文章里的轻量编辑注释卡，复用糖果屋主题令牌。 */
+.ai-summary {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 2rem 1.25rem;
+  padding: 14px 16px 16px 18px;
+  overflow: hidden;
+  border: 1px solid var(--efu-card-border);
+  border-left: 4px solid var(--efu-theme);
+  border-radius: var(--candy-radius);
+  background: var(--efu-secondbg);
+  color: var(--efu-fontcolor);
+}
+
+.ai-summary__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--efu-card-border);
+}
+
+.ai-summary__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.ai-summary__title i {
+  color: var(--efu-theme);
+  font-size: 15px;
+}
+
+.ai-summary__model {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid var(--efu-card-border);
+  border-radius: var(--candy-radius-sm);
+  background: var(--efu-card-bg);
+  color: var(--efu-secondtext);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.ai-summary__text {
+  margin: 0;
+  color: var(--efu-fontcolor);
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: left;
+}
+
+/* 打字机光标 */
+.ai-summary__text.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--efu-theme);
+  animation: ai-summary-blink 0.9s steps(1) infinite;
+}
+
+@keyframes ai-summary-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media screen and (max-width: 768px) {
+  .ai-summary {
+    margin: 0 1rem 1rem;
+    padding: 12px 14px 14px 16px;
+  }
+
+  .ai-summary__header {
+    align-items: flex-start;
+  }
+
+  .ai-summary__model {
+    max-width: 42%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .ai-summary__header {
+    flex-wrap: wrap;
+  }
+
+  .ai-summary__model {
+    margin-left: 29px;
+    max-width: calc(100% - 29px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-summary__text.is-typing::after {
+    animation: none;
+  }
+}

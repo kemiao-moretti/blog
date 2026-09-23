@@ -296,7 +296,7 @@
 .relatedPosts-random:focus-visible {
   border-color: var(--efu-theme);
   background: var(--efu-theme);
-  color: var(--efu-white);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
 }
 
 .relatedPosts-random:focus-visible {

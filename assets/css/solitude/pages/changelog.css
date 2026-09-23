@@ -394,19 +394,7 @@
   color: var(--efu-secondtext);
 }
 
-/* 行内代码：卡面底 + 糖果描边，等宽字体，与主题既有 code 规范一致 */
-.cl-entry-md code {
-  padding: 1px 6px;
-  border: 1px solid var(--efu-theme-op-deep);
-  border-radius: var(--candy-radius-sm);
-  background: var(--efu-secondbg);
-  color: var(--efu-fontcolor);
-  font-family: var(--efu-code-font-family);
-  font-size: 0.88em;
-  word-break: break-word;
-}
-
-/* 代码块内的 code 不再重复描边与内边距 */
+/* 行内代码的样式由 candy-components 统一提供，这里只负责代码块内的复位 */
 .cl-entry-md pre code {
   padding: 0;
   border: 0;

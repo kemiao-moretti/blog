@@ -1,6 +1,9 @@
 home: {other: 首頁}
 startReading: {other: 開始閱讀}
 backHome: {other: 返回首頁}
+errorBack: {other: 返回上一頁}
+errorRecommendTitle: {other: 也許你會喜歡}
+errorRecommendLead: {other: 從最近的內容繼續逛逛}
 pageNotFound: {other: 找不到頁面}
 backTop: {other: 返回頂部}
 homeSticky: {other: 置頂}
@@ -187,3 +190,10 @@ ipWelcomeFrom: {other: 歡迎來自}
 ipWelcomeFriend: {other: 的朋友}
 ipWelcomeDistance: {other: 距站長約 %s 公里}
 ipWelcomeUnknownPlace: {other: 遠方}
+
+# Cookie 同意彈窗
+cookieConsentTitle: {other: Cookie 使用說明}
+cookieConsentDescription: {other: 本站會使用必要的 Cookie 儲存主題偏好和基本功能狀態。你可以選擇接受或拒絕非必要 Cookie。}
+cookieConsentPrivacy: {other: 了解隱私說明}
+cookieConsentReject: {other: 拒絕非必要}
+cookieConsentAccept: {other: 接受全部}

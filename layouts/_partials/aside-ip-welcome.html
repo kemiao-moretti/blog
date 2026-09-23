@@ -16,7 +16,7 @@
     data-blogger-lng="{{ $cfg.bloggerLng | default 118.7969 }}"
     data-cache-hours="{{ $cfg.cacheHours | default 24 }}"
     data-timeout-ms="{{ $cfg.timeoutMs | default 6000 }}"
-    data-primary-api="{{ $cfg.primaryApi | default "https://api.ip.sb/geoip" }}"
+    data-primary-api="{{ $cfg.primaryApi | default "https://60s-api.518339.xyz/v2/ip" }}"
     data-ip-apis="{{ delimit ($cfg.ipApis | default (slice "https://api.ipify.org?format=json" "https://icanhazip.com/")) "," }}"
     data-fallback-api="{{ $cfg.fallbackApi | default "https://ipapi.co/%s/json/" }}"
     data-tips="{{ $cfg.tips | default dict | jsonify }}"

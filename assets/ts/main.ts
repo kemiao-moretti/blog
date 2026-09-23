@@ -1,6 +1,7 @@
 import { Solitude } from "./core/api";
 import { initActionDelegation } from "./core/actions";
 import { lifecycle } from "./core/lifecycle";
+import { initAiNews } from "./ai-news";
 import { initPreloader } from "./core/preloader";
 
 let coverColor: (music?: boolean) => void = () => {};
@@ -1567,7 +1568,8 @@ const scrollFnToDo = () => {
 
   if (toc) {
     const $cardTocLayout = document.getElementById("card-toc");
-    const $cardToc = $cardTocLayout.querySelector(".toc-content");
+    const $cardToc = $cardTocLayout?.querySelector(".toc-content");
+    if (!$cardTocLayout || !$cardToc) return;
     const tocItemClickFn = (e) => {
       const target = e.target.closest(".toc-link");
       if (!target) return;
@@ -1873,6 +1875,7 @@ Solitude.refresh = async () => {
     lifecycle.add(() => archivePageController.destroy());
   }
   initAboutPage();
+  initAiNews();
   forPostFn();
 };
 

@@ -1,25 +1,55 @@
 {{ define "main" }}
   {{ $cfg := site.Params.solitude.errorpage }}
+  {{ $title := $cfg.title | default (i18n "pageNotFound") }}
+  {{ $brand := $cfg.brand | default site.Title }}
   <main id="error-wrap" aria-labelledby="error-page-title">
-    <div class="error-content">
-      <div class="error-img" style="background-image:url('{{ $cfg.img | relURL }}')" aria-hidden="true"></div>
-      <div class="error-info">
-        <h1 class="error_title" id="error-page-title">404</h1>
-        <div class="error_subtitle">{{ $cfg.text }}</div>
-        <a class="button--animated" href="{{ site.Home.RelPermalink }}"><i class="solitude fas fa-arrow-up-right-from-square" aria-hidden="true"></i>{{ i18n "backHome" }}</a>
+    <section class="error-hero">
+      <div class="error-hero-copy">
+        {{ with $cfg.eyebrow }}<p class="error-kicker">{{ . }}</p>{{ end }}
+        <h1 class="error-title" id="error-page-title">{{ $title }}</h1>
+        {{ with $cfg.text }}<p class="error-lede">{{ . }}</p>{{ end }}
+        <div class="error-actions">
+          <a class="error-btn error-btn--primary" href="{{ site.Home.RelPermalink }}">{{ i18n "backHome" }}</a>
+          <a class="error-btn error-btn--secondary" id="error-back" href="{{ site.Home.RelPermalink }}">{{ i18n "errorBack" }}</a>
+        </div>
       </div>
-    </div>
-  </main>
-  {{ if $cfg.recommendList }}
-    <section class="aside-list" aria-label="{{ i18n "recentPosts" }}">
-      <div class="aside-list-group">
-        {{ range first 5 (where site.RegularPages.ByDate.Reverse "Section" "posts") }}
-          <article class="aside-list-item">
-            <a class="thumbnail" href="{{ .RelPermalink }}"><img src="{{ .Params.cover | default "/img/default.avif" | relURL }}" alt="{{ .Title }}" loading="lazy"></a>
-            <div class="content"><a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a></div>
-          </article>
-        {{ end }}
+      <div class="error-hero-visual" aria-hidden="true">
+        <div class="error-sticker">
+          <span class="error-sticker-code">404</span>
+          <span class="error-sticker-brand">{{ $brand }}</span>
+        </div>
       </div>
     </section>
-  {{ end }}
+    {{ if $cfg.recommendList }}
+      <section class="error-recommend" aria-labelledby="error-recommend-title">
+        <div class="error-recommend-head">
+          <h2 id="error-recommend-title">{{ i18n "errorRecommendTitle" }}</h2>
+          <p>{{ i18n "errorRecommendLead" }}</p>
+        </div>
+        <div class="error-recommend-cards">
+          {{ range first 3 (where site.RegularPages.ByDate.Reverse "Section" "posts") }}
+            {{ $cover := .Params.cover | default "/img/default.avif" }}
+            <article class="error-recommend-card">
+              <a class="error-recommend-cover" href="{{ .RelPermalink }}" tabindex="-1" aria-hidden="true"><img src="{{ $cover | relURL }}" alt="" loading="lazy" decoding="async"></a>
+              <div class="error-recommend-body">
+                <h3 class="error-recommend-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                <time class="error-recommend-meta" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format "2006/01/02" }}</time>
+              </div>
+            </article>
+          {{ end }}
+        </div>
+      </section>
+    {{ end }}
+  </main>
+  <script>
+    (() => {
+      const back = document.getElementById("error-back");
+      if (!back) return;
+      back.addEventListener("click", (event) => {
+        if (window.history.length <= 1) return;
+        event.preventDefault();
+        window.history.back();
+      });
+    })();
+  </script>
 {{ end }}

@@ -1,0 +1,333 @@
+/* 404 page. Pure CSS/typography, no fixed image.
+   All colors/surfaces follow the candy token layer; nothing is hardcoded
+   for a specific theme, so light and dark modes share the same rules. */
+
+#body-wrap.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#body-wrap.error #page-header {
+  width: 100%;
+}
+
+#body-wrap.error #error-wrap {
+  width: 100%;
+  max-width: 1180px;
+  margin: 28px auto 60px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* ---------- 主视觉卡片 ---------- */
+#body-wrap.error .error-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  overflow: hidden;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-lg);
+  background: var(--efu-card-bg);
+  box-shadow: var(--efu-shadow-border);
+}
+
+#body-wrap.error .error-hero-copy {
+  display: flex;
+  min-height: 410px;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(32px, 6vw, 76px);
+}
+
+#body-wrap.error .error-kicker {
+  width: fit-content;
+  margin: 0 0 20px;
+  padding: 5px 9px;
+  color: var(--efu-fontcolor);
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius-sm);
+  background: var(--efu-green);
+  box-shadow: 2px 2px 0 var(--efu-card-border);
+  font: 800 12px/1 var(--efu-code-font-family);
+  letter-spacing: 0.04em;
+}
+
+#body-wrap.error .error-title {
+  max-width: 660px;
+  margin: 0;
+  color: var(--efu-fontcolor);
+  font-size: clamp(56px, 8vw, 112px);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: -0.08em;
+}
+
+#body-wrap.error .error-lede {
+  max-width: 510px;
+  margin: 28px 0 0;
+  color: var(--efu-secondtext);
+  font-size: clamp(16px, 2vw, 21px);
+  line-height: 1.55;
+}
+
+#body-wrap.error .error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+#body-wrap.error .error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 9px 16px;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  text-decoration: none;
+  font-weight: 800;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+#body-wrap.error .error-btn--primary {
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  background: var(--efu-theme);
+  box-shadow: 3px 3px 0 var(--efu-card-border);
+}
+
+#body-wrap.error .error-btn--secondary {
+  color: var(--efu-fontcolor);
+  background: transparent;
+}
+
+#body-wrap.error .error-btn:hover {
+  transform: translate(-1px, -1px);
+}
+
+#body-wrap.error .error-btn:focus-visible {
+  outline: 3px solid var(--efu-theme);
+  outline-offset: 3px;
+}
+
+/* ---------- 糖果贴纸视觉区 ---------- */
+#body-wrap.error .error-hero-visual {
+  position: relative;
+  display: grid;
+  min-height: 410px;
+  place-items: center;
+  overflow: hidden;
+  background: var(--efu-background);
+  border-left: var(--style-border-always);
+}
+
+#body-wrap.error .error-hero-visual::before,
+#body-wrap.error .error-hero-visual::after {
+  position: absolute;
+  content: "";
+  border: var(--candy-border-width) solid var(--efu-card-border);
+  border-radius: 50%;
+  opacity: 0.34;
+}
+
+#body-wrap.error .error-hero-visual::before { width: 290px; height: 290px; }
+#body-wrap.error .error-hero-visual::after { width: 430px; height: 430px; }
+
+#body-wrap.error .error-sticker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 230px;
+  height: 230px;
+  place-items: center;
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  border: 3px solid var(--efu-card-border);
+  border-radius: 38% 62% 55% 45% / 48% 40% 60% 52%;
+  background: var(--efu-theme);
+  box-shadow: 10px 10px 0 var(--efu-card-border);
+  transform: rotate(-7deg);
+}
+
+#body-wrap.error .error-sticker::before,
+#body-wrap.error .error-sticker::after {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  content: "";
+  border: 3px solid var(--efu-card-border);
+  border-radius: 50%;
+  background: var(--efu-pink);
+}
+
+#body-wrap.error .error-sticker::before { top: -18px; right: 23px; }
+
+#body-wrap.error .error-sticker::after {
+  bottom: 18px;
+  left: -20px;
+  width: 20px;
+  height: 20px;
+  background: var(--efu-green);
+}
+
+#body-wrap.error .error-sticker-code {
+  display: block;
+  font: 900 64px/0.78 var(--efu-code-font-family);
+  letter-spacing: -0.12em;
+  transform: rotate(7deg);
+}
+
+#body-wrap.error .error-sticker-brand {
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transform: rotate(7deg);
+}
+
+/* ---------- 推荐文章 ---------- */
+#body-wrap.error .error-recommend {
+  margin-top: 36px;
+}
+
+#body-wrap.error .error-recommend-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+#body-wrap.error .error-recommend-head h2 {
+  margin: 0;
+  color: var(--efu-fontcolor);
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+#body-wrap.error .error-recommend-head p {
+  margin: 0;
+  color: var(--efu-secondtext);
+  font-size: 13px;
+}
+
+#body-wrap.error .error-recommend-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#body-wrap.error .error-recommend-card {
+  overflow: hidden;
+  border: var(--style-border-always);
+  border-radius: var(--candy-radius);
+  background: var(--efu-card-bg);
+  box-shadow: 3px 3px 0 var(--efu-card-border);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+#body-wrap.error .error-recommend-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--efu-theme);
+}
+
+#body-wrap.error .error-recommend-cover {
+  display: block;
+  overflow: hidden;
+  border-bottom: var(--style-border-always);
+}
+
+#body-wrap.error .error-recommend-cover img {
+  display: block;
+  width: 100%;
+  height: 132px;
+  object-fit: cover;
+}
+
+#body-wrap.error .error-recommend-body {
+  padding: 14px;
+}
+
+#body-wrap.error .error-recommend-title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+#body-wrap.error .error-recommend-title a {
+  color: var(--efu-fontcolor);
+  text-decoration: none;
+}
+
+#body-wrap.error .error-recommend-title a:hover {
+  color: var(--efu-theme);
+}
+
+#body-wrap.error .error-recommend-title a:focus-visible,
+#body-wrap.error .error-recommend-cover:focus-visible {
+  outline: 3px solid var(--efu-theme);
+  outline-offset: 2px;
+  border-radius: var(--candy-radius-sm);
+}
+
+#body-wrap.error .error-recommend-meta {
+  display: block;
+  margin-top: 9px;
+  color: var(--efu-secondtext);
+  font-size: 12px;
+}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 768px) {
+  #body-wrap.error #error-wrap {
+    margin: 18px auto 40px;
+    padding: 0 12px;
+  }
+
+  #body-wrap.error .error-hero {
+    grid-template-columns: 1fr;
+  }
+
+  #body-wrap.error .error-hero-copy {
+    min-height: 0;
+    padding: 34px 26px 30px;
+  }
+
+  #body-wrap.error .error-hero-visual {
+    min-height: 270px;
+    border-top: var(--style-border-always);
+    border-left: 0;
+  }
+
+  #body-wrap.error .error-hero-visual::before { width: 220px; height: 220px; }
+  #body-wrap.error .error-hero-visual::after { width: 320px; height: 320px; }
+
+  #body-wrap.error .error-sticker { width: 170px; height: 170px; }
+  #body-wrap.error .error-sticker-code { font-size: 46px; }
+  #body-wrap.error .error-sticker-brand { right: 19px; bottom: 20px; }
+
+  #body-wrap.error .error-recommend-cards {
+    grid-template-columns: 1fr;
+  }
+
+  #body-wrap.error .error-recommend-cover img {
+    height: 90px;
+  }
+
+  #body-wrap.error .error-recommend-head {
+    display: block;
+  }
+
+  #body-wrap.error .error-recommend-head p {
+    margin-top: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #body-wrap.error .error-btn,
+  #body-wrap.error .error-recommend-card {
+    transition: none;
+  }
+}

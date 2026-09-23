@@ -1,4 +1,6 @@
 import "./core/api";
+import "./cookie-consent";
+import "./ai-summary";
 import "./utils";
 import "./main";
 import "./comments";

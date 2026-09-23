@@ -16,6 +16,7 @@
       {{ block "main" . }}{{ end }}
       {{ if ne $pageType "404" }}<footer id="footer">{{ partial "footer.html" . }}</footer>{{ end }}
     </div>
+    {{ partial "cookie-consent.html" . }}
     {{ partial "search.html" . }}
     {{ if site.Params.solitude.capsule.enable }}{{ partial "capsule.html" . }}{{ end }}
     {{ partial "scripts.html" . }}

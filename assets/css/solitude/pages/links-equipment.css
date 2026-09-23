@@ -873,7 +873,7 @@ div#banners .banner-button.secondary {
 div#banners .banner-button:hover,
 body[data-type=links] div#banners .banner-button:focus-visible {
   background: var(--efu-theme);
-  color: var(--efu-white);
+  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
 }
 
 body[data-type=links] div#banners .banner-button:focus-visible {

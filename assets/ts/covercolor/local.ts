@@ -1,5 +1,13 @@
-import { applyThemeColor, getCoverSource, resolveColor, rgbToHex } from "./shared";
+import { applyDefaultColor, applyThemeColor, getCoverSource, resolveColor, rgbToHex } from "./shared";
 import { Solitude } from "../core/api";
+
+const isCrossOrigin = (source) => {
+  try {
+    return new URL(source, window.location.href).origin !== window.location.origin;
+  } catch {
+    return true;
+  }
+};
 
 const extractLocalColor = (source) => new Promise((resolve, reject) => {
   const image = new Image();
@@ -20,5 +28,10 @@ const extractLocalColor = (source) => new Promise((resolve, reject) => {
 export const coverColor = (music = false) => {
   const configured = !music && Solitude.page.color;
   if (configured && /^#[0-9a-f]{6}$/i.test(configured)) return applyThemeColor(configured);
-  return resolveColor(getCoverSource(music), extractLocalColor, music);
+
+  const source = getCoverSource(music);
+  if (!music && isCrossOrigin(source)) {
+    return applyDefaultColor();
+  }
+  return resolveColor(source, extractLocalColor, music);
 };

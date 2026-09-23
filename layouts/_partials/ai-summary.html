@@ -1,0 +1,15 @@
+{{ $cfg := site.Params.solitude.ai_summary | default dict }}
+{{ with .Params.ai_summary }}
+  {{ if ne $cfg.enable false }}
+    <section class="ai-summary" data-ai-summary data-summary="{{ . | plainify | htmlEscape }}" aria-labelledby="ai-summary-title">
+      <div class="ai-summary__header">
+        <div class="ai-summary__title" id="ai-summary-title">
+          <i class="solitude fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+          <span>{{ $cfg.title | default "AI 摘要" }}</span>
+        </div>
+        {{ with $cfg.model }}<span class="ai-summary__model">{{ . }}</span>{{ end }}
+      </div>
+      <p class="ai-summary__text" data-ai-summary-text>{{ . | plainify }}</p>
+    </section>
+  {{ end }}
+{{ end }}

@@ -102,7 +102,9 @@ export const resolveColor = async (source, fetchColor, music = false) => {
     if (source !== getCoverSource(music)) return;
     return music ? applyMusicColor(color) : applyThemeColor(color);
   } catch (error) {
-    console.error("Unable to resolve cover color:", error);
+    if (error?.name !== "AbortError") {
+      console.debug("Solitude cover color unavailable; using the theme color fallback.");
+    }
     if (!music) applyDefaultColor();
   }
 };

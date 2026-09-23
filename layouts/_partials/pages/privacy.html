@@ -1,0 +1,155 @@
+{{- $cfg := site.Params.solitude -}}
+{{- $statsCfg := $cfg.stats | default dict -}}
+{{- $umamiCfg := $statsCfg.umami | default dict -}}
+{{- $umamiEnabled := false -}}
+{{- if isset $umamiCfg "enable" }}{{ $umamiEnabled = $umamiCfg.enable }}{{ end -}}
+{{- $umamiEndpoint := $umamiCfg.endpoint | default "" -}}
+{{- $umamiWebsiteID := $umamiCfg.website_id | default "" -}}
+{{- $commentProvider := lower (strings.TrimSpace ($cfg.comment.use | default "")) -}}
+{{- $commentLabel := "未配置独立评论系统" -}}
+{{- if eq $commentProvider "artalk" }}{{ $commentLabel = "Artalk（自托管）" }}{{ else if eq $commentProvider "valine" }}{{ $commentLabel = "Valine（LeanCloud）" }}{{ else if eq $commentProvider "twikoo" }}{{ $commentLabel = "Twikoo" }}{{ else if eq $commentProvider "waline" }}{{ $commentLabel = "Waline" }}{{ else if eq $commentProvider "giscus" }}{{ $commentLabel = "Giscus" }}{{ end -}}
+{{- $updateDate := .Params.updated | default "2026-09-22" -}}
+
+<section id="privacy-page" aria-labelledby="privacy-page-title">
+  <header class="privacy-hero">
+    <div class="privacy-hero__eyebrow"><i class="solitude fas fa-shield-halved" aria-hidden="true"></i><span>TRANSPARENCY NOTE / 01</span></div>
+    <div class="privacy-hero__heading">
+      <div>
+        <h1 id="privacy-page-title" class="privacy-title">{{ .Title }}</h1>
+        {{ with .Description }}<p class="privacy-lead">{{ . }}</p>{{ end }}
+      </div>
+      <div class="privacy-hero__stamp" aria-label="最近更新日期">
+        <span>LAST UPDATED</span>
+        <time datetime="{{ $updateDate }}">{{ $updateDate }}</time>
+      </div>
+    </div>
+    <p class="privacy-hero__intro">这是一份面向访客的简明说明：你会看到哪些数据被使用、为什么使用，以及如何管理自己的选择。</p>
+  </header>
+
+  <div class="privacy-status-grid" aria-label="站点隐私状态摘要">
+    <div class="privacy-status-card privacy-status-card--accent">
+      <span class="privacy-status-card__label">站点统计</span>
+      <strong><i class="solitude fas fa-chart-line" aria-hidden="true"></i>{{ if $umamiEnabled }}Umami 已启用{{ else }}未启用{{ end }}</strong>
+      <small>{{ if $umamiEnabled }}仅用于了解访问趋势与页面表现{{ else }}当前没有配置站点统计脚本{{ end }}</small>
+    </div>
+    <div class="privacy-status-card">
+      <span class="privacy-status-card__label">评论服务</span>
+      <strong><i class="solitude fas fa-comments" aria-hidden="true"></i>{{ $commentLabel }}</strong>
+      <small>{{ if $commentProvider }}评论数据由对应服务处理{{ else }}本站当前未开放独立评论服务{{ end }}</small>
+    </div>
+    <div class="privacy-status-card">
+      <span class="privacy-status-card__label">Cookie 选择</span>
+      <strong><i class="solitude fas fa-cookie-bite" aria-hidden="true"></i>由你决定</strong>
+      <small>必要状态保留，非必要选择可拒绝</small>
+    </div>
+  </div>
+
+  <div class="privacy-layout">
+    <nav class="privacy-nav" aria-label="隐私说明章节">
+      <div class="privacy-nav__title"><i class="solitude fas fa-list" aria-hidden="true"></i><span>章节导航</span></div>
+      <a href="#privacy-scope">说明范围<span>01</span></a>
+      <a href="#privacy-collected">收集的信息<span>02</span></a>
+      <a href="#privacy-cookie">Cookie 与本地存储<span>03</span></a>
+      <a href="#privacy-analytics">Umami 统计<span>04</span></a>
+      <a href="#privacy-third-party">第三方资源<span>05</span></a>
+      <a href="#privacy-comments">评论与提交<span>06</span></a>
+      <a href="#privacy-rights">你的权利<span>07</span></a>
+      <a href="#privacy-contact">联系站长<span>08</span></a>
+    </nav>
+
+    <article class="privacy-content">
+      <section id="privacy-scope" class="privacy-section">
+        <div class="privacy-section__heading"><span>01</span><h2>说明范围</h2></div>
+        <p>喵洛阁（{{ site.BaseURL }}）是由克喵Moretti维护的个人博客，用于记录文字、项目经验与个人兴趣。本页面说明本站在你访问和使用过程中可能涉及的信息处理方式。</p>
+        <p>本站不要求注册账号，也不会主动出售、出租或向无关第三方交易你的个人信息。页面中的第三方服务仅在对应功能被加载或使用时发生网络请求。</p>
+      </section>
+
+      <section id="privacy-collected" class="privacy-section">
+        <div class="privacy-section__heading"><span>02</span><h2>我们会处理哪些信息</h2></div>
+        <div class="privacy-list">
+          <div><i class="solitude fas fa-globe" aria-hidden="true"></i><div><h3>访问技术信息</h3><p>访问页面时，服务器或 CDN 可能接收到 IP 地址、User-Agent、操作系统、浏览器、设备类型、来源页面和请求时间等网络请求信息。</p></div></div>
+          <div><i class="solitude fas fa-sliders" aria-hidden="true"></i><div><h3>界面偏好</h3><p>本站可能在浏览器中保存明暗模式、Cookie 同意选择等状态，用于记住你的界面偏好和隐私选择。</p></div></div>
+          <div><i class="solitude fas fa-pen" aria-hidden="true"></i><div><h3>你主动提交的内容</h3><p>如果你通过评论、邮件或其他方式主动联系本站，本站只会在处理你的请求所需范围内使用相关内容。</p></div></div>
+        </div>
+      </section>
+
+      <section id="privacy-cookie" class="privacy-section">
+        <div class="privacy-section__heading"><span>03</span><h2>Cookie 与本地存储</h2></div>
+        <p>Cookie 是网站写入浏览器的小型文本记录，LocalStorage 是浏览器提供的本地存储能力。本站将它们区分用于不同目的：</p>
+        <div class="privacy-table-wrap">
+          <table>
+            <thead><tr><th>类别</th><th>用途</th><th>是否必要</th></tr></thead>
+            <tbody>
+              <tr><td><strong>同意状态</strong></td><td><code>solitude_cookie_consent</code> 保存你选择“接受全部”或“拒绝非必要”的结果，保存期限为一年。</td><td>必要</td></tr>
+              <tr><td><strong>主题偏好</strong></td><td>记住明暗模式等界面设置，避免每次访问重新调整。</td><td>功能需要</td></tr>
+              <tr><td><strong>统计状态</strong></td><td>Umami 可能使用其自身机制记录匿名访问统计，具体以 Umami 服务端实现为准。</td><td>非必要</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>你可以通过浏览器设置查看、删除或限制 Cookie 和本地存储。删除后，本站可能再次询问 Cookie 选择，主题等界面偏好也可能恢复默认。</p>
+      </section>
+
+      <section id="privacy-analytics" class="privacy-section">
+        <div class="privacy-section__heading"><span>04</span><h2>Umami 访问统计</h2></div>
+        {{ if $umamiEnabled }}
+          <div class="privacy-service-card">
+            <div class="privacy-service-card__icon"><i class="solitude fas fa-chart-simple" aria-hidden="true"></i></div>
+            <div><span class="privacy-service-card__eyebrow">SELF-HOSTED ANALYTICS</span><h3>Umami</h3><p>本站当前通过自建 Umami 实例了解页面访问趋势、访问来源和站点性能，帮助判断哪些内容更有价值以及页面是否正常工作。</p></div>
+          </div>
+          <dl class="privacy-definition-list">
+            <div><dt>统计服务地址</dt><dd><a href="{{ $umamiEndpoint }}" target="_blank" rel="noopener noreferrer">{{ $umamiEndpoint }}</a></dd></div>
+            <div><dt>网站标识</dt><dd><code>{{ $umamiWebsiteID }}</code></dd></div>
+            <div><dt>脚本加载方式</dt><dd>站点页面通过 `defer` 加载 Umami 脚本，不阻塞页面主体渲染。</dd></div>
+          </dl>
+          <p>Umami 统计不是本站 Cookie 同意记录本身。你可以拒绝非必要 Cookie，并通过浏览器的内容拦截、Do Not Track 或脚本控制功能进一步限制统计请求。统计服务端对请求信息的保存和处理以其实际配置及适用政策为准。</p>
+        {{ else }}
+          <p>本站当前没有启用 Umami 或其他站点统计脚本。</p>
+        {{ end }}
+      </section>
+
+      <section id="privacy-third-party" class="privacy-section">
+        <div class="privacy-section__heading"><span>05</span><h2>第三方资源</h2></div>
+        <p>为了提供字体图标、代码高亮、图片、音乐、评论或其他页面功能，本站部分页面可能请求第三方 CDN 或服务。请求这些资源时，对方可能获得你的 IP、浏览器和资源请求信息。</p>
+        <ul class="privacy-bullet-list">
+          <li><strong>资源 CDN：</strong>用于加载字体图标、前端库、代码高亮或页面功能脚本。</li>
+          <li><strong>媒体平台：</strong>当你主动播放嵌入的音频、视频或查看外部图片时，对应平台可能处理播放或访问数据。</li>
+          <li><strong>评论服务：</strong>{{ $commentLabel }}{{ if eq $commentProvider "artalk" }}，当前服务地址为 <a href="{{ $cfg.artalk.server }}" target="_blank" rel="noopener noreferrer">{{ $cfg.artalk.server }}</a>。{{ end }}</li>
+        </ul>
+        <p>第三方服务有独立的隐私政策和数据处理规则。本站无法控制其服务端的保存期限和处理范围，建议你在使用对应功能前查看相关说明。</p>
+      </section>
+
+      <section id="privacy-comments" class="privacy-section">
+        <div class="privacy-section__heading"><span>06</span><h2>评论与主动提交</h2></div>
+        {{ if eq $commentProvider "artalk" }}
+          <p>本站当前使用 Artalk 评论服务。你提交评论时，评论内容、昵称、邮箱（如填写）、页面地址、IP 和 User-Agent 等信息可能被发送至 Artalk 服务端，用于展示评论、通知回复和防止垃圾评论。</p>
+        {{ else if $commentProvider }}
+          <p>本站当前配置了 {{ $commentLabel }}。评论表单中的内容会被发送至对应服务，并按照该服务的隐私政策处理。请不要在评论中提交身份证号、住址、密码、验证码等敏感信息。</p>
+        {{ else }}
+          <p>本站当前未配置独立评论系统。如果未来开放评论功能，会在启用前更新本页面，说明具体服务、收集字段和保存方式。</p>
+        {{ end }}
+        <p>通过邮件联系站长时，请尽量只提供处理问题所需的信息。站长不会要求你通过邮件提供密码、验证码或支付信息。</p>
+      </section>
+
+      <section id="privacy-rights" class="privacy-section">
+        <div class="privacy-section__heading"><span>07</span><h2>你的选择与权利</h2></div>
+        <ul class="privacy-bullet-list">
+          <li>你可以在 Cookie 弹窗中接受全部或拒绝非必要 Cookie。</li>
+          <li>你可以通过浏览器设置清除 Cookie、本地存储和缓存。</li>
+          <li>你可以使用内容拦截或浏览器隐私功能限制统计脚本和第三方资源。</li>
+          <li>如果你曾主动提交信息，可以联系站长询问、更正或请求删除相关内容。</li>
+        </ul>
+        <div class="privacy-note"><i class="solitude fas fa-circle-info" aria-hidden="true"></i><p>限制第三方资源可能导致评论、统计、音乐或部分页面功能无法使用，但不影响本站核心文章内容的阅读。</p></div>
+      </section>
+
+      <section id="privacy-contact" class="privacy-section privacy-section--contact">
+        <div class="privacy-section__heading"><span>08</span><h2>联系站长</h2></div>
+        <p>如果你对隐私、数据处理或页面中的第三方服务有疑问，可以联系：</p>
+        <a class="privacy-contact-card" href="mailto:{{ site.Params.author.email }}">
+          <span class="privacy-contact-card__icon"><i class="solitude fas fa-envelope" aria-hidden="true"></i></span>
+          <span><small>站长邮箱</small><strong>{{ site.Params.author.email }}</strong></span>
+          <i class="solitude fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+      </section>
+    </article>
+  </div>
+</section>

@@ -1081,16 +1081,17 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     applyArtalkDarkMode();
     await Solitude.loadScript(cdn.artalk);
     const config = artalkConfig();
-    (window as any).Artalk?.init?.({
+    const artalkInit = (window as any).Artalk?.init?.({
       el: "#artalk-wrap",
       server: config.server,
       site: config.site,
       placeholder: config.placeholder || undefined,
       ...(config.option || {}),
     });
+    await Promise.resolve(artalkInit).catch(() => undefined);
     watchArtalkDarkMode();
-    void initializeArtalkEffects();
-    void initializeArtalkCounters();
+    void initializeArtalkEffects().catch(() => undefined);
+    void initializeArtalkCounters().catch(() => undefined);
   }
 };
 
@@ -1125,7 +1126,7 @@ const initializeComments = () => {
         });
     }
   }
-  void initializeOtherProviders(enabled);
+  void initializeOtherProviders(enabled).catch(() => undefined);
 };
 
 document.addEventListener("solitude:ready", initializeComments);

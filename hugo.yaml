@@ -46,7 +46,7 @@ params:
       name:
         class: text
         custom: Solitude
-      icon: /img/logo.png
+      icon: /img/avatar.png
     nav:
       group: {}
       right:
@@ -73,9 +73,9 @@ params:
         Sticky: newestPost,allInfo
       my_card:
         author:
-          img: /img/logo.png
+          img: /img/avatar.png
           emoji:
-          sticker: 
+          sticker:
         description: A Hugo theme for expressive personal sites.
         content: Write, collect, and share with Solitude.
         state:
@@ -115,7 +115,7 @@ params:
         locate: China
         copyright:
           enable: true
-          author: /img/logo.png
+          author: /img/avatar.png
           author_background: ""
           license: CC BY-NC-SA 4.0
           licenurl: https://creativecommons.org/licenses/by-nc-sa/4.0/
@@ -218,7 +218,7 @@ params:
     footer:
       randomlink: false
       information:
-        author: /img/logo.png
+        author: /img/avatar.png
         left: []
         right: []
       group: {}

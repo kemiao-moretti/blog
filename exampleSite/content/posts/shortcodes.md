@@ -24,13 +24,13 @@ Shortcode 是 Hugo 在 Markdown 之外提供的内容组件语法。Solitude 用
 
 Hugo shortcode 有两种边界符：`{{</* shortcode */>}}` 适合普通参数，`{{%/* shortcode */%}}` 会先处理内部 Markdown。Solitude 的块级组件已经按各自用途处理正文，通常直接使用尖括号写法即可。
 
-| 内容类型 | 推荐组件 | 适合场景 |
-| --- | --- | --- |
-| 行内强调 | `span`、`label`、`keyboard` | 一句话中的状态、术语或快捷键 |
-| 块级提示 | `note`、`subnote`、`fold` | 说明、警告、补充资料 |
-| 导航与引用 | `button`、`link`、`card` | 行动入口、站内外资源 |
-| 结构化内容 | `tabs`、`timeline`、`gallery`、`series` | 分组、步骤、图片与文章集合 |
-| 动态内容 | `mermaid`、`chartjs`、`typeit` | 流程、数据与动态文字 |
+| 内容类型   | 推荐组件                                | 适合场景                     |
+| ---------- | --------------------------------------- | ---------------------------- |
+| 行内强调   | `span`、`label`、`keyboard`             | 一句话中的状态、术语或快捷键 |
+| 块级提示   | `note`、`subnote`、`fold`               | 说明、警告、补充资料         |
+| 导航与引用 | `button`、`link`、`card`                | 行动入口、站内外资源         |
+| 结构化内容 | `tabs`、`timeline`、`gallery`、`series` | 分组、步骤、图片与文章集合   |
+| 动态内容   | `mermaid`、`chartjs`、`typeit`          | 流程、数据与动态文字         |
 
 {{< note type="warning" style="simple" >}}
 Shortcode 名称和参数区分大小写。块级组件还要成对书写结束标签，否则 Hugo 会在构建阶段直接报错。
@@ -75,11 +75,11 @@ Shortcode 名称和参数区分大小写。块级组件还要成对书写结束�
 {{</* subnote type="warning" */>}}次级提示{{</* /subnote */>}}
 ```
 
-| 参数 | 是否必填 | 说明 |
-| --- | --- | --- |
-| `type` | 否 | `info`、`success`、`warning`、`danger`、`primary` 或默认样式 |
-| `style` | 否 | `flat`、`simple`、`modern`；默认使用 `flat` |
-| 正文 | 是 | 支持 Markdown 的提示内容 |
+| 参数    | 是否必填 | 说明                                                         |
+| ------- | -------- | ------------------------------------------------------------ |
+| `type`  | 否       | `info`、`success`、`warning`、`danger`、`primary` 或默认样式 |
+| `style` | 否       | `flat`、`simple`、`modern`；默认使用 `flat`                  |
+| 正文    | 是       | 支持 Markdown 的提示内容                                     |
 
 **效果**
 
@@ -122,13 +122,13 @@ Shortcode 名称和参数区分大小写。块级组件还要成对书写结束�
 {{</* link url="/" title="站内链接" desc="返回示例站首页" */>}}
 ```
 
-| 参数 | 适用组件 | 说明 |
-| --- | --- | --- |
-| `url` | 全部 | 目标地址 |
-| `text` | `button` | 按钮文字 |
-| `icon` | `button` | 图标类名 |
-| `option` | `button` | 可组合 `outline`、颜色、`block` 等样式 |
-| `title` / `desc` | `link` | 卡片标题与说明 |
+| 参数             | 适用组件 | 说明                                   |
+| ---------------- | -------- | -------------------------------------- |
+| `url`            | 全部     | 目标地址                               |
+| `text`           | `button` | 按钮文字                               |
+| `icon`           | `button` | 图标类名                               |
+| `option`         | `button` | 可组合 `outline`、颜色、`block` 等样式 |
+| `title` / `desc` | `link`   | 卡片标题与说明                         |
 
 **效果**
 
@@ -145,12 +145,12 @@ Shortcode 名称和参数区分大小写。块级组件还要成对书写结束�
 
 ```go-html-template
 {{</* img src="/img/default.avif" alt="示例图片" caption="主题默认封面" */>}}
-{{</* inlineImg src="/img/logo.png" alt="Logo" height="24px" */>}}
+{{</* inlineImg src="/img/avatar.png" alt="Logo" height="24px" */>}}
 ```
 
 {{< img src="/img/demo/cover-shortcodes-v2.webp" alt="Solitude Shortcode 示例封面" caption="本地 Shortcode 示例素材" >}}
 
-Solitude {{< inlineImg src="/img/logo.png" alt="Solitude Logo" height="24px" >}} 与 Hugo 可以出现在同一行文字中。
+Solitude {{< inlineImg src="/img/avatar.png" alt="Solitude Logo" height="24px" >}} 与 Hugo 可以出现在同一行文字中。
 
 ### 视频与音频
 
@@ -212,12 +212,12 @@ YouTube、哔哩哔哩、原生音频和原生视频分别使用独立组件。�
 {{</* /card */>}}
 ```
 
-| 参数 | 说明 |
-| --- | --- |
-| `title` | 卡片标题，也可使用 `name` |
-| `url` | 可选的跳转地址 |
-| `cover` | 可选封面，也可使用 `bg` |
-| `tag` / `star` | 分类标签与评分 |
+| 参数               | 说明                                 |
+| ------------------ | ------------------------------------ |
+| `title`            | 卡片标题，也可使用 `name`            |
+| `url`              | 可选的跳转地址                       |
+| `cover`            | 可选封面，也可使用 `bg`              |
+| `tag` / `star`     | 分类标签与评分                       |
 | `width` / `height` | 可选尺寸，建议优先沿用默认响应式宽度 |
 
 {{< card title="Hugo 卡片" url="https://gohugo.io/" cover="/img/demo/cover-shortcodes-v2.webp" tag="封面卡片" star="5" >}}展示主题与重点内容{{< /card >}}
@@ -239,8 +239,8 @@ flowchart LR
 
 {{< mermaid >}}
 flowchart LR
-  Hexo --> Hugo
-  Hugo --> HTML
+Hexo --> Hugo
+Hugo --> HTML
 {{< /mermaid >}}
 
 ### Chart.js 图表
@@ -310,14 +310,14 @@ C D E F|G A B c|
 ```
 
 {{< flink >}}
+
 - class_name: 官方资源
   class_desc: Hugo 官方网站
-  link_list:
-    - name: Hugo
-      link: https://gohugo.io/
-      avatar: https://gohugo.io/images/hugo-logo-wide.svg
-      descr: 世界上最快的网站构建框架
-{{< /flink >}}
+  link_list: - name: Hugo
+  link: https://gohugo.io/
+  avatar: https://gohugo.io/images/hugo-logo-wide.svg
+  descr: 世界上最快的网站构建框架
+  {{< /flink >}}
 
 ## 布局与内容集合
 

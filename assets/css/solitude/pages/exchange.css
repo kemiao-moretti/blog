@@ -227,15 +227,20 @@
   margin: 0;
   padding: var(--efu-space-4, 16px);
   border-radius: var(--efu-radius-md, 12px);
-  background: var(--efu-hl-bg, var(--efu-secondbg));
+  border: var(--candy-border-width, 2px) solid var(--efu-card-border);
+  background: var(--efu-secondbg);
+  color: var(--efu-fontcolor);
   overflow-x: auto;
+  color-scheme: light dark;
 }
 
 .exchange-snippet code {
+  display: block;
+  min-width: max-content;
   font-family: var(--efu-code-font-family);
   font-size: 14px;
   line-height: 1.8;
-  color: var(--efu-fontcolor);
+  color: inherit;
   white-space: pre;
 }
 

@@ -20,6 +20,8 @@
 @import "./components/keyboard.css" layer(solitude.components);
 @import "./components/post-feed.css" layer(solitude.components);
 @import "./components/comments-share.css" layer(solitude.components);
+@import "./components/cookie-consent.css" layer(solitude.components);
+@import "./components/ai-summary.css" layer(solitude.components);
 
 @import "./pages/home.css" layer(solitude.pages);
 @import "./pages/taxonomy-archives.css" layer(solitude.pages);
@@ -30,9 +32,12 @@
 @import "./pages/fcircle.css" layer(solitude.pages);
 @import "./pages/post.css" layer(solitude.pages);
 @import "./pages/about.css" layer(solitude.pages);
+@import "./pages/error-404.css" layer(solitude.pages);
 @import "./pages/gallery.css" layer(solitude.pages);
 @import "./pages/changelog.css" layer(solitude.pages);
 @import "./pages/stats.css" layer(solitude.pages);
+@import "./pages/ai-news.css" layer(solitude.pages);
+@import "./pages/privacy.css" layer(solitude.pages);
 
 @import "./shortcodes/text-status.css" layer(solitude.shortcodes);
 @import "./shortcodes/disclosure.css" layer(solitude.shortcodes);
