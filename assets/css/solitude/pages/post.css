@@ -296,7 +296,7 @@
 .relatedPosts-random:focus-visible {
   border-color: var(--efu-theme);
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
 }
 
 .relatedPosts-random:focus-visible {
@@ -765,7 +765,7 @@
 #post #pagination .prev-post,
 #post #pagination .next-post.pull-right,
 #post #pagination .prev-post.pull-left {
-  background: var(--efu-secondbg);
+  background: var(--paper-surface, var(--efu-card-bg));
 }
 
 @media screen and (min-width: 1300px) {
@@ -773,7 +773,7 @@
   #post #pagination .prev-post,
   #post #pagination .next-post.pull-right,
   #post #pagination .prev-post.pull-left {
-    background: var(--efu-maskbgdeep);
+    background: var(--paper-surface, var(--efu-card-bg));
     backdrop-filter: blur(5px);
     transform: translateZ(0);
   }
@@ -784,7 +784,7 @@
   #post #pagination .prev-post,
   #post #pagination .next-post.pull-right,
   #post #pagination .prev-post.pull-left {
-    background: var(--efu-card-bg);
+    background: var(--paper-surface, var(--efu-card-bg));
   }
 }
 

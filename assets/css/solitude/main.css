@@ -6,7 +6,6 @@
 
 @import "hugo:vars" layer(solitude.settings);
 @import "./foundation/tokens.css" layer(solitude.tokens);
-@import "./foundation/candy-tokens.css" layer(solitude.tokens);
 @import "./foundation/base.css" layer(solitude.base);
 @import "./foundation/animations.css" layer(solitude.motion);
 
@@ -60,4 +59,4 @@
 
 /* Unlayered rules intentionally outrank theme layers and external vendor CSS. */
 @import "./integrations/overrides.css";
-@import "./foundation/candy-components.css";
+@import "./integrations/paper-reward.css";

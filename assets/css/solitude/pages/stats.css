@@ -1,5 +1,5 @@
 /* ============================================================
-   stats.css · 数据统计页（糖果屋规范）
+   stats.css · 数据统计页（纸张规范）
    全部颜色走 token：明暗两套自动适配，禁止硬编码色值。
    图表内部的配色由 stats.ts 从 --efu-* 现场解析后注入 canvas，
    本文件只负责外壳、排版、布局与动效降级。
@@ -44,10 +44,9 @@
   padding: 14px 16px 14px 20px;
   overflow: hidden;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   background: var(--efu-card-bg);
-  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0
-    var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -61,9 +60,8 @@
 
 .st-metric:hover {
   border-color: var(--efu-theme);
-  box-shadow: calc(var(--candy-shadow-offset) + 2px) calc(var(--candy-shadow-offset) + 2px) 0
-    var(--efu-theme);
-  transform: translate(-2px, -2px);
+  box-shadow: var(--paper-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .st-metric-label {
@@ -94,10 +92,9 @@
   position: relative;
   overflow: hidden;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   background: var(--efu-card-bg);
-  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0
-    var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
 }
 
 .st-card-head {
@@ -128,7 +125,7 @@
   height: 1em;
   border-radius: 2px;
   background: var(--efu-theme);
-  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
 }
 
 .st-card-title p {
@@ -192,7 +189,7 @@
   height: 14px;
   border: 1px solid var(--efu-card-border);
   border-radius: 2px;
-  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
 }
 
 /* ---------- 年份切换 ---------- */
@@ -209,9 +206,9 @@
 .st-year {
   padding: 6px 14px;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   background: var(--efu-card-bg);
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
   color: var(--efu-fontcolor);
   font-size: 13px;
   font-weight: 600;
@@ -226,7 +223,7 @@
 .st-year[aria-pressed="true"] {
   border-color: var(--efu-theme);
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
 }
 
 .st-year:hover {
@@ -451,7 +448,7 @@
   height: 132px;
   padding: 8px;
   border: 1px dashed color-mix(in srgb, var(--efu-card-border) 45%, transparent);
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
 }
 
 .st-umami-trend-cell {
@@ -497,7 +494,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   background: var(--efu-secondbg);
   color: var(--efu-secondtext);
   font-size: 12px;
@@ -507,7 +504,7 @@
 
 .st-umami-top-item:nth-child(-n+3) .st-umami-rank {
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
 }
 
 .st-umami-url {

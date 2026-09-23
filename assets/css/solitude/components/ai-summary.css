@@ -1,4 +1,4 @@
-/* AI 摘要：文章里的轻量编辑注释卡，复用糖果屋主题令牌。 */
+/* AI 摘要：文章里的轻量编辑注释卡，复用纸张主题令牌。 */
 .ai-summary {
   position: relative;
   display: flex;
@@ -9,7 +9,7 @@
   overflow: hidden;
   border: 1px solid var(--efu-card-border);
   border-left: 4px solid var(--efu-theme);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   background: var(--efu-secondbg);
   color: var(--efu-fontcolor);
 }
@@ -42,7 +42,7 @@
   margin-left: auto;
   padding: 2px 8px;
   border: 1px solid var(--efu-card-border);
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   background: var(--efu-card-bg);
   color: var(--efu-secondtext);
   font-size: 11px;

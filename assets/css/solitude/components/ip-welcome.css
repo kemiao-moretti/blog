@@ -1,7 +1,7 @@
 /* ============================================================
-   ip-welcome.css · 侧边栏访客欢迎卡片（糖果屋风格）
-   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
-   卡片外壳继承 #aside-content .card-widget 糖果规则。
+   ip-welcome.css · 侧边栏访客欢迎卡片（纸张风格）
+   全部颜色走 token（--efu-* / --paper-*），明暗双模自动生效。
+   卡片外壳继承 #aside-content .card-widget 纸张规则。
    注意：侧栏仅在 ≥1200px 显示，可见时宽度恒为 300px。
    ============================================================ */
 
@@ -45,33 +45,33 @@
   color: var(--efu-secondtext);
 }
 
-/* ---------- 地区强调：糖果橙 + 下划硬线 ---------- */
+/* ---------- 地区强调：纸张强调色 + 下划硬线 ---------- */
 .ip-welcome-place .ip-welcome-strong {
   color: var(--efu-theme);
   font-weight: 700;
   padding: 0 2px;
-  border-bottom: var(--candy-border-width) solid var(--efu-theme);
+  border-bottom: var(--paper-border-width) solid var(--efu-theme);
 }
 
-/* ---------- 距离徽标：糖果 pill ---------- */
+/* ---------- 距离徽标：纸张 pill ---------- */
 .ip-welcome-dist-chip {
   display: inline-block;
   padding: 0.1rem 0.5rem;
-  border: 1px solid var(--candy-nav-border, var(--efu-card-border));
-  border-radius: var(--candy-radius);
-  background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  border: 1px solid var(--paper-nav-border, var(--efu-card-border));
+  border-radius: var(--paper-radius);
+  background: var(--paper-nav-surface, var(--efu-card-bg));
+  box-shadow: var(--paper-shadow-soft);
   color: var(--efu-fontcolor);
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* ---------- 地区 Tip：引自文章的糖果便签 ---------- */
+/* ---------- 地区 Tip：引自文章的纸张便签 ---------- */
 .ip-welcome-tip-text {
   display: block;
   padding: 0.35rem 0.6rem;
-  border-left: var(--candy-border-width) solid var(--efu-theme);
-  border-radius: 0 var(--candy-radius-sm) var(--candy-radius-sm) 0;
+  border-left: var(--paper-border-width) solid var(--efu-theme);
+  border-radius: 0 var(--paper-radius-sm) var(--paper-radius-sm) 0;
   background: var(--efu-post-blockquote-bg, var(--efu-secondbg));
   color: var(--efu-fontcolor);
   font-size: 0.8rem;

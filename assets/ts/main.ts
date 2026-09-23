@@ -347,6 +347,11 @@ const initHomeCenter = () => {
     if (banners[index].dataset.color) return;
     const src = sourceImage.currentSrc || sourceImage.src;
     if (!src) return;
+    try {
+      if (new URL(src, window.location.href).origin !== window.location.origin) return;
+    } catch {
+      return;
+    }
     const cachedColor = getCachedColor(src);
     if (cachedColor) {
       applyItemColor(index, normalizeHomeCenterColor(cachedColor));

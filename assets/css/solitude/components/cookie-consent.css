@@ -17,7 +17,7 @@
   padding: 16px 18px;
   color: var(--cookie-consent-text);
   background: var(--cookie-consent-bg);
-  border: var(--candy-border-width, 2px) solid var(--cookie-consent-border);
+  border: var(--paper-border-width, 2px) solid var(--cookie-consent-border);
   border-radius: var(--efu-radius-lg, 14px);
   box-shadow: var(--efu-shadow-border);
   opacity: 0;

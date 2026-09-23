@@ -1,7 +1,7 @@
 /* ============================================================
-   gallery.css · 相册页（糖果屋风格）
+   gallery.css · 相册页（纸张手账风格）
    列表页：相册卡片网格；详情页：按月分组的照片/视频网格。
-   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
+   全部颜色走 token（--efu-* / --paper-*），明暗双模自动生效。
    ============================================================ */
 
 /* ---------- 页面外层 ---------- */
@@ -23,10 +23,10 @@
   margin: 0;
   padding: 0.4rem 1.4rem;
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
-  box-shadow: 3px 3px 0 var(--efu-card-border);
+  border-radius: var(--paper-radius-sm);
+  box-shadow: var(--paper-shadow-soft);
   font-size: 1.65rem;
   font-weight: 700;
   line-height: 1.5;
@@ -74,8 +74,8 @@
   background: var(--efu-card-bg);
   color: var(--efu-fontcolor);
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
-  box-shadow: 2px 2px 0 var(--efu-card-border);
+  border-radius: var(--paper-radius-sm);
+  box-shadow: var(--paper-shadow-soft);
   font-size: 0.88rem;
   font-weight: 600;
   transition: all 0.25s ease;
@@ -89,7 +89,7 @@
 .gallery-album-back a:hover {
   color: var(--efu-theme);
   border-color: var(--efu-theme);
-  box-shadow: 3px 3px 0 var(--efu-theme);
+  box-shadow: var(--paper-shadow-hover);
   transform: translate(-1px, -1px);
 }
 
@@ -100,7 +100,7 @@
   color: var(--efu-secondtext);
   text-align: center;
   border: var(--style-border-dashed);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
 }
 
 /* ============================================================
@@ -125,7 +125,7 @@
   height: 100%;
   background: var(--efu-card-bg);
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   box-shadow: var(--card-box-shadow);
   overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
@@ -152,15 +152,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: var(--candy-border-width) solid var(--efu-card-border);
-  border-radius: calc(var(--candy-radius) - 2px);
+  border: var(--paper-border-width) solid var(--efu-card-border);
+  border-radius: calc(var(--paper-radius) - 2px);
   background: var(--efu-secondbg);
   transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
 }
 
 .gallery-album-card__cover--1 {
   z-index: 3;
-  box-shadow: var(--candy-shadow-offset) var(--candy-shadow-offset) 0 color-mix(in srgb, var(--efu-card-border) 55%, transparent);
+  box-shadow: var(--paper-shadow-soft);
 }
 
 .gallery-album-card__cover--2 {
@@ -247,10 +247,10 @@
   margin: 0 0 1rem;
   padding: 0.25rem 1rem;
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
-  box-shadow: 2px 2px 0 var(--efu-card-border);
+  border-radius: var(--paper-radius-sm);
+  box-shadow: var(--paper-shadow-soft);
   font-size: 0.95rem;
   font-weight: 700;
   transform: rotate(-0.8deg);
@@ -277,13 +277,13 @@
 .gallery-photo__media {
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border: var(--candy-border-width) solid var(--efu-card-border);
-  border-radius: var(--candy-radius);
+  border: var(--paper-border-width) solid var(--efu-card-border);
+  border-radius: var(--paper-radius);
   background: var(--efu-secondbg);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* 图片 hover 糖果效果 */
+/* 图片 hover 纸张悬浮效果 */
 .gallery-photo__link:hover .gallery-photo__media {
   transform: translate(-2px, -2px);
   border-color: var(--efu-theme);

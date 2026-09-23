@@ -60,15 +60,11 @@
 }
 
 :root:not([data-theme='dark']) .code-block[data-code-light-theme='github-light'] {
-  --code-block-bg: #f1f2f4;
+  --code-block-bg: var(--code-block-light-theme-bg, var(--efu-hl-bg));
 }
 
 [data-theme='dark'] .code-block {
   --code-block-bg: var(--code-block-dark-theme-bg, var(--efu-hl-bg));
-}
-
-[data-theme='dark'] .code-block[data-code-dark-theme='github-dark'] {
-  --code-block-bg: #202327;
 }
 
 .code-block__toolbar {

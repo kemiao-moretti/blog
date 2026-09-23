@@ -6,7 +6,7 @@
   }
   .author-content-item .card-content .banner-button-group .banner-button {
     background: 0 0;
-    color: var(--efu-white);
+    color: var(--efu-card-bg);
     padding: 0;
     width: 30px;
     height: 30px;
@@ -373,7 +373,7 @@
 }
 
 .social-share .social-share-ico:hover {
-  color: #fff;
+  color: var(--efu-accent-ink, var(--efu-white));
 }
 
 .social-share .icon-qq {

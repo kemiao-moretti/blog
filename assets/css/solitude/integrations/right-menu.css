@@ -9,10 +9,11 @@
   --right-menu-icon-gap: 0.5rem;
   --right-menu-radius: var(--efu-radius-md);
   --right-menu-item-radius: var(--efu-radius-sm);
-  --right-menu-accent: var(--solitude-theme-dark, #ffc848);
-  --right-menu-surface: rgba(0, 0, 0, 0.85);
-  --right-menu-foreground: #f7f7fa;
-  --right-menu-border: #3d3d3f;
+  --right-menu-accent: var(--paper-accent, var(--solitude-theme-light, #6b9a78));
+  --right-menu-surface: var(--paper-surface, var(--efu-card-bg));
+  --right-menu-foreground: var(--paper-ink, var(--efu-fontcolor));
+  --right-menu-border: var(--paper-line, var(--efu-card-border));
+  --right-menu-accent-ink: var(--paper-accent-ink, var(--efu-accent-ink, #213128));
   --right-menu-divider: color-mix(in srgb, var(--right-menu-accent) 14%, transparent);
   position: fixed;
   top: 10%;
@@ -106,7 +107,7 @@ body[data-right-menu="false"] #rightmenu-mask {
 
 #rightMenu .rightMenu-item:hover,
 #rightMenu .rightMenu-item:focus-visible {
-  color: #1d1e22;
+  color: var(--right-menu-accent-ink);
   background-color: var(--right-menu-accent);
   box-shadow: none;
 }
@@ -120,7 +121,7 @@ body[data-right-menu="false"] #rightmenu-mask {
 
 #rightMenu .rightMenu-small .rightMenu-item:hover,
 #rightMenu .rightMenu-small .rightMenu-item:focus-visible {
-  color: #1d1e22;
+  color: var(--right-menu-accent-ink);
   background-color: var(--right-menu-accent);
   box-shadow: 0 8px 20px color-mix(in srgb, var(--right-menu-accent) 22%, transparent);
 }

@@ -1,5 +1,5 @@
 /* ============================================================
-   changelog.css · 更新日志页（糖果屋规范）
+   changelog.css · 更新日志页（纸张规范）
    全部颜色走 token：明暗两套自动适配，禁止硬编码色值。
    ============================================================ */
 
@@ -49,9 +49,9 @@
   box-sizing: border-box;
   padding: 9px 12px 9px 36px;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
-  background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--paper-radius);
+  background: var(--paper-nav-surface, var(--efu-card-bg));
+  box-shadow: var(--paper-shadow-soft);
   color: var(--efu-fontcolor);
   font-size: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -65,7 +65,7 @@
 .cl-search input:focus {
   outline: none;
   border-color: var(--efu-theme);
-  box-shadow: 2px 2px 0 var(--efu-theme);
+  box-shadow: var(--paper-shadow-hover);
 }
 
 .cl-pills {
@@ -80,9 +80,9 @@
   gap: 6px;
   padding: 5px 12px;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
-  background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--paper-radius);
+  background: var(--paper-nav-surface, var(--efu-card-bg));
+  box-shadow: var(--paper-shadow-soft);
   color: var(--efu-fontcolor);
   font-size: 13px;
   line-height: 1.6;
@@ -95,8 +95,8 @@
 .cl-pill[data-active] {
   border-color: var(--efu-theme);
   background: var(--efu-theme);
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  box-shadow: var(--paper-shadow-soft);
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
 }
 
 .cl-pill:hover {
@@ -147,7 +147,7 @@
   border: 2px solid var(--efu-card-border);
   border-radius: 50%;
   background: var(--efu-theme);
-  box-shadow: 2px 2px 0 var(--efu-card-border);
+  box-shadow: var(--paper-shadow-soft);
 }
 
 .cl-entry-body {
@@ -174,9 +174,9 @@
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   background: var(--efu-theme);
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
   font-size: 12px;
   font-weight: 600;
   line-height: 1.6;
@@ -193,7 +193,7 @@
 .cl-entry-version {
   padding: 2px 8px;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.6;
@@ -203,15 +203,15 @@
 /* ---------- 条目卡片（<details> 折叠） ---------- */
 .cl-entry-card {
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
-  background: var(--candy-nav-surface, var(--efu-card-bg));
-  box-shadow: 2px 2px 0 var(--candy-nav-border, var(--efu-card-border));
+  border-radius: var(--paper-radius);
+  background: var(--paper-nav-surface, var(--efu-card-bg));
+  box-shadow: var(--paper-shadow-soft);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .cl-entry-card:hover {
   border-color: var(--efu-theme);
-  box-shadow: 3px 3px 0 var(--efu-theme);
+  box-shadow: var(--paper-shadow-hover);
   transform: translate(-1px, -1px);
 }
 
@@ -262,7 +262,7 @@
 
 /* ---------- 详情区 Markdown 排版 ----------
    目录里的条目正文由 Hugo 直接渲染成 HTML（h2/h3、ul/ol、p、strong、
-   code、a、blockquote、hr、表格），模板不做二次加工。这里按糖果屋规范补齐
+   code、a、blockquote、hr、表格），模板不做二次加工。这里按纸张规范补齐
    各类元素的样式：颜色全部走 token，明暗两套自动适配。 */
 .cl-entry-md {
   font-size: 14.5px;
@@ -291,7 +291,7 @@
 
 /* ---------- 标题 ---------- */
 /* 详情区起手就是 ## 变更详情，用它做区块标题：
-   左侧糖果色竖条 + 小号大写感字重，和正文列表拉开层级。 */
+   左侧强调色竖条 + 小号大写感字重，和正文列表拉开层级。 */
 .cl-entry-md h2 {
   display: flex;
   align-items: center;
@@ -310,7 +310,7 @@
   height: 1em;
   border-radius: 2px;
   background: var(--efu-theme);
-  box-shadow: 1px 1px 0 var(--candy-nav-border, var(--efu-card-border));
+  box-shadow: var(--paper-shadow-soft);
 }
 
 /* 三级标题：降一级的弱化标题，靠颜色区分 */
@@ -394,7 +394,7 @@
   color: var(--efu-secondtext);
 }
 
-/* 行内代码的样式由 candy-components 统一提供，这里只负责代码块内的复位 */
+/* 行内代码的样式由全局纸张样式统一提供，这里只负责代码块内的复位 */
 .cl-entry-md pre code {
   padding: 0;
   border: 0;
@@ -422,8 +422,8 @@
 .cl-entry-md blockquote {
   margin: 0 0 10px;
   padding: 8px 12px;
-  border-left: var(--candy-border-width) solid var(--efu-theme);
-  border-radius: 0 var(--candy-radius-sm) var(--candy-radius-sm) 0;
+  border-left: var(--paper-border-width) solid var(--efu-theme);
+  border-radius: 0 var(--paper-radius-sm) var(--paper-radius-sm) 0;
   background: var(--efu-post-blockquote-bg);
   color: var(--efu-fontcolor);
 }

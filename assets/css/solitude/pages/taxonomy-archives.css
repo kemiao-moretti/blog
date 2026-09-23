@@ -109,13 +109,13 @@ span.tagsPageCount {
 
 #tag #tag-page-tags a.select {
   order: -1;
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text)) !important;
   background: var(--efu-theme);
   box-shadow: var(--efu-shadow-theme);
 }
 
 #tag #tag-page-tags a:hover {
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text)) !important;
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text)) !important;
   background: var(--efu-theme);
   box-shadow: var(--efu-shadow-theme);
 }

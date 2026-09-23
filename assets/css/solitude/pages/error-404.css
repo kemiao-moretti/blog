@@ -1,5 +1,5 @@
 /* 404 page. Pure CSS/typography, no fixed image.
-   All colors/surfaces follow the candy token layer; nothing is hardcoded
+   All colors/surfaces follow the paper token layer; nothing is hardcoded
    for a specific theme, so light and dark modes share the same rules. */
 
 #body-wrap.error {
@@ -26,7 +26,7 @@
   grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
   overflow: hidden;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-lg);
+  border-radius: var(--paper-radius-lg);
   background: var(--efu-card-bg);
   box-shadow: var(--efu-shadow-border);
 }
@@ -45,9 +45,9 @@
   padding: 5px 9px;
   color: var(--efu-fontcolor);
   border: var(--style-border-always);
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
   background: var(--efu-green);
-  box-shadow: 2px 2px 0 var(--efu-card-border);
+  box-shadow: var(--paper-shadow-soft);
   font: 800 12px/1 var(--efu-code-font-family);
   letter-spacing: 0.04em;
 }
@@ -85,16 +85,16 @@
   min-height: 44px;
   padding: 9px 16px;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   text-decoration: none;
   font-weight: 800;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 #body-wrap.error .error-btn--primary {
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
   background: var(--efu-theme);
-  box-shadow: 3px 3px 0 var(--efu-card-border);
+  box-shadow: var(--paper-shadow-soft);
 }
 
 #body-wrap.error .error-btn--secondary {
@@ -111,7 +111,7 @@
   outline-offset: 3px;
 }
 
-/* ---------- 糖果贴纸视觉区 ---------- */
+/* ---------- 纸张贴纸视觉区 ---------- */
 #body-wrap.error .error-hero-visual {
   position: relative;
   display: grid;
@@ -126,7 +126,7 @@
 #body-wrap.error .error-hero-visual::after {
   position: absolute;
   content: "";
-  border: var(--candy-border-width) solid var(--efu-card-border);
+  border: var(--paper-border-width) solid var(--efu-card-border);
   border-radius: 50%;
   opacity: 0.34;
 }
@@ -141,11 +141,11 @@
   width: 230px;
   height: 230px;
   place-items: center;
-  color: var(--candy-nav-active-text, var(--efu-nav-hover-text));
+  color: var(--paper-nav-active-text, var(--efu-nav-hover-text));
   border: 3px solid var(--efu-card-border);
   border-radius: 38% 62% 55% 45% / 48% 40% 60% 52%;
   background: var(--efu-theme);
-  box-shadow: 10px 10px 0 var(--efu-card-border);
+  box-shadow: var(--paper-shadow-soft);
   transform: rotate(-7deg);
 }
 
@@ -222,15 +222,15 @@
 #body-wrap.error .error-recommend-card {
   overflow: hidden;
   border: var(--style-border-always);
-  border-radius: var(--candy-radius);
+  border-radius: var(--paper-radius);
   background: var(--efu-card-bg);
-  box-shadow: 3px 3px 0 var(--efu-card-border);
+  box-shadow: var(--paper-shadow-soft);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 #body-wrap.error .error-recommend-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--efu-theme);
+  box-shadow: var(--paper-shadow-hover);
 }
 
 #body-wrap.error .error-recommend-cover {
@@ -269,7 +269,7 @@
 #body-wrap.error .error-recommend-cover:focus-visible {
   outline: 3px solid var(--efu-theme);
   outline-offset: 2px;
-  border-radius: var(--candy-radius-sm);
+  border-radius: var(--paper-radius-sm);
 }
 
 #body-wrap.error .error-recommend-meta {

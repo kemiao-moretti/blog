@@ -67,8 +67,8 @@
       const dark = document.documentElement.dataset.theme === 'dark';
       const mode = dark ? 'dark-mode' : 'light-mode';
       const styles = getComputedStyle(document.documentElement);
-      window.Chart.defaults.color = styles.getPropertyValue('--efu-fontcolor').trim() || (dark ? '#f5f5f5' : '#363636');
-      window.Chart.defaults.borderColor = dark ? 'rgba(255,255,255,.16)' : 'rgba(0,0,0,.1)';
+      window.Chart.defaults.color = styles.getPropertyValue('--efu-fontcolor').trim();
+      window.Chart.defaults.borderColor = styles.getPropertyValue('--efu-card-border').trim();
 
       containers.forEach((container: HTMLElement, index) => {
         try {

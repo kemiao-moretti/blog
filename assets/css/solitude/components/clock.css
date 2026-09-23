@@ -1,7 +1,7 @@
 /* ============================================================
-   clock.css · 侧边栏时钟卡片（糖果屋风格）
-   全部颜色走 token（--efu-* / --candy-*），明暗双模自动生效。
-   卡片外壳继承 #aside-content .card-widget 糖果规则。
+   clock.css · 侧边栏时钟卡片（纸张风格）
+   全部颜色走 token（--efu-* / --paper-*），明暗双模自动生效。
+   卡片外壳继承 #aside-content .card-widget 纸张规则。
    注意：侧栏仅在 ≥1200px 显示（主题 #aside-content .card-widget
    在 ≤1199px 被 display:none），可见时宽度恒为 300px。
    ============================================================ */
@@ -47,7 +47,7 @@
   letter-spacing: 0.02em;
 }
 
-/* ---------- 大号时间：糖果 LED 数字 ---------- */
+/* ---------- 大号时间：纸张数字 ---------- */
 .clock-time {
   color: var(--efu-fontcolor);
   font-size: 2.5rem;

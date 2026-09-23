@@ -227,7 +227,7 @@
   margin: 0;
   padding: var(--efu-space-4, 16px);
   border-radius: var(--efu-radius-md, 12px);
-  border: var(--candy-border-width, 2px) solid var(--efu-card-border);
+  border: var(--paper-border-width, 2px) solid var(--efu-card-border);
   background: var(--efu-secondbg);
   color: var(--efu-fontcolor);
   overflow-x: auto;
