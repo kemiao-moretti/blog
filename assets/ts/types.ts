@@ -10,6 +10,7 @@ export interface FeatureModules {
   right_menu: boolean;
   translate: boolean;
   covercolor: CoverColorProvider;
+  external_link: boolean;
 }
 
 export interface KeyboardShortcutConfiguration {

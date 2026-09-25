@@ -1,0 +1,68 @@
+{{ $cfg := site.Params.solitude }}
+<!doctype html>
+<html lang="{{ site.Language.Locale | default site.Language.Lang }}" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <script>
+      (() => {
+        let mode = {{ $cfg.display_mode.type | jsonify | safeJS }};
+        try {
+          const stored = JSON.parse(localStorage.getItem("theme"));
+          if (stored?.value && (!stored.expiry || stored.expiry > Date.now())) mode = stored.value;
+          else if (stored) localStorage.removeItem("theme");
+        } catch (_) {
+          localStorage.removeItem("theme");
+        }
+        if (mode === "auto") mode = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = mode === "dark" ? "dark" : "light";
+      })();
+    </script>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>{{ .Title }} | {{ site.Title }}</title>
+    <link rel="icon" href="{{ $cfg.site.icon | relURL }}">
+    {{ partial "styles.html" . }}
+    {{ with resources.Get "css/external-link.css" }}
+      {{ $cssOpts := dict "minify" (not hugo.IsDevelopment) "targetPath" "css/external-link.css" }}
+      {{ with . | css.Build $cssOpts }}
+        {{ if hugo.IsDevelopment }}
+          <link rel="stylesheet" href="{{ .RelPermalink }}">
+        {{ else }}
+          {{ with . | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">{{ end }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+    {{/* 关键布局内联：垂直居中不能依赖 external-link.css 的到达时机，
+         否则样式表到位前页面会先以「卡片贴顶」的裸布局渲染一帧。
+         内联选择器带元素名，特异性高于样式表里的 .xlink-page，双保险。 */}}
+    <style>
+      html {
+        height: 100%;
+      }
+      body.xlink-page {
+        box-sizing: border-box;
+        display: grid;
+        align-content: center;
+        align-content: safe center;
+        justify-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 32px 18px;
+      }
+      @media screen and (max-width: 520px) {
+        body.xlink-page {
+          padding: 24px 14px;
+        }
+      }
+    </style>
+  </head>
+  <body class="xlink-page" data-type="external-link">
+    {{ block "main" . }}{{ end }}
+    {{ with resources.Get "js/external-link-page.js" }}
+      {{ $jsOpts := dict "format" "iife" "target" "es2020" "minify" (not hugo.IsDevelopment) "targetPath" "js/external-link-page.js" }}
+      {{ with . | js.Build $jsOpts | fingerprint }}<script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous"></script>{{ end }}
+    {{ end }}
+  </body>
+</html>

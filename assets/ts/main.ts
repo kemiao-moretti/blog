@@ -18,6 +18,7 @@ const loadFeatureModules = async () => {
   if (features.keyboard) requests.push(import("./keyboard"));
   if (features.right_menu) requests.push(import("./right_menu"));
   if (features.translate) requests.push(import("./tw_cn"));
+  if (features.external_link) requests.push(import("./external_link"));
   if (features.music) {
     requests.push(import("./music").then((module) => {
       initializeMusicPlayer = module.initializeMusicPlayer;

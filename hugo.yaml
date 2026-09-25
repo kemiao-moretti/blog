@@ -228,6 +228,50 @@ params:
       img: /img/404.avif
       text: =awa= Page Not Found
       recommendList: true
+    # 外链中转：站外链接先经中转页核对目标域名再前往
+    # 页面模板在 layouts/go/，运行时改写逻辑在 assets/ts/external_link.ts
+    external_link:
+      enable: false
+      page: /go/ # 中转页路径，需与站点 content/go.md 对应
+      param: u # 中转页承载目标的查询参数名
+      # 改写时会额外拼上 r=<来源页路径>，供中转页「返回上一页」用。
+      # 外链普遍带 target="_blank"，中转页在新标签里打开时 history 长度为 1，
+      # history.back() 无处可去，只能靠 r 回到点链接时所在的页面。
+      encode: base64url # 参数编码：base64url（默认，避免目标 URL 明文出现在地址栏）| none
+      countdown: 4 # 自动前往的秒数；负数表示不自动跳转，只留手动按钮
+      pause_on_hover: true # 倒计时期间指针悬停或键盘聚焦时暂停
+      referrer_guard: false # true = 仅当来源为本站时才展示中转页，否则提示来源异常
+      # 生效容器：只有落在这些选择器里的链接会被改写。三个默认值都是主题自身的标记。
+      containers:
+        - .post-content # 文章正文
+        - "#banners" # 友链页顶部跑马灯
+        - "#friend-links-list" # 友链页列表
+      exclude: [] # 页面路径前缀黑名单，命中则整页不改写
+      # 带这些属性的链接一律放过（data-fancybox 是灯箱图片锚点，不能当外链跳转）
+      ignore_attrs:
+        - data-fancybox
+        - data-no-safego
+      # 域名白名单：命中则视为站内，直接放行。按主机名后缀匹配，写 518339.xyz 即可覆盖 blog.518339.xyz
+      whitelist: []
+      appearance:
+        eyebrow: 出站提醒
+        title: "" # 留空则回落到站点标题
+        subtitle: 你要离开本站了
+        avatar: "" # 留空则回落到侧栏名片头像
+        leave_text: 即将前往
+        copy_text: 复制链接
+        copied_text: 已复制
+        # {seconds} 是倒计时数字的占位符，缺少占位符时只显示数字不显示数值
+        countdown_text: 将在 {seconds} 秒后自动前往，请先确认链接安全
+        manual_text: 请确认链接安全后，再点击「继续前往」
+        confirm_text: 继续前往
+        cancel_text: 返回上一页
+        invalid_text: 这个跳转链接不完整或格式不对
+        guard_text: 链接来源异常，本站不代为跳转
+        pause_text: 已暂停自动跳转
+        resume_text: 已继续自动跳转
+        back_home: 回到首页
+        noscript_text: 这个中转页需要 JavaScript 才能解析目标地址，请开启后重试，或直接回到首页。
     capsule:
       enable: false
       id: ""

@@ -1,0 +1,379 @@
+@charset "UTF-8";
+
+/* 外链中转页（layouts/go/）：一张「转乘车票」。
+   颜色、圆角、阴影、缓动全部消费 --paper-* 令牌，明暗模式由 custom.css 的
+   [data-theme="dark"] 接管，本文件不出现任何硬编码色值。 */
+
+/* 与 layouts/go/baseof.html 里的内联关键样式保持一致：
+   box-sizing 必须 border-box，否则 padding 会把 100dvh 的容器再撑高 64px，
+   页面凭空多出一截可滚动高度（触摸设备上很容易被滑走，卡片就"跑上面去"了）。 */
+.xlink-page {
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  align-content: safe center;
+  justify-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 32px 18px;
+}
+
+.xlink {
+  width: 100%;
+  max-width: 780px;
+}
+
+.xlink-ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px solid var(--paper-line);
+  border-radius: 4px 10px 6px 9px;
+  background: var(--paper-surface);
+  box-shadow: var(--paper-shadow);
+}
+
+/* 票面胶带：与站点卡片的贴纸语言一致 */
+.xlink-tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 72px;
+  height: 16px;
+  margin-left: -36px;
+  border-radius: 1px;
+  background: var(--paper-tape);
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+
+.xlink-stub,
+.xlink-body {
+  padding: 26px 22px;
+}
+
+/* 票根：出发站信息 */
+.xlink-stub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px dashed var(--paper-dash);
+}
+
+/* 撕票线的两端打孔 */
+.xlink-stub::before,
+.xlink-stub::after {
+  position: absolute;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  content: "";
+  border: 1px solid var(--paper-line);
+  border-radius: 50%;
+  background: var(--paper-bg);
+}
+.xlink-stub::before {
+  left: -7px;
+}
+.xlink-stub::after {
+  right: -7px;
+}
+
+.xlink-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+
+.xlink-avatar {
+  width: 46px;
+  height: 46px;
+  margin-top: 14px;
+  border: 1px solid var(--paper-line);
+  border-radius: 50%;
+  background: var(--paper-surface-alt);
+  object-fit: cover;
+}
+
+.xlink-title {
+  margin: 10px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -.01em;
+}
+
+.xlink-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--paper-muted);
+}
+
+/* 票面：目的地与操作 */
+.xlink-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.xlink-lead {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--paper-muted);
+}
+
+.xlink-dest {
+  position: relative;
+  margin-top: 8px;
+  padding: 14px 60px 14px 14px;
+  border: 1px dashed var(--paper-dash);
+  border-radius: var(--paper-radius-small);
+  background: var(--paper-surface-alt);
+}
+
+.xlink-dest-host {
+  display: block;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -.015em;
+  word-break: break-all;
+}
+
+.xlink-dest-url {
+  display: -webkit-box;
+  margin-top: 6px;
+  overflow: hidden;
+  font-family: var(--paper-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--paper-muted);
+}
+
+.xlink-copy {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--paper-radius-small);
+  background: var(--paper-surface);
+  color: var(--paper-muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 180ms ease-out, border-color 180ms ease-out;
+}
+.xlink-copy:hover {
+  border-color: var(--paper-accent);
+  color: var(--paper-accent-strong);
+}
+.xlink-copy svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.xlink-meter {
+  position: relative;
+  height: 6px;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+  background: var(--paper-surface-alt);
+}
+
+.xlink-meter-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--paper-accent);
+  transform: scaleX(1);
+  transform-origin: 0 50%;
+}
+
+.xlink-ticket[data-paused="1"] .xlink-meter-fill {
+  opacity: .45;
+}
+
+.xlink-countdown {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--paper-muted);
+}
+
+.xlink-countdown strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper-accent-strong);
+}
+
+.xlink-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.xlink-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--paper-radius-small);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 180ms var(--paper-ease), box-shadow 180ms var(--paper-ease), background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out;
+}
+
+.xlink-btn--ghost {
+  background: var(--paper-surface);
+  color: var(--paper-ink);
+}
+.xlink-btn--ghost:hover {
+  border-color: var(--paper-accent);
+  background: var(--paper-accent-soft);
+  color: var(--paper-ink);
+}
+
+/* 实心强调底配 accent-ink：深色下 accent-strong 比 accent 更亮，会糊成一片 */
+.xlink-btn--primary {
+  border-color: var(--paper-accent);
+  background: var(--paper-accent);
+  color: var(--paper-accent-ink);
+  box-shadow: var(--paper-shadow-soft);
+}
+.xlink-btn--primary:hover {
+  box-shadow: var(--paper-shadow-hover);
+  transform: translateY(-1px);
+}
+.xlink-btn:active {
+  transform: translateY(0);
+}
+.xlink-btn:focus-visible {
+  outline: 2px solid var(--paper-accent);
+  outline-offset: 2px;
+}
+
+.xlink-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 组件自身的 display 声明会盖掉 UA 的 [hidden]{display:none}，必须显式补回 */
+.xlink [hidden] {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .xlink-ticket {
+    grid-template-columns: minmax(0, 216px) minmax(0, 1fr);
+  }
+  .xlink-stub {
+    border-bottom: 0;
+    border-right: 1px dashed var(--paper-dash);
+  }
+  .xlink-stub::before {
+    top: -7px;
+    bottom: auto;
+    right: -7px;
+    left: auto;
+  }
+  .xlink-stub::after {
+    right: -7px;
+    left: auto;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .xlink-page {
+    padding: 24px 14px;
+  }
+  .xlink-stub,
+  .xlink-body {
+    padding: 22px 18px;
+  }
+  .xlink-dest {
+    padding: 12px 58px 12px 12px;
+  }
+  .xlink-dest-host {
+    font-size: 18px;
+  }
+}
+
+/* 一次编排好的入场：票面先落，票根与票面内容错峰跟进 */
+@media (prefers-reduced-motion: no-preference) {
+  .xlink-ticket {
+    animation: xlink-ticket-in 560ms var(--paper-ease) both;
+  }
+  .xlink-stub,
+  .xlink-body > * {
+    animation: xlink-rise 480ms var(--paper-ease) both;
+  }
+  .xlink-body > *:nth-child(1) {
+    animation-delay: 80ms;
+  }
+  .xlink-body > *:nth-child(2) {
+    animation-delay: 150ms;
+  }
+  .xlink-body > *:nth-child(3) {
+    animation-delay: 220ms;
+  }
+  .xlink-body > *:nth-child(4) {
+    animation-delay: 290ms;
+  }
+  .xlink-body > *:nth-child(5) {
+    animation-delay: 360ms;
+  }
+}
+
+@keyframes xlink-ticket-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) rotate(-.4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes xlink-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,58 @@
+{{ define "main" }}
+  {{ $cfg := site.Params.solitude }}
+  {{ $xlink := $cfg.external_link }}
+  {{ $app := $xlink.appearance }}
+  {{ $avatar := $app.avatar | default $cfg.aside.my_card.author.img | default "/img/avatar.png" }}
+  {{ $siteName := $app.title | default site.Title }}
+  {{ $config := dict
+    "countdown" $xlink.countdown
+    "pauseOnHover" (ne $xlink.pause_on_hover false)
+    "guard" (eq $xlink.referrer_guard true)
+    "param" ($xlink.param | default "u")
+    "encode" ($xlink.encode | default "base64url")
+    "home" site.Home.RelPermalink
+    "guardText" ($app.guard_text | default "")
+    "manualText" ($app.manual_text | default "")
+    "countdownText" ($app.countdown_text | default "")
+    "invalidText" ($app.invalid_text | default "")
+    "copiedText" ($app.copied_text | default "")
+    "pauseText" ($app.pause_text | default "")
+    "resumeText" ($app.resume_text | default "")
+  }}
+  <main class="xlink" id="xlink">
+    <section class="xlink-ticket" aria-labelledby="xlink-title">
+      <span class="xlink-tape" aria-hidden="true"></span>
+      <header class="xlink-stub">
+        {{ with $app.eyebrow }}<p class="xlink-eyebrow">{{ . }}</p>{{ end }}
+        <img class="xlink-avatar" src="{{ $avatar | relURL }}" alt="" width="46" height="46">
+        <h1 class="xlink-title" id="xlink-title">{{ $siteName }}</h1>
+        {{ with $app.subtitle }}<p class="xlink-subtitle">{{ . }}</p>{{ end }}
+      </header>
+      <div class="xlink-body">
+        <p class="xlink-lead" id="xlink-lead">{{ $app.leave_text }}</p>
+        <div class="xlink-dest">
+          <span class="xlink-dest-host" id="xlink-host">—</span>
+          <span class="xlink-dest-url" id="xlink-url"></span>
+          <button class="xlink-copy" id="xlink-copy" type="button">
+            <span class="xlink-sr">{{ $app.copy_text }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" aria-hidden="true"><path d="M208 0L332.1 0c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9L448 336c0 26.5-21.5 48-48 48l-192 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48zM48 128l80 0 0 64-64 0 0 256 192 0 0-32 64 0 0 48c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 176c0-26.5 21.5-48 48-48z"/></svg>
+          </button>
+        </div>
+        <div class="xlink-meter" id="xlink-meter" aria-hidden="true"><span class="xlink-meter-fill" id="xlink-fill"></span></div>
+        <p class="xlink-countdown" id="xlink-countdown"><span id="xlink-countdown-before"></span><strong id="xlink-countdown-number"></strong><span id="xlink-countdown-after"></span></p>
+        <div class="xlink-actions">
+          <button class="xlink-btn xlink-btn--ghost" id="xlink-cancel" type="button" hidden>{{ $app.cancel_text }}</button>
+          <a class="xlink-btn xlink-btn--primary" id="xlink-go" rel="noreferrer noopener">{{ $app.confirm_text }}</a>
+          <a class="xlink-btn xlink-btn--primary" id="xlink-home" href="{{ site.Home.RelPermalink }}" hidden>{{ $app.back_home }}</a>
+        </div>
+        <span class="xlink-sr" id="xlink-copy-status" role="status" aria-live="polite"></span>
+        <span class="xlink-sr" id="xlink-status" role="status" aria-live="polite"></span>
+        <noscript>
+          <style>#xlink-go{display:none}#xlink-home{display:inline-flex}</style>
+          <p class="xlink-countdown">{{ $app.noscript_text }}</p>
+        </noscript>
+      </div>
+    </section>
+    <template id="xlink-config">{{ $config | jsonify | safeHTML }}</template>
+  </main>
+{{ end }}
