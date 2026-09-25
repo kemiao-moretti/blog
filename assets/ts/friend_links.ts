@@ -494,18 +494,28 @@ import { Solitude } from "./core/api";
     }
   };
 
-  const renderFooter = async () => {
+  const renderFooter = async (argument, event, element) => {
     const target = document.getElementById("friend-links-in-footer");
     if (!target) return;
+    if (
+      element instanceof Element &&
+      element.classList.contains("random-friends-btn")
+    ) {
+      element.classList.remove("is-spinning");
+      void (element as HTMLElement).offsetWidth;
+      element.classList.add("is-spinning");
+    }
     try {
       const data = await load();
       if (!target.isConnected) return;
-      const links = data.links.flatMap((group) =>
-        (Array.isArray(group.link_list) ? group.link_list : []).map((item) => ({
-          name: item.name,
-          link: item.link,
-        }))
-      );
+      const links = data.links
+        .filter((group) => group.type !== "discn" && group.type !== "lost")
+        .flatMap((group) =>
+          (Array.isArray(group.link_list) ? group.link_list : []).map((item) => ({
+            name: item.name,
+            link: item.link,
+          }))
+        );
       const fragment = document.createDocumentFragment();
       const available = [...links];
       const count = Math.min(3, available.length);
