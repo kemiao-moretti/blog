@@ -1,4 +1,12 @@
 {{ $cfg := site.Params.solitude }}
+{{/* 可选网络字体（如朱雀仿宋的 cn-font-split 分片 CSS）。
+     由 params.solitude.font.webfont_css 指定；baseof 与 go/baseof 两个 head 骨架都经此加载，
+     保证外链中转页不会掉字体。preconnect 只对绝对 URL 输出。 */}}
+{{ with $cfg.font.webfont_css }}
+  {{ $u := urls.Parse . }}
+  {{ if and $u.Scheme $u.Host }}<link rel="preconnect" href="{{ printf "%s://%s" $u.Scheme $u.Host }}" crossorigin>{{ end }}
+  <link rel="stylesheet" href="{{ . }}">
+{{ end }}
 {{ $targets := slice "chrome115" "edge115" "firefox116" "ios16.4" "opera101" "safari16.4" }}
 {{ $vars := dict
   "solitude-theme-light" $cfg.theme_color.light

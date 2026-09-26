@@ -152,6 +152,9 @@ params:
       code_font_size: 16px
       font_family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
       code_font_family: "ui-monospace, SFMono-Regular, Menlo, monospace"
+      # 可选：网络字体的 CSS 地址（含 @font-face 声明）。留空则只用系统字体。
+      # 例：朱雀仿宋的分片 CSS，浏览器按 unicode-range 只下载用到的分片。
+      webfont_css: ""
     index_post_list:
       direction: column
       column: 2
