@@ -53,6 +53,7 @@ allPosts: {other: Todos los artículos}
 categories: {other: Categorías}
 tags: {other: Etiquetas}
 toc: {other: Contenido}
+tocToComment: {other: Ir a los comentarios}
 recentPosts: {other: Artículos recientes}
 archives: {other: Archivos}
 archiveAll: {other: Todos}

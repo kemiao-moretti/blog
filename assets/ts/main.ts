@@ -188,19 +188,23 @@ const percent = () => {
   const scrolledPercent = totalScrollableHeight > 0
     ? Math.round((scrollPos / totalScrollableHeight) * 100)
     : 0;
-  const navToTop = document.querySelector("#nav-totop");
-  const percentDisplay = document.querySelector("#nav-totop #percent");
   const endTarget =
     document.getElementById("post-comment") || document.getElementById("footer");
   const isNearEnd = endTarget
     ? window.scrollY + docEl.clientHeight >= endTarget.offsetTop
     : false;
+  const isLong = isNearEnd || scrolledPercent > 90;
 
-  navToTop?.classList.toggle("long", isNearEnd || scrolledPercent > 90);
-  if (percentDisplay) percentDisplay.textContent =
-    isNearEnd || scrolledPercent > 90
-      ? Solitude.config.lang.backtop
-      : scrolledPercent;
+  document
+    .querySelectorAll("[data-solitude-totop]")
+    .forEach((el) => el.classList.toggle("long", isLong));
+
+  const percentLabel = isLong
+    ? Solitude.config.lang.backtop
+    : String(scrolledPercent);
+  document.querySelectorAll("[data-solitude-percent]").forEach((el) => {
+    el.textContent = percentLabel;
+  });
 
   document
     .querySelectorAll(".needEndHide")
@@ -1589,7 +1593,7 @@ const scrollFnToDo = () => {
         ),
         300
       );
-      if (window.innerWidth < 900) {
+      if (window.innerWidth < 1201) {
         $cardTocLayout.classList.remove("open");
       }
     };
@@ -1918,6 +1922,8 @@ window.onkeydown = (e) => {
   }
   if (code === "Escape") {
     Solitude.hideConsole();
+    document.getElementById("card-toc")?.classList.remove("open");
+    document.getElementById("toc-fab")?.setAttribute("aria-expanded", "false");
   }
 };
 

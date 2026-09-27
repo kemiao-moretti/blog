@@ -1,5 +1,15 @@
+{{ $cfg := site.Params.solitude }}
+{{ $hasComments := and $cfg.comment.use (ne .Params.comment false) }}
 <div class="card-widget" id="card-toc">
-  <div class="item-headline"><i class="solitude fas fa-bars"></i><span>{{ i18n "toc" }}</span></div>
+  <div class="item-headline">
+    <i class="solitude fas fa-bars"></i><span>{{ i18n "toc" }}</span>
+    <div class="toc-actions">
+      {{ if $hasComments }}
+        <button class="toc-action" type="button" data-solitude-action="scrollTo" data-solitude-target="post-comment" aria-label="{{ i18n "tocToComment" }}" title="{{ i18n "tocToComment" }}"><i class="solitude fas fa-arrow-down"></i></button>
+      {{ end }}
+      <button class="toc-action toc-action-totop" type="button" data-solitude-action="toTop" data-solitude-totop aria-label="{{ i18n "backTop" }}" title="{{ i18n "backTop" }}"><i class="solitude fas fa-arrow-up"></i><span class="toc-percent" data-solitude-percent>0</span></button>
+    </div>
+  </div>
   <div class="toc-content" id="toc-content">
     <ol class="toc">
       {{- partial "aside-toc-items.html" (dict "headings" .Fragments.Headings) -}}

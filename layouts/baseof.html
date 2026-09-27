@@ -13,6 +13,7 @@
     {{ partial "rightmenu.html" . }}
     <div id="body-wrap" class="{{ if eq $pageType "404" }}error{{ else if and .IsPage (eq .Section "posts") }}post{{ else }}page{{ end }}">
       {{ partial "header.html" . }}
+      {{ partial "toc-fab.html" . }}
       {{ block "main" . }}{{ end }}
       {{ if ne $pageType "404" }}<footer id="footer">{{ partial "footer.html" . }}</footer>{{ end }}
     </div>

@@ -53,6 +53,7 @@ allPosts: {other: 全部文章}
 categories: {other: 分類}
 tags: {other: 標籤}
 toc: {other: 目錄}
+tocToComment: {other: 直達底部}
 recentPosts: {other: 最新文章}
 archives: {other: 歸檔}
 archiveAll: {other: 全部}
