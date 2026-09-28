@@ -1,0 +1,13 @@
+{{ range $groupName, $items := . }}
+  <div class="back-menu-list-group">
+    <div class="back-menu-list-title">{{ $groupName }}</div>
+    <div class="back-menu-list">
+      {{ range $items }}
+        <a class="back-menu-item" href="{{ .url | relURL }}">
+          {{ with .icon }}<img class="nolazyload back-menu-item-icon" src="{{ . | relURL }}" alt="">{{ end }}
+          <span class="back-menu-item-text">{{ .name }}</span>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+{{ end }}

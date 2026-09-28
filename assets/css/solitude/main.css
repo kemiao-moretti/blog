@@ -2,7 +2,7 @@
 
 @layer solitude.settings, solitude.tokens, solitude.base, solitude.motion,
   solitude.layout, solitude.components, solitude.pages, solitude.shortcodes,
-  solitude.integrations;
+  solitude.integrations, solitude.mobile;
 
 @import "hugo:vars" layer(solitude.settings);
 @import "./foundation/tokens.css" layer(solitude.tokens);
@@ -12,6 +12,7 @@
 @import "./layout/shell.css" layer(solitude.layout);
 @import "./layout/footer.css" layer(solitude.layout);
 @import "./layout/navigation.css" layer(solitude.layout);
+@import "./layout/mobile-compact.css" layer(solitude.mobile);
 
 @import "./components/aside-console.css" layer(solitude.components);
 @import "./components/clock.css" layer(solitude.components);

@@ -1,6 +1,7 @@
 {{ $cfg := site.Params.solitude.capsule }}
 <div class="needEndHide" id="nav-music">
   <button class="music-capsule-hitarea" type="button" data-solitude-action="handleMusicClick" data-solitude-event="true" aria-keyshortcuts="ArrowLeft ArrowRight Home End" aria-label="{{ i18n "rightMenuMusicStart" }}" title="{{ i18n "rightMenuMusicStart" }}"></button>
+  <span class="music-mini-icon" aria-hidden="true"><i class="solitude fas fa-play"></i></span>
   <output class="music-progress-tooltip" aria-hidden="true">0:00 / 0:00</output>
   <span class="music-progress-status" role="status" aria-live="polite"></span>
   <div id="nav-music-hoverTips">

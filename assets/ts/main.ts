@@ -44,23 +44,12 @@ const sidebarFn = () => {
   const $toggleMenu = document.getElementById("toggle-menu");
   const $mobileSidebarMenus = document.getElementById("sidebar-menus");
   const $menuMask = document.getElementById("menu-mask");
-  const $body = document.body;
 
-  const toggleMobileSidebar = (isOpen) => {
-    $body.style.overflow = isOpen ? "hidden" : "";
-    Solitude[isOpen ? "fadeIn" : "fadeOut"]($menuMask, 0.5);
-    $mobileSidebarMenus.classList.toggle("open", isOpen);
-  };
-
-  const closeMobileSidebar = () => {
-    if ($mobileSidebarMenus.classList.contains("open")) {
-      toggleMobileSidebar(false);
-    }
-  };
+  const closeMobileSidebar = () => Solitude.closeMobileSidebar();
 
   if (!$toggleMenu || !$mobileSidebarMenus || !$menuMask) return;
 
-  lifecycle.listen($toggleMenu, "click", () => toggleMobileSidebar(true));
+  lifecycle.listen($toggleMenu, "click", () => Solitude.toggleMobileSidebar());
   lifecycle.listen($menuMask, "click", closeMobileSidebar);
 
   let resizeFrame;
@@ -721,6 +710,82 @@ const actions = {
         $rmIcon.className = `solitude fas ${this.musicPlaying ? "fa-pause" : "fa-play"}`;
       }
     }
+
+    const hitarea = document.querySelector<HTMLElement>("#nav-music .music-capsule-hitarea");
+    const label = this.musicPlaying
+      ? musicLabels?.stop || ""
+      : musicLabels?.start || "";
+    if (hitarea && label) {
+      hitarea.setAttribute("aria-label", label);
+      hitarea.setAttribute("title", label);
+    }
+  },
+  syncMobilePanelState() {
+    const sidebarOpen = document.getElementById("sidebar-menus")?.classList.contains("open") || false;
+    const groupOpen = document.getElementById("nav-group-panel")?.classList.contains("open") || false;
+    const tocOpen = document.getElementById("card-toc")?.classList.contains("open") || false;
+    const anyOpen = sidebarOpen || groupOpen || tocOpen;
+    document.body.style.overflow = anyOpen ? "hidden" : "";
+    document.documentElement.classList.toggle("toc-open", tocOpen);
+    document.getElementById("toggle-menu")?.setAttribute("aria-expanded", String(sidebarOpen));
+    document.getElementById("mobile-nav-group-toggle")?.setAttribute("aria-expanded", String(groupOpen));
+    document.querySelector("#nav-toc a")?.setAttribute("aria-expanded", String(tocOpen));
+    document.getElementById("nav-group-mask")?.setAttribute("aria-hidden", String(!groupOpen));
+    document.querySelector(".solitude-toc-mask")?.setAttribute("aria-hidden", String(!tocOpen));
+  },
+  toggleMobileSidebar() {
+    const panel = document.getElementById("sidebar-menus");
+    if (!panel) return;
+    const open = !panel.classList.contains("open");
+    document.getElementById("nav-group-panel")?.classList.remove("open");
+    document.getElementById("nav-group-mask")?.classList.remove("show");
+    document.getElementById("card-toc")?.classList.remove("open");
+    panel.classList.toggle("open", open);
+    const mask = document.getElementById("menu-mask");
+    if (mask) {
+      if (open) Solitude.fadeIn(mask, 0.5);
+      else mask.style.display = "none";
+    }
+    this.syncMobilePanelState();
+  },
+  closeMobileSidebar() {
+    document.getElementById("sidebar-menus")?.classList.remove("open");
+    const mask = document.getElementById("menu-mask");
+    if (mask) mask.style.display = "none";
+    this.syncMobilePanelState();
+  },
+  toggleNavGroup() {
+    const panel = document.getElementById("nav-group-panel");
+    if (!panel) return;
+    const open = !panel.classList.contains("open");
+    document.getElementById("sidebar-menus")?.classList.remove("open");
+    const menuMask = document.getElementById("menu-mask");
+    if (menuMask) menuMask.style.display = "none";
+    document.getElementById("card-toc")?.classList.remove("open");
+    panel.classList.toggle("open", open);
+    document.getElementById("nav-group-mask")?.classList.toggle("show", open);
+    this.syncMobilePanelState();
+  },
+  closeNavGroup() {
+    document.getElementById("nav-group-panel")?.classList.remove("open");
+    document.getElementById("nav-group-mask")?.classList.remove("show");
+    this.syncMobilePanelState();
+  },
+  toggleToc() {
+    const tocPanel = document.getElementById("card-toc");
+    if (!tocPanel) return;
+    const open = !tocPanel.classList.contains("open");
+    document.getElementById("sidebar-menus")?.classList.remove("open");
+    document.getElementById("nav-group-panel")?.classList.remove("open");
+    document.getElementById("nav-group-mask")?.classList.remove("show");
+    const menuMask = document.getElementById("menu-mask");
+    if (menuMask) menuMask.style.display = "none";
+    tocPanel.classList.toggle("open", open);
+    this.syncMobilePanelState();
+  },
+  closeToc() {
+    document.getElementById("card-toc")?.classList.remove("open");
+    this.syncMobilePanelState();
   },
   musicScrubberBind() {
     const $music = document.getElementById("nav-music");
@@ -1923,7 +1988,17 @@ window.onkeydown = (e) => {
   if (code === "Escape") {
     Solitude.hideConsole();
     document.getElementById("card-toc")?.classList.remove("open");
-    document.getElementById("toc-fab")?.setAttribute("aria-expanded", "false");
+    document.querySelector("#nav-toc a")?.setAttribute("aria-expanded", "false");
+    document.documentElement.classList.remove("toc-open");
+    document.getElementById("sidebar-menus")?.classList.remove("open");
+    document.getElementById("toggle-menu")?.setAttribute("aria-expanded", "false");
+    const menuMask = document.getElementById("menu-mask");
+    if (menuMask) menuMask.style.display = "none";
+    document.body.style.overflow = "";
+    document.getElementById("nav-group-panel")?.classList.remove("open");
+    document.getElementById("mobile-nav-group-toggle")?.setAttribute("aria-expanded", "false");
+    document.getElementById("nav-group-mask")?.classList.remove("show");
+    document.documentElement.classList.remove("toc-open");
   }
 };
 

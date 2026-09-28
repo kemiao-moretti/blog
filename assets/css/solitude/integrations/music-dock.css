@@ -595,3 +595,55 @@
     transition: none;
   }
 }
+
+/* 移动端未播放时只保留一个小型播放入口；播放后恢复完整胶囊。 */
+.music-mini-icon {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  #nav-music:not(.playing) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    overflow: hidden;
+    border: 1px solid var(--efu-card-border);
+    border-radius: 50%;
+    background: var(--efu-card-bg);
+    box-shadow: var(--efu-shadow-border);
+  }
+
+  #nav-music:not(.playing) .aplayer,
+  #nav-music:not(.playing) #nav-music-hoverTips,
+  #nav-music:not(.playing) .music-progress-tooltip {
+    display: none;
+  }
+
+  #nav-music:not(.playing) .music-mini-icon {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--efu-fontcolor);
+    pointer-events: none;
+  }
+
+  #nav-music:not(.playing) .music-mini-icon i {
+    font-size: 16px;
+  }
+
+  #nav-music:not(.playing) .music-capsule-hitarea {
+    z-index: 1;
+    border-radius: 50%;
+  }
+
+  #nav-music.playing {
+    max-width: calc(100vw - 32px);
+  }
+}

@@ -11,9 +11,17 @@ const rerunPjaxScripts = () => {
 
 const closePersistentOverlays = () => {
   document.body.style.overflow = "";
+  document.documentElement.classList.remove("toc-open");
   document.getElementById("sidebar-menus")?.classList.remove("open");
+  document.getElementById("nav-group-panel")?.classList.remove("open");
+  document.getElementById("card-toc")?.classList.remove("open");
+  document.getElementById("toggle-menu")?.setAttribute("aria-expanded", "false");
+  document.getElementById("mobile-nav-group-toggle")?.setAttribute("aria-expanded", "false");
+  document.getElementById("nav-toc a")?.setAttribute("aria-expanded", "false");
   const menuMask = document.getElementById("menu-mask");
   if (menuMask) menuMask.style.display = "none";
+  const navGroupMask = document.getElementById("nav-group-mask");
+  if (navGroupMask) navGroupMask.classList.remove("show");
   document.getElementById("console")?.classList.remove("show");
   const searchMask = document.getElementById("search-mask");
   const searchDialog = document.querySelector<HTMLElement>("#local-search .search-dialog, #algolia-search .search-dialog");

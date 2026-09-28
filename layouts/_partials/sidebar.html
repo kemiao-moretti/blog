@@ -1,7 +1,8 @@
 {{ $cfg := site.Params.solitude }}
 <div id="sidebar" style="zoom:1">
   <div id="menu-mask" style="display:none"></div>
-  <div id="sidebar-menus">
+  <div id="sidebar-menus" aria-label="{{ i18n "menu" }}">
+    <div class="mobile-panel-head"><span>{{ i18n "menu" }}</span><button type="button" data-solitude-action="closeMobileSidebar" aria-label="关闭菜单" title="关闭"><i class="solitude fas fa-xmark" aria-hidden="true"></i></button></div>
     <div class="site-data">
       {{ range $item := slice (dict "name" (i18n "archives") "url" "/archives/" "count" (len (where site.RegularPages "Section" "posts"))) (dict "name" (i18n "categories") "url" "/categories/" "count" (len site.Taxonomies.categories)) (dict "name" (i18n "tags") "url" "/tags/" "count" (len site.Taxonomies.tags)) }}
         <div class="data-item is-center"><div class="data-item-link"><a href="{{ $item.url | relLangURL }}"><div class="headline">{{ $item.name }}</div><div class="length-num">{{ $item.count }}</div></a></div></div>

@@ -23,7 +23,7 @@
 <link rel="icon" href="{{ $cfg.site.icon | relURL }}">
 {{ partial "pwa.html" . }}
 <link rel="canonical" href="{{ .Permalink }}">
-{{ with .OutputFormats.Get "RSS" }}<link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="{{ .RelPermalink }}">{{ end }}
+{{ with .OutputFormats.Get "ATOM" }}<link rel="alternate" type="application/atom+xml" title="{{ site.Title }}" href="{{ .RelPermalink }}">{{ end }}
 <meta property="og:title" content="{{ $pageTitle | default site.Title }}">
 <meta property="og:description" content="{{ $description | plainify }}">
 <meta property="og:url" content="{{ .Permalink }}">
