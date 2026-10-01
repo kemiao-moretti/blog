@@ -27,8 +27,8 @@ export const initPreloader = (api) => {
 
   api.endLoading = end;
   window.addEventListener("load", end, { once: true });
-  window.addEventListener("pjax:send", start);
-  document.addEventListener("pjax:complete", end);
+  document.addEventListener("swup:visit:start", start);
+  document.addEventListener("swup:page:view", end);
   fallbackTimer = setTimeout(end, 5000);
   if (document.readyState === "complete") end();
 };

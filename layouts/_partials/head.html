@@ -30,10 +30,11 @@
 <meta property="og:type" content="{{ if and .IsPage (eq .Section "posts") }}article{{ else }}website{{ end }}">
 {{ with .Params.cover }}<meta property="og:image" content="{{ . | absURL }}">{{ end }}
 <link rel="stylesheet" href="{{ $cfg.cdn.fontawesome }}">
-{{ if $cfg.katex.enable }}<link rel="stylesheet" href="{{ $cfg.cdn.katex_css }}">{{ end }}
-{{ if eq $cfg.lightbox "fancybox" }}<link rel="stylesheet" href="{{ $cfg.cdn.fancyapps_css }}">{{ end }}
-{{ if and $cfg.search.enable (eq $cfg.search.type "algolia") }}<link rel="stylesheet" href="{{ $cfg.cdn.instantsearch_css }}">{{ end }}
-{{ if or $cfg.capsule.enable $cfg.music.enable }}<link rel="stylesheet" href="{{ $cfg.cdn.aplayer_css }}">{{ end }}
+{{- $hasMath := or (in .RawContent "$$") (in .RawContent "\\(") -}}
+{{ if and $cfg.katex.enable $hasMath }}<link rel="stylesheet" href="{{ $cfg.cdn.katex_css }}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{{ $cfg.cdn.katex_css }}"></noscript>{{ end }}
+{{ if eq $cfg.lightbox "fancybox" }}<link rel="stylesheet" href="{{ $cfg.cdn.fancyapps_css }}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{{ $cfg.cdn.fancyapps_css }}"></noscript>{{ end }}
+{{ if and $cfg.search.enable (eq $cfg.search.type "algolia") }}<link rel="stylesheet" href="{{ $cfg.cdn.instantsearch_css }}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{{ $cfg.cdn.instantsearch_css }}"></noscript>{{ end }}
+{{ if or $cfg.capsule.enable $cfg.music.enable }}<link rel="stylesheet" href="{{ $cfg.cdn.aplayer_css }}" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="{{ $cfg.cdn.aplayer_css }}"></noscript>{{ end }}
 {{ partial "styles.html" . }}
 {{ partial "config.html" . }}
 {{ range $cfg.verify_site }}{{ . | safeHTML }}{{ end }}

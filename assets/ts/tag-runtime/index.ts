@@ -329,7 +329,7 @@
     image.src = image.dataset.fallback;
   }, true);
   document.addEventListener('solitude:beforeNavigate', destroyCharts);
-  document.addEventListener('pjax:complete', init);
+  document.addEventListener('swup:page:view', init);
   document.addEventListener('solitude:themeChange', () => {
     renderCharts();
     renderMermaid(true);

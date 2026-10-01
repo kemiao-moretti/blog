@@ -156,7 +156,7 @@ class LocalSearch {
 
     bindPjaxEvents() {
         if (this.pjaxBound) return;
-        window.addEventListener('pjax:complete', this.handlePjaxComplete);
+        window.addEventListener('swup:page:view', this.handlePjaxComplete);
         this.pjaxBound = true;
     }
 

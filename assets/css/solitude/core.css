@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* 全站核心聚合根（CSS 按页分片）：
+   - core.css 承担所有页面都需要的基座（foundation/layout/components/shortcodes/integrations）。
+   - 各页面专属的 pages/*.css 由 styles.html 按页面类型单独构建输出，不再聚合进这里，
+     使具体页面（如文章/首页）不加载 about/music/stats 等无关页面样式，砍首屏 CSS 体积。
+   层声明保留（与 main.css 一致），确保 core 与页级规则层序稳定。 */
+
+@layer solitude.settings, solitude.tokens, solitude.base, solitude.motion,
+  solitude.layout, solitude.components, solitude.pages, solitude.shortcodes,
+  solitude.integrations, solitude.mobile;
+
+@import "hugo:vars" layer(solitude.settings);
+@import "./foundation/tokens.css" layer(solitude.tokens);
+@import "./foundation/base.css" layer(solitude.base);
+@import "./foundation/animations.css" layer(solitude.motion);
+
+@import "./layout/shell.css" layer(solitude.layout);
+@import "./layout/footer.css" layer(solitude.layout);
+@import "./layout/navigation.css" layer(solitude.layout);
+@import "./layout/mobile-compact.css" layer(solitude.mobile);
+
+@import "./components/aside-console.css" layer(solitude.components);
+@import "./components/clock.css" layer(solitude.components);
+@import "./components/ip-welcome.css" layer(solitude.components);
+@import "./components/keyboard.css" layer(solitude.components);
+@import "./components/post-feed.css" layer(solitude.components);
+@import "./components/comments-share.css" layer(solitude.components);
+@import "./components/cookie-consent.css" layer(solitude.components);
+@import "./components/ai-summary.css" layer(solitude.components);
+
+@import "./shortcodes/text-status.css" layer(solitude.shortcodes);
+@import "./shortcodes/disclosure.css" layer(solitude.shortcodes);
+@import "./shortcodes/actions.css" layer(solitude.shortcodes);
+@import "./shortcodes/media.css" layer(solitude.shortcodes);
+@import "./shortcodes/collections.css" layer(solitude.shortcodes);
+@import "./shortcodes/responsive.css" layer(solitude.shortcodes);
+
+@import "./integrations/hugo.css" layer(solitude.integrations);
+@import "./integrations/syntax.css" layer(solitude.integrations);
+@import "./integrations/search.css" layer(solitude.integrations);
+/* Comment providers ship unlayered vendor CSS at runtime. Keep our scoped
+   compatibility rules unlayered as well so the Hexo theme styles can win. */
+@import "./integrations/comments.css";
+@import "./integrations/artalk.css";
+/* APlayer ships unlayered vendor CSS, so the scoped capsule compatibility
+   rules must also remain unlayered to override its fixed player geometry. */
+@import "./integrations/music-dock.css";
+@import "./integrations/rightside.css" layer(solitude.integrations);
+@import "./integrations/right-menu.css" layer(solitude.integrations);
+
+/* Unlayered rules intentionally outrank theme layers and external vendor CSS. */
+@import "./integrations/overrides.css";
+@import "./integrations/paper-reward.css";

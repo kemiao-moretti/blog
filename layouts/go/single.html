@@ -2,7 +2,7 @@
   {{ $cfg := site.Params.solitude }}
   {{ $xlink := $cfg.external_link }}
   {{ $app := $xlink.appearance }}
-  {{ $avatar := $app.avatar | default $cfg.aside.my_card.author.img | default "/img/avatar.png" }}
+  {{ $avatar := $app.avatar | default $cfg.aside.my_card.author.img | default "/img/avatar.webp" }}
   {{ $siteName := $app.title | default site.Title }}
   {{ $config := dict
     "countdown" $xlink.countdown

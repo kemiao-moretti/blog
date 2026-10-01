@@ -115,7 +115,7 @@ const initializeTranslation = () => {
     }
 
     translateInitialization();
-    document.addEventListener('pjax:complete', translateInitialization);
+    document.addEventListener('swup:page:view', translateInitialization);
 };
 
 if (document.readyState === 'loading') {

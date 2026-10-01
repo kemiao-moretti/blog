@@ -12,4 +12,5 @@ import "./post-reward";
 import "./stats";
 import "./clock";
 import "./ip-welcome";
-import "./core/pjax";
+import "./img-perf";
+import "./core/swup";

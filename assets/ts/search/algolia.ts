@@ -344,7 +344,7 @@ class AlgoliaSearch {
      * 绑定 PJAX 事件
      */
     bindPjaxEvents() {
-        window.addEventListener("pjax:complete", () => {
+        window.addEventListener("swup:page:view", () => {
             if (!Solitude.isHidden(this.elements.searchMask)) {
                 this.closeSearch();
             }

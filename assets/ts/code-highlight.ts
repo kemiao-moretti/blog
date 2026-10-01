@@ -85,7 +85,9 @@ const bindControls = (block: HTMLElement, signal: AbortSignal) => {
   if (block.dataset.codeControlsReady === "true") return;
   block.dataset.codeControlsReady = "true";
 
-  const code = block.querySelector<HTMLElement>(".code-block__fallback code");
+  const code = block.querySelector<HTMLElement>(".code-block__fallback code") ?? {
+    textContent: block.dataset.codeSource || "",
+  };
   sourceCode.set(block, code?.textContent || "");
 
   const copyButton = block.querySelector<HTMLButtonElement>("[data-code-copy]");
@@ -160,21 +162,34 @@ const renderHighlightedCode = async (
   return null;
 };
 
+/** 交互层：绑定复制/折叠/行号并设置主题属性，与代码块是否已静态高亮无关。 */
+const prepareBlock = (
+  block: HTMLElement,
+  configuration: NormalizedHighlightConfiguration,
+  signal: AbortSignal
+) => {
+  bindControls(block, signal);
+  block.dataset.codeLightTheme = configuration.themes.light;
+  block.dataset.codeDarkTheme = configuration.themes.dark;
+  block.classList.toggle("code-block--line-numbers", configuration.lineNumbers);
+  setCollapsibleState(block, configuration.maxHeight, signal);
+};
+
 export const initializeCodeBlocks = async (signal: AbortSignal) => {
-  const blocks = [...document.querySelectorAll<HTMLElement>("[data-code-block]")]
+  const all = [...document.querySelectorAll<HTMLElement>("[data-code-block]")]
     .filter((block) => block.dataset.codeBlockReady !== "true");
-  if (!blocks.length) return;
+  if (!all.length) return;
 
   const configuration = getConfiguration();
-  blocks.forEach((block) => {
-    bindControls(block, signal);
-    block.dataset.codeLightTheme = configuration.themes.light;
-    block.dataset.codeDarkTheme = configuration.themes.dark;
-    block.classList.toggle("code-block--line-numbers", configuration.lineNumbers);
-    setCollapsibleState(block, configuration.maxHeight, signal);
-  });
+
+  // 交互层：所有未就绪的块都补交互（复制/折叠/行号/主题属性）
+  all.forEach((block) => prepareBlock(block, configuration, signal));
 
   if (!configuration.enable || signal.aborted) return;
+
+  // 高亮层：仅对 viewport 尚无 .shiki 的块做运行时 shiki（静态预渲染的块跳过，不再 import shiki）
+  const blocks = all.filter((block) => !block.querySelector(".code-block__viewport .shiki"));
+  if (!blocks.length) return;
 
   let shiki: ShikiModule;
   try {
