@@ -188,7 +188,8 @@ function renderWeather(root: HTMLElement, data: QwNow, cfg: ClockConfig): void {
 
 function initClock(): void {
   const root = document.getElementById("hexo-electric-clock");
-  if (!root) return;
+  if (!root || root.dataset.clockInitialized === "true") return;
+  root.dataset.clockInitialized = "true";
   const cfg = readConfig(root);
   startTicking(root, cfg);
   void fetchWeather(cfg).then((data) => {

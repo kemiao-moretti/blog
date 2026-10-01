@@ -716,7 +716,6 @@ const renderPostCardParticipants = async () => {
 const refreshTimes = (container: Element) => {
   Solitude.changeTimeFormat?.(container.querySelectorAll("time"));
   window.lazyLoadInstance?.update?.();
-  Solitude.pjax?.refresh?.();
 };
 
 const renderAside = (container: Element, comments: NormalizedComment[]) => {
@@ -811,7 +810,6 @@ const renderCards = (
   container.replaceChildren(...items.map(createCommentCard));
   Solitude.diffDateFormat?.(container.querySelectorAll("time.comment-time"));
   window.lazyLoadInstance?.update?.();
-  Solitude.pjax?.refresh?.();
 };
 
 const renderAggregateSurfaces = async () => {
@@ -1091,7 +1089,6 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     await Promise.resolve(artalkInit).catch(() => undefined);
     watchArtalkDarkMode();
     void initializeArtalkEffects().catch(() => undefined);
-    void initializeArtalkCounters().catch(() => undefined);
   }
 };
 
@@ -1099,6 +1096,7 @@ const initializeComments = () => {
   const enabled = providers();
   if (!enabled.length) return;
   if (activeProvider() === "artalk") {
+    void initializeArtalkCounters().catch(() => undefined);
     void renderPostCardParticipants();
     void renderAggregateSurfaces();
     void renderAggregateCount();

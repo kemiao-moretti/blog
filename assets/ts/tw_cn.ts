@@ -100,7 +100,10 @@ const initializeTranslation = () => {
                 setLang();
                 setTimeout(translateBody, translateDelay);
             }
-            btn_1.addEventListener('click', () => translatePage(btn_1), false);
+            if (btn_1.dataset.translateBound !== 'true') {
+                btn_1.addEventListener('click', () => translatePage(btn_1), false);
+                btn_1.dataset.translateBound = 'true';
+            }
         }
 
         const btn_2 = document.querySelector('.rs_hide .translate');
@@ -110,7 +113,10 @@ const initializeTranslation = () => {
                 setLang();
                 setTimeout(translateBody, translateDelay);
             }
-            btn_2.addEventListener('click', () => translatePage(btn_2, '简', '繁'), false);
+            if (btn_2.dataset.translateBound !== 'true') {
+                btn_2.addEventListener('click', () => translatePage(btn_2, '简', '繁'), false);
+                btn_2.dataset.translateBound = 'true';
+            }
         }
     }
 

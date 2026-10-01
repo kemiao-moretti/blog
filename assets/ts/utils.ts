@@ -113,6 +113,10 @@ import { Solitude } from "./core/api";
       createEle.appendChild(selector);
     },
     lazyloadImg: () => {
+      if (window.lazyLoadInstance) {
+        window.lazyLoadInstance.update?.();
+        return window.lazyLoadInstance;
+      }
       window.lazyLoadInstance = new LazyLoad({
         elements_selector: "img",
         threshold: 0,
