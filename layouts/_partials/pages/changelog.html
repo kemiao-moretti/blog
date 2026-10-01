@@ -1,4 +1,5 @@
 {{ $entries := .Pages.ByDate.Reverse }}
+{{ $siteTimezone := site.Params.timeZone | default "Asia/Shanghai" }}
 {{ $typeLabels := dict "feature" "功能新增" "improvement" "功能优化" "fix" "问题修复" }}
 {{ $typeIcons := dict "feature" "fas fa-rocket" "improvement" "fas fa-wrench" "fix" "fas fa-bug" }}
 <header class="page-title-wrap cl-header">
@@ -28,7 +29,8 @@
         <div class="cl-entry-dot"></div>
         <div class="cl-entry-body">
           <div class="cl-entry-meta">
-            <time datetime="{{ $entry.Date.Format "2006-01-02T15:04" }}">{{ $entry.Date.Format "2006-01-02 · 15:04" }}</time>
+            {{ $entryTime := time.In $siteTimezone $entry.Date }}
+            <time datetime="{{ $entryTime | time.Format "2006-01-02T15:04:05Z07:00" }}">{{ $entryTime | time.Format "2006-01-02 · 15:04" }}</time>
             <span class="cl-entry-type"><i class="{{ index $typeIcons $entry.Params.type }}"></i>{{ index $typeLabels $entry.Params.type }}</span>
             <span class="cl-entry-version">{{ $entry.Params.version }}</span>
           </div>

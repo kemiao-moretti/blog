@@ -1,0 +1,25 @@
+{{- $content := .Inner | strings.TrimSpace -}}
+{{- $side := "left" -}}
+<div class="solitude-tag chat" role="log" aria-label="聊天记录">
+  {{- range $line := split $content "\n" -}}
+    {{- $line = trim $line " \t\r" -}}
+    {{- if $line -}}
+      {{- $parts := findRESubmatch `^\{([.:]?)(.*)\}$` $line -}}
+      {{- if $parts -}}
+        {{- $control := index (index $parts 0) 1 -}}
+        {{- $text := index (index $parts 0) 2 -}}
+        {{- if eq $control ":" -}}
+          <div class="chat-system">{{ $text | markdownify }}</div>
+        {{- else if eq $control "." -}}
+          {{- $side = "right" -}}
+          {{- with $text }}<div class="chat-caption chat-myself">{{ . | markdownify }}</div>{{ end -}}
+        {{- else -}}
+          {{- $side = "left" -}}
+          {{- with $text }}<div class="chat-caption">{{ . | markdownify }}</div>{{ end -}}
+        {{- end -}}
+      {{- else -}}
+        <div class="chat-body{{ if eq $side "right" }} chat-myself{{ end }}">{{ $line | replaceRE `\\\\` "<br>" | safeHTML | markdownify }}</div>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+</div>

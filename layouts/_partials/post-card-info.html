@@ -1,5 +1,6 @@
 {{ $post := .post }}
-{{ $posts := where site.RegularPages "Section" "posts" }}
+{{ $siteTimezone := site.Params.timeZone | default "Asia/Shanghai" }}
+{{ $postDate := time.In $siteTimezone $post.Date }}{{ $posts := where site.RegularPages "Section" "posts" }}
 {{ $newestPermalink := "" }}
 {{ if gt (len $posts) 0 }}
   {{ $newest := index $posts.ByDate.Reverse 0 }}
@@ -30,6 +31,6 @@
         {{ end }}
       </span>
     {{ end }}
-    <span class="post-meta-date"><time datetime="{{ $post.Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ $post.Date.Format "2006-01-02" }}</time></span>
+    <span class="post-meta-date"><time datetime="{{ $postDate.Format "2006-01-02T15:04:05Z07:00" }}">{{ $postDate.Format "2006-01-02" }}</time></span>
   </div>
 </div>

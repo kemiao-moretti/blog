@@ -40,6 +40,7 @@
 @import "./pages/privacy.css" layer(solitude.pages);
 
 @import "./shortcodes/text-status.css" layer(solitude.shortcodes);
+@import "./shortcodes/chat.css" layer(solitude.shortcodes);
 @import "./shortcodes/disclosure.css" layer(solitude.shortcodes);
 @import "./shortcodes/actions.css" layer(solitude.shortcodes);
 @import "./shortcodes/media.css" layer(solitude.shortcodes);

@@ -12,12 +12,13 @@
       </div>
       <div class="relatedPosts-list">
         {{ range . }}
+          {{ $relatedDate := time.In (site.Params.timeZone | default "Asia/Shanghai") .Date }}
           <article class="relatedPosts-item">
             <a class="relatedPosts-link" href="{{ .RelPermalink }}">
               <img class="cover" src="{{ (.Params.cover | default "/img/default.avif") | relURL }}" alt="" loading="lazy" decoding="async">
               <div class="content is-center">
                 <div class="title">{{ .Title }}</div>
-                <time class="date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+                <time class="date" datetime="{{ $relatedDate.Format "2006-01-02" }}">{{ $relatedDate.Format "2006-01-02" }}</time>
               </div>
             </a>
           </article>

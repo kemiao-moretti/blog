@@ -1,0 +1,73 @@
+/* 聊天记录 shortcode */
+.article-container .solitude-tag.chat {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-block: var(--efu-space-6);
+  padding-inline: var(--efu-space-4);
+  color: var(--efu-text-1);
+  font-size: 0.95em;
+}
+
+.article-container .chat-caption {
+  align-self: flex-start;
+  margin-top: var(--efu-space-3);
+  color: var(--efu-text-2);
+  font-size: 0.9em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.article-container .chat-caption.chat-myself {
+  align-self: flex-end;
+  text-align: end;
+}
+
+.article-container .chat-time,
+.article-container .chat-system {
+  align-self: center;
+  margin-block: var(--efu-space-3);
+  text-align: center;
+}
+
+.article-container .chat-system {
+  color: var(--efu-text-2);
+  font-weight: 600;
+}
+
+.article-container .chat-body {
+  align-self: flex-start;
+  width: fit-content;
+  max-width: min(90%, 36rem);
+  margin: 0 0 var(--efu-space-2);
+  padding: var(--efu-space-3) var(--efu-space-4);
+  border-radius: var(--efu-radius-lg);
+  border-start-start-radius: var(--efu-radius-sm);
+  background: color-mix(in srgb, var(--efu-card-bg) 82%, var(--efu-fontcolor));
+  border: 1px solid color-mix(in srgb, var(--efu-card-border) 75%, var(--efu-fontcolor));
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.article-container .chat-body.chat-myself {
+  align-self: flex-end;
+  border-start-start-radius: var(--efu-radius-lg);
+  border-start-end-radius: var(--efu-radius-sm);
+  background: var(--efu-theme);
+  color: var(--efu-white);
+}
+
+.article-container .chat-body :where(p, ul, ol) {
+  margin-block: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .article-container .solitude-tag.chat {
+    padding-inline: var(--efu-space-2);
+  }
+
+  .article-container .chat-body {
+    max-width: 92%;
+  }
+}
