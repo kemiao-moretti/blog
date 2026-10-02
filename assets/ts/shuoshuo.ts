@@ -69,6 +69,48 @@ interface MemosItem {
   pinned?: boolean;
 }
 
+interface TgEntity {
+  type?: string;
+  offset?: number;
+  length?: number;
+  url?: string;
+  language?: string;
+}
+
+interface TgMedia {
+  id?: string;
+  kind?: string;
+  mimeType?: string | null;
+  fileName?: string | null;
+  fileSize?: string | null;
+  width?: number | null;
+  height?: number | null;
+  duration?: number | null;
+  originalUrl?: string | null;
+  thumbnailUrl?: string | null;
+}
+
+interface TgMessage {
+  id: string;
+  channel?: {
+    id?: string;
+    title?: string;
+    username?: string | null;
+  };
+  content?: {
+    html?: string | null;
+    text?: string | null;
+    kind?: string;
+    entities?: TgEntity[];
+  };
+  media?: TgMedia[];
+  mediaGroupId?: string | null;
+  publishedAt?: string;
+  revision?: number;
+  sourceUrl?: string | null;
+  authorSignature?: string | null;
+}
+
 interface PageConfig {
   api: string;
   pageSize: number;
@@ -80,9 +122,19 @@ interface PageConfig {
   extensions: Record<string, boolean>;
   markedUrl: string;
   dompurifyUrl: string;
-  source: "ech0" | "memos";
+  source: "ech0" | "memos" | "tg";
   creator: string;
   publicOnly: boolean;
+  tgChannel: string;
+  tgFormat: "html" | "markdown";
+  tgAuthorName: string;
+  tgSearchEnable: boolean;
+  tgSearchPlaceholder: string;
+  tgSearchLimit: number;
+  tgRssEnable: boolean;
+  tgVoteEnable: boolean;
+  tgVoteApi: string;
+  tgLimit: number;
 }
 
 const LIKED_KEY = "solitude-shuoshuo-liked";
@@ -119,9 +171,19 @@ const readConfig = (root: HTMLElement): PageConfig => ({
   },
   markedUrl: root.dataset.marked || "",
   dompurifyUrl: root.dataset.dompurify || "",
-  source: root.dataset.source === "memos" ? "memos" : "ech0",
+  source: root.dataset.source === "memos" ? "memos" : root.dataset.source === "tg" ? "tg" : "ech0",
   creator: root.dataset.creator || "",
   publicOnly: root.dataset.publicOnly === "true",
+  tgChannel: root.dataset.tgChannel || "",
+  tgFormat: root.dataset.tgFormat === "markdown" ? "markdown" : "html",
+  tgAuthorName: root.dataset.tgAuthorName || "",
+  tgSearchEnable: root.dataset.tgSearchEnable === "true",
+  tgSearchPlaceholder: root.dataset.tgSearchPlaceholder || "搜索 Telegram 说说",
+  tgSearchLimit: Number(root.dataset.tgSearchLimit) || 20,
+  tgRssEnable: root.dataset.tgRssEnable === "true",
+  tgVoteEnable: root.dataset.tgVoteEnable === "true",
+  tgVoteApi: (root.dataset.tgVoteApi || "").replace(/\/$/, ""),
+  tgLimit: Number(root.dataset.tgLimit) || 0,
 });
 
 /* ---------------- 工具 ---------------- */
@@ -200,6 +262,88 @@ const renderMarkdown = async (config: PageConfig, content: string) => {
     // 库加载失败时降级为纯文本，保证内容可见
     return escapeHtml(source).replace(/\n/g, "<br>");
   }
+};
+
+/* ---------------- Tg：entities → Markdown ---------------- */
+
+// 由 Telegram 的 content.text + entities 重建为可经 marked 渲染的 Markdown。
+// entities 的 offset/length 基于 UTF-16 码元，与 JS string.length 一致，可直接切片。
+// 从后向前替换，避免前面的插入位移后面的 offset。
+const tgOpenMarkup: Record<string, [string, string]> = {
+  bold: ["**", "**"],
+  italic: ["_", "_"],
+  code: ["`", "`"],
+  pre: ["```\n", "\n```"],
+  strikethrough: ["~~", "~~"],
+  underline: ["<u>", "</u>"],
+  spoiler: ["||", "||"],
+};
+
+const tgBoundaryHashtagRanges = (text: string, entities?: TgEntity[]) => {
+  const ranges = (entities || [])
+    .filter((entity) => entity.type === "hashtag" && typeof entity.offset === "number" && typeof entity.length === "number")
+    .map((entity) => ({ start: entity.offset as number, end: (entity.offset as number) + (entity.length as number) }))
+    .filter((range) => range.start >= 0 && range.end <= text.length && range.end > range.start)
+    .sort((a, b) => a.start - b.start);
+  if (!ranges.length) return { start: 0, end: text.length };
+
+  let start = 0;
+  let end = text.length;
+  let index = 0;
+  while (index < ranges.length && /^\\s*$/.test(text.slice(start, ranges[index].start))) {
+    const range = ranges[index];
+    if (range.start < start || !/^#?[\\p{L}\\p{N}_]+$/u.test(text.slice(range.start, range.end))) break;
+    end = end;
+    start = range.end;
+    index += 1;
+  }
+  while (ranges.length && /^\\s*$/.test(text.slice(ranges[ranges.length - 1].end, end))) {
+    const range = ranges[ranges.length - 1];
+    if (range.end > end || !/^#?[\\p{L}\\p{N}_]+$/u.test(text.slice(range.start, range.end))) break;
+    end = range.start;
+    ranges.pop();
+  }
+  return { start, end };
+};
+
+const stripTgBoundaryHashtags = (text: string, entities?: TgEntity[]) => {
+  const source = text || "";
+  const range = tgBoundaryHashtagRanges(source, entities);
+  return source.slice(range.start, range.end).trim();
+};
+
+const tgEntitiesToMarkdown = (text: string, entities?: TgEntity[]) => {
+  const source = text || "";
+  const boundary = tgBoundaryHashtagRanges(source, entities);
+  let result = source.slice(boundary.start, boundary.end);
+  const adjustedEntities = (entities || [])
+    .filter((entity) => typeof entity.offset === "number" && typeof entity.length === "number")
+    .map((entity) => ({ ...entity, offset: (entity.offset as number) - boundary.start }))
+    .filter((entity) => (entity.offset as number) >= 0 && (entity.offset as number) + (entity.length as number) <= result.length);
+  if (!adjustedEntities.length || !result) return result.trim();
+  const sorted = adjustedEntities
+    .filter((e) => e.type && typeof e.offset === "number" && typeof e.length === "number" && e.length > 0)
+    .sort((a, b) => (b.offset as number) - (a.offset as number));
+  for (const entity of sorted) {
+    const start = entity.offset as number;
+    const length = entity.length as number;
+    if (start < 0 || start + length > result.length) continue;
+    const raw = result.slice(start, start + length);
+    if (!raw) continue;
+    if (entity.type === "text_link" && entity.url) {
+      result = result.slice(0, start) + `[${raw}](${entity.url})` + result.slice(start + length);
+      continue;
+    }
+    if (entity.type === "custom_emoji") {
+      result = result.slice(0, start) + raw + result.slice(start + length);
+      continue;
+    }
+    const markup = tgOpenMarkup[entity.type || ""];
+    if (markup) {
+      result = result.slice(0, start) + markup[0] + raw + markup[1] + result.slice(start + length);
+    }
+  }
+  return result;
 };
 
 /* ---------------- 扩展卡片 ---------------- */
@@ -778,6 +922,239 @@ const fetchMemosAll = async (config: PageConfig): Promise<MemosItem[]> => {
   return items;
 };
 
+/* ---------------- Tg 数据 ---------------- */
+
+const tgCacheKey = (config: PageConfig) =>
+  `solitude-shuoshuo:tg:v1:${config.api}:${config.tgChannel}:${config.tgLimit}`;
+
+// 游标分页全量拉取：koharu-suite 每条返回 nextCursor，空串即末页。
+// 全量拉取后在前端做本地数字分页切片（与 memos 一致，复用主题分页 UI）。
+const fetchTgAll = async (config: PageConfig): Promise<TgMessage[]> => {
+  const items: TgMessage[] = [];
+
+  let cursor = "";
+  for (let guard = 0; guard < 200; guard += 1) {
+    const params = new URLSearchParams({ limit: "100" });
+    if (config.tgChannel) params.set("channel", config.tgChannel);
+    if (cursor) params.set("cursor", cursor);
+    const response = await fetch(`${config.api}/api/v1/messages?${params.toString()}`);
+    if (!response.ok) throw new Error(`Tg 请求失败：HTTP ${response.status}`);
+    const payload = await response.json();
+    const pageItems = (payload?.items || []) as TgMessage[];
+    items.push(...pageItems);
+    // 已达 limit 上限，恰好取够即停
+    if (config.tgLimit > 0 && items.length >= config.tgLimit) break;
+    cursor = payload?.nextCursor || "";
+    if (!cursor || !pageItems.length) break;
+  }
+
+  if (config.tgLimit > 0) items.length = Math.min(items.length, config.tgLimit);
+  return items;
+};
+
+const searchTg = async (config: PageConfig, query: string): Promise<TgMessage[]> => {
+  const params = new URLSearchParams({
+    q: query,
+    limit: String(Math.min(50, Math.max(1, config.tgSearchLimit))),
+    sort: "newest",
+  });
+  if (config.tgChannel) params.set("channel", config.tgChannel);
+  const response = await fetch(`${config.api}/api/v1/search/messages?${params.toString()}`);
+  if (!response.ok) throw new Error(`Tg 搜索失败：HTTP ${response.status}`);
+  const payload = await response.json();
+  return (payload?.items || []).map((entry: { message?: TgMessage }) => entry.message).filter(Boolean) as TgMessage[];
+};
+
+// 判断媒体是否为可作为卡片网格展示的图片
+const isTgImage = (media: TgMedia) => {
+  const kind = (media.kind || "").toLowerCase();
+  const mime = (media.mimeType || "").toLowerCase();
+  if (kind === "photo") return true;
+  if (mime.startsWith("image/")) return true;
+  return false;
+};
+
+const tgMediaUrl = (media: TgMedia) =>
+  media.originalUrl || media.thumbnailUrl || "";
+
+const formatFileSizeTg = (size?: string | null) => formatBytes(size || "");
+
+const tgVoteStorageKey = "solitude-shuoshuo-tg-votes";
+
+const readTgVotes = (): Record<string, "up" | "down"> => {
+  try { return JSON.parse(localStorage.getItem(tgVoteStorageKey) || "{}"); } catch { return {}; }
+};
+
+const writeTgVote = (id: string, value: "up" | "down") => {
+  try {
+    const votes = readTgVotes();
+    votes[id] = value;
+    localStorage.setItem(tgVoteStorageKey, JSON.stringify(votes));
+  } catch { /* 隐私模式下忽略本地记录 */ }
+};
+
+const loadTgVote = async (config: PageConfig, id: string) => {
+  if (!config.tgVoteEnable || !config.tgVoteApi) return { up: 0, down: 0 };
+  const response = await fetch(`${config.tgVoteApi}/api/vote/info?id=${encodeURIComponent(id)}`);
+  if (!response.ok) throw new Error(`投票统计请求失败：HTTP ${response.status}`);
+  const payload = await response.json();
+  return { up: Number(payload?.votes?.up) || 0, down: Number(payload?.votes?.down) || 0 };
+};
+
+const submitTgVote = async (config: PageConfig, id: string, value: "up" | "down") => {
+  const response = await fetch(`${config.tgVoteApi}/api/vote/update?id=${encodeURIComponent(id)}&value=${value}`, { method: "POST" });
+  if (!response.ok) throw new Error(`投票提交失败：HTTP ${response.status}`);
+  writeTgVote(id, value);
+};
+
+const buildTgVote = async (config: PageConfig, id: string) => {
+  if (!config.tgVoteEnable || !config.tgVoteApi) return null;
+  const wrap = document.createElement("div");
+  wrap.className = "shuoshuo-vote";
+  wrap.dataset.voteId = id;
+  wrap.innerHTML = `<button type="button" class="shuoshuo-vote-button shuoshuo-vote-up"><i class="solitude fas fa-thumbs-up" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>
+    <button type="button" class="shuoshuo-vote-button shuoshuo-vote-down"><i class="solitude fas fa-thumbs-down" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>`;
+  try {
+    const counts = await loadTgVote(config, id);
+    const buttons = wrap.querySelectorAll<HTMLButtonElement>(".shuoshuo-vote-button");
+    const up = buttons[0];
+    const down = buttons[1];
+    if (up) up.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.up);
+    if (down) down.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.down);
+    const voted = readTgVotes()[id];
+    if (voted) wrap.querySelector(`.shuoshuo-vote-${voted}`)?.classList.add("is-voted");
+    wrap.addEventListener("click", async (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>(".shuoshuo-vote-button");
+      if (!button || button.disabled) return;
+      const value = button.classList.contains("shuoshuo-vote-up") ? "up" : "down";
+      button.disabled = true;
+      try {
+        await submitTgVote(config, id, value);
+        const count = button.querySelector(".shuoshuo-vote-count");
+        if (count) count.textContent = String(Number(count.textContent) + 1);
+        wrap.querySelectorAll(".shuoshuo-vote-button").forEach((node) => node.classList.remove("is-voted"));
+        button.classList.add("is-voted");
+      } catch {
+        Solitude.snackbarShow?.("投票失败，请稍后重试", false, 2000);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  } catch {
+    wrap.hidden = true;
+  }
+  return wrap;
+};
+
+// 评论页「引用」等动作按钮与 memos/ech0 保持一致的交互语义
+const buildTgCard = async (config: PageConfig, item: TgMessage) => {
+  const card = document.createElement("article");
+  card.className = "shuoshuo-card";
+  card.dataset.id = item.id;
+
+  const channelName = config.tgAuthorName || config.authorName || item.channel?.title || "";
+  const createdStamp = parseMemosTime(item.publishedAt);
+  const header = document.createElement("div");
+  header.className = "shuoshuo-card-header";
+  header.innerHTML = `<img class="shuoshuo-avatar no-lightbox" src="${escapeHtml(config.authorAvatar)}" alt="" loading="lazy">
+    <div class="shuoshuo-author">
+      <span class="shuoshuo-name">${escapeHtml(channelName)}</span>
+      <time class="shuoshuo-time" datetime="${escapeHtml(formatTime(createdStamp))}">${escapeHtml(formatTime(createdStamp))}</time>
+    </div>`;
+  card.append(header);
+
+  // 正文：format=html 直接用 content.html（净化）；format=markdown 用 text+entities 重建后经 marked 渲染
+  const body = document.createElement("div");
+  body.className = "shuoshuo-card-body";
+  const rawText = item.content?.text || "";
+  const entities = item.content?.entities || [];
+  const visibleText = stripTgBoundaryHashtags(rawText, entities);
+  let bodyHtml = "";
+  if (config.tgFormat === "html") {
+    const rawHtml = item.content?.html || (visibleText ? await renderMarkdown(config, visibleText) : "");
+    const visibleHtml = rawHtml
+      .replace(/^\s*(?:#[\p{L}\p{N}_]+\s*)+/u, "")
+      .replace(/(?:\s*#[\p{L}\p{N}_]+)+\s*$/u, "");
+    if (visibleHtml && config.dompurifyUrl) {
+      try {
+        const purify = await loadRemote(config.dompurifyUrl, "DOMPurify");
+        bodyHtml = (purify as any)?.sanitize ? (purify as any).sanitize(visibleHtml) : escapeHtml(visibleText).replace(/\n/g, "<br>");
+      } catch {
+        bodyHtml = escapeHtml(visibleText).replace(/\n/g, "<br>");
+      }
+    } else {
+      bodyHtml = visibleText ? await renderMarkdown(config, visibleText) : "";
+    }
+  } else {
+    bodyHtml = await renderMarkdown(config, tgEntitiesToMarkdown(rawText, entities));
+  }
+  if (bodyHtml) {
+    body.innerHTML = bodyHtml;
+    card.append(body);
+  }
+
+  const media = (item.media || []).filter(Boolean);
+  const images = media.filter(isTgImage).map(tgMediaUrl).filter(Boolean);
+  const inlineImages = collectCardImages(config, body);
+  const gallery = buildSmartGallery([...inlineImages, ...images]);
+  if (gallery) card.append(gallery);
+
+  // 非图片媒体（视频 / 文档 / 音频）以扩展卡片形式展示
+  const nonImages = media.filter((m) => !isTgImage(m));
+  if (nonImages.length) {
+    const wrap = document.createElement("div");
+    wrap.className = "shuoshuo-ext-wrap";
+    wrap.innerHTML = nonImages
+      .map((m) => {
+        const url = tgMediaUrl(m);
+        const name = m.fileName || m.kind || "附件";
+        const inner = `<i class="solitude fas fa-paperclip" aria-hidden="true"></i>
+          <span class="ext-file-name">${escapeHtml(name)}</span>
+          ${m.fileSize ? `<span class="ext-file-size">${escapeHtml(formatFileSizeTg(m.fileSize))}</span>` : ""}`;
+        return url
+          ? `<a class="shuoshuo-ext ext-file" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+          : `<div class="shuoshuo-ext ext-file">${inner}</div>`;
+      })
+      .join("");
+    if (wrap.childElementCount) card.append(wrap);
+  }
+
+  const footer = document.createElement("div");
+  footer.className = "shuoshuo-card-footer";
+
+  const actions = document.createElement("div");
+  actions.className = "shuoshuo-actions";
+
+  // 来源链接：跳转到 Telegram 原文
+  if (item.sourceUrl) {
+    const link = document.createElement("a");
+    link.className = "shuoshuo-source";
+    link.href = item.sourceUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.innerHTML = `<i class="solitude fab fa-telegram" aria-hidden="true"></i><span>原文</span>`;
+    actions.append(link);
+  }
+
+  const quote = document.createElement("button");
+  quote.type = "button";
+  quote.className = "shuoshuo-quote";
+  quote.dataset.solitudeAction = "toTalk";
+  quote.dataset.solitudeValue = (rawText || "").slice(0, 200);
+  quote.title = "引用并评论";
+  quote.innerHTML = `<i class="solitude fas fa-comment-dots" aria-hidden="true"></i><span>引用</span>`;
+  actions.append(quote);
+
+  const vote = await buildTgVote(config, `tg:${item.id}`);
+  if (vote) actions.append(vote);
+
+  footer.append(actions);
+  card.append(footer);
+
+  card.dataset.imageCount = String(gallery ? gallery.querySelectorAll(".shuoshuo-image").length : 0);
+  return card;
+};
+
 /* ---------------- 页面初始化 ---------------- */
 
 const initShuoshuo = async () => {
@@ -798,6 +1175,11 @@ const initShuoshuo = async () => {
   const loadMemos = () => {
     if (!memosPromise) memosPromise = fetchMemosAll(config);
     return memosPromise;
+  };
+  let tgPromise: Promise<TgMessage[]> | null = null;
+  const loadTg = () => {
+    if (!tgPromise) tgPromise = fetchTgAll(config);
+    return tgPromise;
   };
 
   const setStatus = (message: string, state: string) => {
@@ -824,6 +1206,23 @@ const initShuoshuo = async () => {
               tags.push({ name: tag });
             }
           });
+        });
+      } else if (config.source === "tg") {
+        // tg 无标签接口：从 content.entities 的 hashtag 聚合（text 中切片还原）
+        const all = await loadTg();
+        const seen = new Set<string>();
+        all.forEach((item) => {
+          const text = item.content?.text || "";
+          (item.content?.entities || [])
+            .filter((e) => e.type === "hashtag" && typeof e.offset === "number" && e.length)
+            .forEach((e) => {
+              const raw = text.slice(e.offset as number, (e.offset as number) + (e.length as number));
+              const name = raw.replace(/^#/, "").trim();
+              if (name && !seen.has(name.toLowerCase())) {
+                seen.add(name.toLowerCase());
+                tags.push({ name });
+              }
+            });
         });
       } else {
         const response = await fetch(`${config.api}/api/tags`);
@@ -975,6 +1374,26 @@ const initShuoshuo = async () => {
         for (const item of slice) {
           fragment.append(await buildMemosCard(config, item));
         }
+      } else if (config.source === "tg") {
+        // tg：全量拉取 + 按 hashtag 本地过滤 + 数字分页（与 memos 一致）
+        const all = await loadTg();
+        const filtered = activeTag
+          ? all.filter((item) => (item.content?.entities || [])
+              .some((e) => e.type === "hashtag" &&
+                (item.content?.text || "").slice(e.offset as number, (e.offset as number) + (e.length as number))
+                  .replace(/^#/, "").toLowerCase() === activeTag.toLowerCase()))
+          : all;
+        total = filtered.length;
+        const slice = filtered.slice((page - 1) * config.pageSize, page * config.pageSize);
+        if (!slice.length) {
+          setStatus('<span>还没有说说</span>', "empty");
+          if (pagination) pagination.hidden = true;
+          return;
+        }
+        if (loading) loading.hidden = true;
+        for (const item of slice) {
+          fragment.append(await buildTgCard(config, item));
+        }
       } else {
         const data = await fetchPage(config, page, activeTagId);
         if (!data.items.length) {
@@ -1000,6 +1419,62 @@ const initShuoshuo = async () => {
     }
   };
 
+  const setupTgTools = () => {
+    if (config.source !== "tg") return;
+    const tools = root.querySelector<HTMLElement>("#shuoshuo-tg-tools");
+    const form = root.querySelector<HTMLFormElement>("#shuoshuo-tg-search");
+    const input = root.querySelector<HTMLInputElement>("#shuoshuo-tg-query");
+    const clear = root.querySelector<HTMLButtonElement>("#shuoshuo-tg-clear");
+    const rss = root.querySelector<HTMLAnchorElement>("#shuoshuo-tg-rss");
+    if (!tools || !form || !input || !clear || !rss) return;
+    if (config.tgSearchEnable) {
+      input.placeholder = config.tgSearchPlaceholder;
+      tools.hidden = false;
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const query = input.value.trim();
+        if (query.length < 3) {
+          setStatus("<span>请输入至少 3 个字符</span>", "empty");
+          return;
+        }
+        setStatus('<i class="solitude fas fa-spinner fa-spin" aria-hidden="true"></i><span>搜索中</span>', "loading");
+        try {
+          const results = await searchTg(config, query);
+          list.replaceChildren();
+          if (!results.length) {
+            setStatus("<span>没有找到匹配的说说</span>", "empty");
+          } else {
+            if (loading) loading.hidden = true;
+            const fragment = document.createDocumentFragment();
+            for (const item of results) fragment.append(await buildTgCard(config, item));
+            list.replaceChildren(fragment);
+            bindActions();
+            applyGallery();
+          }
+          clear.hidden = false;
+          if (pagination) pagination.hidden = true;
+        } catch (error) {
+          console.error("[shuoshuo] tg search", error);
+          setStatus("<span>搜索失败，请稍后重试</span>", "error");
+        }
+      });
+    }
+    if (config.tgRssEnable) {
+      rss.href = config.tgChannel
+        ? `${config.api}/api/v1/channels/${encodeURIComponent(config.tgChannel)}/rss.xml`
+        : `${config.api}/api/v1/rss.xml`;
+      rss.hidden = false;
+    }
+    clear.addEventListener("click", () => {
+      input.value = "";
+      clear.hidden = true;
+      page = 1;
+      list.replaceChildren();
+      void render();
+    });
+  };
+
+  setupTgTools();
   void loadTags();
   void render();
 };

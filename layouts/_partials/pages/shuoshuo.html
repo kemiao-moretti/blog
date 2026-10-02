@@ -3,6 +3,7 @@
 {{- $source := $cfg.source | default "ech0" -}}
 {{- $api := $cfg.api -}}
 {{- if eq $source "memos" }}{{ with $cfg.memos.api }}{{ $api = . }}{{ end }}{{ end -}}
+{{- if eq $source "tg" }}{{ with $cfg.tg.api }}{{ $api = . }}{{ end }}{{ end -}}
 <div class="shuoshuo-page" id="shuoshuo"
   data-source="{{ $source }}"
   data-api="{{ $api }}"
@@ -14,6 +15,16 @@
   data-tags="{{ cond $cfg.tags.enable true false }}"
   data-creator="{{ with $cfg.memos }}{{ .creator }}{{ end }}"
   data-public-only="{{ with $cfg.memos }}{{ if .public_only }}true{{ else }}false{{ end }}{{ end }}"
+  data-tg-channel="{{ with $cfg.tg }}{{ .channel }}{{ end }}"
+  data-tg-format="{{ with $cfg.tg }}{{ .format | default "html" }}{{ end }}"
+  data-tg-author-name="{{ with $cfg.tg.author }}{{ .name }}{{ end }}"
+  data-tg-search-enable="{{ with $cfg.tg.search }}{{ if .enable }}true{{ else }}false{{ end }}{{ end }}"
+  data-tg-search-placeholder="{{ with $cfg.tg.search }}{{ .placeholder }}{{ end }}"
+  data-tg-search-limit="{{ with $cfg.tg.search }}{{ .limit | default 20 }}{{ end }}"
+  data-tg-rss-enable="{{ with $cfg.tg.rss }}{{ if .enable }}true{{ else }}false{{ end }}{{ end }}"
+  data-tg-vote-enable="{{ with $cfg.tg.vote }}{{ if .enable }}true{{ else }}false{{ end }}{{ end }}"
+  data-tg-vote-api="{{ with $cfg.tg.vote }}{{ .api }}{{ end }}"
+  data-tg-limit="{{ with $cfg.tg }}{{ .limit | default 0 }}{{ end }}"
   data-ext-github="{{ cond $cfg.extensions.github true false }}"
   data-ext-website="{{ cond $cfg.extensions.website true false }}"
   data-ext-music="{{ cond $cfg.extensions.music true false }}"
@@ -23,6 +34,19 @@
   data-marked="{{ $cfg.marked | default site.Params.solitude.cdn.marked }}"
   data-dompurify="{{ $cfg.dompurify | default site.Params.solitude.cdn.dompurify }}">
   {{ with .Params.description }}<p class="shuoshuo-desc">{{ . }}</p>{{ end }}
+
+  {{ if eq $source "tg" }}
+    <div class="shuoshuo-tg-tools" id="shuoshuo-tg-tools" hidden>
+      <form class="shuoshuo-tg-search" id="shuoshuo-tg-search" role="search">
+        <input id="shuoshuo-tg-query" type="search" autocomplete="off" placeholder="搜索 Telegram 说说" aria-label="搜索 Telegram 说说">
+        <button type="submit">搜索</button>
+        <button type="button" id="shuoshuo-tg-clear" hidden>清除</button>
+      </form>
+      <a class="shuoshuo-tg-rss" id="shuoshuo-tg-rss" target="_blank" rel="noopener noreferrer" hidden>
+        <i class="solitude fas fa-rss" aria-hidden="true"></i><span>订阅 RSS</span>
+      </a>
+    </div>
+  {{ end }}
 
   {{ if $cfg.tags.enable }}
     <div class="shuoshuo-tags" id="shuoshuo-tags" hidden></div>
