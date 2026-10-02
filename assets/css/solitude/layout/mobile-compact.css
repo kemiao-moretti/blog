@@ -107,6 +107,12 @@
     padding: 0;
     color: var(--paper-ink);
     border-radius: var(--paper-radius-small);
+    box-sizing: border-box;
+  }
+
+  #nav #toggle-menu > a {
+    position: relative;
+    top: -2px;
   }
 
   #nav #nav-right .nav-button > a i,
