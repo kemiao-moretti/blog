@@ -4,7 +4,7 @@
     <div class="back-menu-list">
       {{ range $items }}
         <a class="back-menu-item" href="{{ .url | relURL }}">
-          {{ with .icon }}<img class="nolazyload back-menu-item-icon" src="{{ . | relURL }}" alt="">{{ end }}
+          {{ with .icon }}<img class="nolazyload back-menu-item-icon" src="{{ . }}" data-fallback="{{ "img/avatar.webp" | relURL }}" alt="" onerror="this.onerror=null;this.src=this.dataset.fallback;">{{ end }}
           <span class="back-menu-item-text">{{ .name }}</span>
         </a>
       {{ end }}

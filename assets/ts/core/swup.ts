@@ -48,7 +48,6 @@ const initSwup = () => {
     // swup 只替换 body 内元素，必须由 head-plugin 覆盖，否则 Solitude.page/config 不会更新）
     plugins: [
       ...(HeadPluginCtor ? [new HeadPluginCtor({ persistAssets: true })] : []),
-      ...((window as any).SwupPreloadPlugin ? [new (window as any).SwupPreloadPlugin()] : []),
     ],
   });
 

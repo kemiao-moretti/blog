@@ -2,7 +2,6 @@
 {{ $pageType := lower (or .Params.type .Layout) }}
 <script src="{{ $cfg.cdn.swup }}"></script>
 <script src="{{ $cfg.cdn.swup_head_plugin }}"></script>
-<script src="{{ $cfg.cdn.swup_preload_plugin }}"></script>
 <script defer src="{{ "js/third_party/waterfall.min.js" | relURL }}"></script>
 {{ if $cfg.lazyload.enable }}<script src="{{ $cfg.cdn.lazyload }}"></script>{{ end }}
 <script defer src="{{ $cfg.cdn.snackbar }}"></script>
