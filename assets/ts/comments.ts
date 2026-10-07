@@ -1075,6 +1075,9 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     });
   }
   if (enabled.includes("artalk") && document.getElementById("artalk-wrap")) {
+    const mount = document.getElementById("artalk-wrap") as HTMLElement;
+    if (mount.dataset.solitudeInitialized === "true") return;
+    mount.dataset.solitudeInitialized = "true";
     if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css);
     applyArtalkDarkMode();
     await Solitude.loadScript(cdn.artalk);
@@ -1094,6 +1097,8 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
 
 const initializeComments = () => {
   const enabled = providers();
+  // Swup 会重复触发生命周期事件；每次只初始化当前页面真实存在且尚未挂载的评论容器。
+  if (!document.querySelector("#post-comment, #vcomment, #artalk-wrap, #twikoo, #waline-wrap")) return;
   if (!enabled.length) return;
   if (activeProvider() === "artalk") {
     void initializeArtalkCounters().catch(() => undefined);
