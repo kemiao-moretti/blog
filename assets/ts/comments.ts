@@ -1129,3 +1129,7 @@ const initializeComments = () => {
 
 document.addEventListener("solitude:ready", initializeComments);
 document.addEventListener("solitude:afterNavigate", initializeComments);
+
+if (document.documentElement.dataset.solitudeRuntime === "ready") {
+  queueMicrotask(initializeComments);
+}

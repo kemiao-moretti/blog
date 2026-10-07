@@ -974,8 +974,12 @@ const isTgImage = (media: TgMedia) => {
   return false;
 };
 
-const tgMediaUrl = (media: TgMedia) =>
-  media.originalUrl || media.thumbnailUrl || "";
+const tgMediaUrl = (config: PageConfig, media: TgMedia) => {
+  const raw = media.originalUrl || media.thumbnailUrl || "";
+  if (!raw) return "";
+  if (/^(https?:)?\/\//i.test(raw) || /^(data|blob):/i.test(raw)) return raw;
+  return `${config.api}${raw.startsWith("/") ? "" : "/"}${raw}`;
+};
 
 const formatFileSizeTg = (size?: string | null) => formatBytes(size || "");
 
@@ -1094,7 +1098,7 @@ const buildTgCard = async (config: PageConfig, item: TgMessage) => {
   }
 
   const media = (item.media || []).filter(Boolean);
-  const images = media.filter(isTgImage).map(tgMediaUrl).filter(Boolean);
+  const images = media.filter(isTgImage).map((m) => tgMediaUrl(config, m)).filter(Boolean);
   const inlineImages = collectCardImages(config, body);
   const gallery = buildSmartGallery([...inlineImages, ...images]);
   if (gallery) card.append(gallery);
@@ -1106,7 +1110,7 @@ const buildTgCard = async (config: PageConfig, item: TgMessage) => {
     wrap.className = "shuoshuo-ext-wrap";
     wrap.innerHTML = nonImages
       .map((m) => {
-        const url = tgMediaUrl(m);
+        const url = tgMediaUrl(config, m);
         const name = m.fileName || m.kind || "附件";
         const inner = `<i class="solitude fas fa-paperclip" aria-hidden="true"></i>
           <span class="ext-file-name">${escapeHtml(name)}</span>
