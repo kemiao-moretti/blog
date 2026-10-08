@@ -1091,42 +1091,55 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     });
     await Promise.resolve(artalkInit).catch(() => undefined);
     watchArtalkDarkMode();
-    void initializeArtalkEffects().catch(() => undefined);
   }
 };
 
 const initializeComments = () => {
   const enabled = providers();
-  // Swup 会重复触发生命周期事件；每次只初始化当前页面真实存在且尚未挂载的评论容器。
-  if (!document.querySelector("#post-comment, #vcomment, #artalk-wrap, #twikoo, #waline-wrap")) return;
   if (!enabled.length) return;
-  if (activeProvider() === "artalk") {
+  const hasCommentBox = Boolean(
+    document.querySelector(
+      "#post-comment, #vcomment, #artalk-wrap, #twikoo, #waline-wrap"
+    )
+  );
+  const provider = activeProvider();
+
+  // 聚合功能：访问任意页面都加载（最新评论 / 评论总数 / 文章卡参与者 / Artalk 计数与弹幕）。
+  // 各函数内部自带容器存在检查，无目标 DOM 时直接返回；数据请求有模块级 Promise + localStorage
+  // 双重缓存，swup 切页重复触发不会重复拉取。
+  if (provider === "artalk") {
     void initializeArtalkCounters().catch(() => undefined);
     void renderPostCardParticipants();
     void renderAggregateSurfaces();
     void renderAggregateCount();
+    void initializeArtalkEffects().catch(() => undefined);
+  } else if (provider === "valine") {
+    void renderPostCardParticipants();
+    void renderAggregateSurfaces();
+    void renderAggregateCount();
+  } else if (enabled.includes("valine") && !valineReady()) {
+    // valine 配置缺失：对全局聚合容器与评论区统一显示错误，而不是永远转圈
+    document
+      .querySelectorAll(
+        "#vcomment, .recent-comments-list, .card-recent-comment .aside-list, .console_recentcomments"
+      )
+      .forEach((container) => {
+        setStatus(
+          container,
+          commentText("error", "Unable to load comments"),
+          "error"
+        );
+        if (container.matches(".card-recent-comment .aside-list")) {
+          container.setAttribute("aria-busy", "false");
+        }
+      });
   }
+
+  // 评论区挂载：仅当页面存在评论区容器（文章页 / 独立页面）
+  if (!hasCommentBox) return;
   if (enabled.includes("valine")) {
     if (valineReady()) {
-      void renderPostCardParticipants();
-      void renderAggregateSurfaces();
-      void renderAggregateCount();
       initializeValine();
-    } else {
-      document
-        .querySelectorAll(
-          "#vcomment, .recent-comments-list, .card-recent-comment .aside-list, .console_recentcomments"
-        )
-        .forEach((container) => {
-          setStatus(
-            container,
-            commentText("error", "Unable to load comments"),
-            "error"
-          );
-          if (container.matches(".card-recent-comment .aside-list")) {
-            container.setAttribute("aria-busy", "false");
-          }
-        });
     }
   }
   void initializeOtherProviders(enabled).catch(() => undefined);
