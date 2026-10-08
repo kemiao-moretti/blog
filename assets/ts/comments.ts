@@ -1067,7 +1067,7 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     });
   }
   if (enabled.includes("waline") && document.getElementById("waline-wrap")) {
-    if (cdn.waline_css) await Solitude.loadStyle(cdn.waline_css);
+    if (cdn.waline_css) await Solitude.loadStyle(cdn.waline_css).catch(() => undefined);
     await Solitude.loadScript(cdn.waline);
     (window as any).Waline?.init?.({
       el: "#waline-wrap",
@@ -1078,7 +1078,7 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     const mount = document.getElementById("artalk-wrap") as HTMLElement;
     if (mount.dataset.solitudeInitialized === "true") return;
     mount.dataset.solitudeInitialized = "true";
-    if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css);
+    if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css).catch(() => undefined);
     applyArtalkDarkMode();
     await Solitude.loadScript(cdn.artalk);
     const config = artalkConfig();
