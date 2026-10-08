@@ -9,7 +9,7 @@
 {{ range site.Pages }}
   {{ $special := lower (or .Params.type .Layout) }}
   {{ $regularMount := and .IsPage (not (in (slice "tags" "categories") $special)) }}
-  {{ $sectionMount := and (eq .Kind "section") (in (slice "message" "kit") $special) }}
+  {{ $sectionMount := and (eq .Kind "section") (in (slice "message" "kit" "shuoshuo") $special) }}
   {{ if and (ne .Params.comment false) (or $regularMount $sectionMount) }}
     {{ $commentRoutes = merge $commentRoutes (dict .RelPermalink (.LinkTitle | default .Title)) }}
   {{ end }}
