@@ -1011,43 +1011,56 @@ const submitTgVote = async (config: PageConfig, id: string, value: "up" | "down"
   writeTgVote(id, value);
 };
 
-const buildTgVote = async (config: PageConfig, id: string) => {
-  if (!config.tgVoteEnable || !config.tgVoteApi) return null;
+const buildTgVoteSkeleton = (id: string) => {
   const wrap = document.createElement("div");
   wrap.className = "shuoshuo-vote";
   wrap.dataset.voteId = id;
-  wrap.innerHTML = `<button type="button" class="shuoshuo-vote-button shuoshuo-vote-up"><i class="solitude fas fa-thumbs-up" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>
-    <button type="button" class="shuoshuo-vote-button shuoshuo-vote-down"><i class="solitude fas fa-thumbs-down" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>`;
-  try {
-    const counts = await loadTgVote(config, id);
-    const buttons = wrap.querySelectorAll<HTMLButtonElement>(".shuoshuo-vote-button");
-    const up = buttons[0];
-    const down = buttons[1];
-    if (up) up.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.up);
-    if (down) down.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.down);
-    const voted = readTgVotes()[id];
-    if (voted) wrap.querySelector(`.shuoshuo-vote-${voted}`)?.classList.add("is-voted");
-    wrap.addEventListener("click", async (event) => {
-      const button = (event.target as HTMLElement).closest<HTMLButtonElement>(".shuoshuo-vote-button");
-      if (!button || button.disabled) return;
-      const value = button.classList.contains("shuoshuo-vote-up") ? "up" : "down";
-      button.disabled = true;
-      try {
-        await submitTgVote(config, id, value);
-        const count = button.querySelector(".shuoshuo-vote-count");
-        if (count) count.textContent = String(Number(count.textContent) + 1);
-        wrap.querySelectorAll(".shuoshuo-vote-button").forEach((node) => node.classList.remove("is-voted"));
-        button.classList.add("is-voted");
-      } catch {
-        Solitude.snackbarShow?.("投票失败，请稍后重试", false, 2000);
-      } finally {
-        button.disabled = false;
-      }
-    });
-  } catch {
-    wrap.hidden = true;
-  }
+  wrap.innerHTML = `<button type="button" class="shuoshuo-vote-button shuoshuo-vote-up" disabled><i class="solitude fas fa-thumbs-up" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>
+    <button type="button" class="shuoshuo-vote-button shuoshuo-vote-down" disabled><i class="solitude fas fa-thumbs-down" aria-hidden="true"></i><span class="shuoshuo-vote-count">0</span></button>`;
   return wrap;
+};
+
+const bindTgVoteClick = (wrap: HTMLElement, config: PageConfig, id: string) => {
+  wrap.addEventListener("click", async (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(".shuoshuo-vote-button");
+    if (!button || button.disabled) return;
+    const value = button.classList.contains("shuoshuo-vote-up") ? "up" : "down";
+    button.disabled = true;
+    try {
+      await submitTgVote(config, id, value);
+      const count = button.querySelector(".shuoshuo-vote-count");
+      if (count) count.textContent = String(Number(count.textContent) + 1);
+      wrap.querySelectorAll(".shuoshuo-vote-button").forEach((node) => node.classList.remove("is-voted"));
+      button.classList.add("is-voted");
+    } catch {
+      Solitude.snackbarShow?.("投票失败，请稍后重试", false, 2000);
+    } finally {
+      button.disabled = false;
+    }
+  });
+};
+
+const fillTgVotes = (config: PageConfig, container: HTMLElement) => {
+  const wraps = [...container.querySelectorAll<HTMLElement>(".shuoshuo-vote")];
+  void Promise.allSettled(wraps.map(async (wrap) => {
+    if (wrap.dataset.voteBound === "true") return;
+    wrap.dataset.voteBound = "true";
+    const id = wrap.dataset.voteId || "";
+    if (!id) return;
+    try {
+      const counts = await loadTgVote(config, id);
+      const buttons = wrap.querySelectorAll<HTMLButtonElement>(".shuoshuo-vote-button");
+      const up = buttons[0];
+      const down = buttons[1];
+      if (up) { up.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.up); up.disabled = false; }
+      if (down) { down.querySelector(".shuoshuo-vote-count")!.textContent = String(counts.down); down.disabled = false; }
+      const voted = readTgVotes()[id];
+      if (voted) wrap.querySelector(`.shuoshuo-vote-${voted}`)?.classList.add("is-voted");
+      bindTgVoteClick(wrap, config, id);
+    } catch {
+      wrap.hidden = true;
+    }
+  }));
 };
 
 // 评论页「引用」等动作按钮与 memos/ech0 保持一致的交互语义
@@ -1149,8 +1162,10 @@ const buildTgCard = async (config: PageConfig, item: TgMessage) => {
   quote.innerHTML = `<i class="solitude fas fa-comment-dots" aria-hidden="true"></i><span>引用</span>`;
   actions.append(quote);
 
-  const vote = await buildTgVote(config, `tg:${item.id}`);
-  if (vote) actions.append(vote);
+  // vote 后置：骨架同步挂载，计数由 fillTgVotes 并发回填，不阻塞卡片渲染
+  if (config.tgVoteEnable && config.tgVoteApi) {
+    actions.append(buildTgVoteSkeleton(`tg:${item.id}`));
+  }
 
   footer.append(actions);
   card.append(footer);
@@ -1185,6 +1200,21 @@ const initShuoshuo = async () => {
     if (!tgPromise) tgPromise = fetchTgAll(config);
     return tgPromise;
   };
+  let ech0Promise: Promise<{ items: EchoItem[]; total: number }> | null = null;
+  const loadEch0 = (page: number, tagId: string) => {
+    if (page === 1 && !tagId) {
+      if (!ech0Promise) ech0Promise = fetchPage(config, 1, "");
+      return ech0Promise;
+    }
+    return fetchPage(config, page, tagId);
+  };
+
+  // 预热：数据与 CDN 库立即并发加载（render/loadTags/搜索复用同一 Promise，.catch 防 unhandled rejection）
+  if (config.source === "tg") void loadTg();
+  if (config.source === "memos") void loadMemos();
+  if (config.source === "ech0") void loadEch0(1, "").catch(() => {});
+  if (config.markedUrl) void loadRemote(config.markedUrl, "marked").catch(() => {});
+  if (config.dompurifyUrl) void loadRemote(config.dompurifyUrl, "DOMPurify").catch(() => {});
 
   const setStatus = (message: string, state: string) => {
     if (!loading) return;
@@ -1375,9 +1405,8 @@ const initShuoshuo = async () => {
           return;
         }
         if (loading) loading.hidden = true;
-        for (const item of slice) {
-          fragment.append(await buildMemosCard(config, item));
-        }
+        const cards = await Promise.all(slice.map((item) => buildMemosCard(config, item)));
+        cards.forEach((card) => fragment.append(card));
       } else if (config.source === "tg") {
         // tg：全量拉取 + 按 hashtag 本地过滤 + 数字分页（与 memos 一致）
         const all = await loadTg();
@@ -1395,26 +1424,25 @@ const initShuoshuo = async () => {
           return;
         }
         if (loading) loading.hidden = true;
-        for (const item of slice) {
-          fragment.append(await buildTgCard(config, item));
-        }
+        const cards = await Promise.all(slice.map((item) => buildTgCard(config, item)));
+        cards.forEach((card) => fragment.append(card));
       } else {
-        const data = await fetchPage(config, page, activeTagId);
+        const data = await loadEch0(page, activeTagId);
         if (!data.items.length) {
           setStatus('<span>还没有说说</span>', "empty");
           if (pagination) pagination.hidden = true;
           return;
         }
         if (loading) loading.hidden = true;
-        for (const item of data.items) {
-          fragment.append(await buildCard(config, item));
-        }
+        const cards = await Promise.all(data.items.map((item) => buildCard(config, item)));
+        cards.forEach((card) => fragment.append(card));
         total = data.total;
       }
       list.replaceChildren(fragment);
       bindActions();
       applyGallery();
       buildPagination(total);
+      fillTgVotes(config, list);
       window.lazyLoadInstance?.update?.();
     } catch (error) {
       console.error("[shuoshuo]", error);
@@ -1450,10 +1478,12 @@ const initShuoshuo = async () => {
           } else {
             if (loading) loading.hidden = true;
             const fragment = document.createDocumentFragment();
-            for (const item of results) fragment.append(await buildTgCard(config, item));
+            const cards = await Promise.all(results.map((item) => buildTgCard(config, item)));
+            cards.forEach((card) => fragment.append(card));
             list.replaceChildren(fragment);
             bindActions();
             applyGallery();
+            fillTgVotes(config, list);
           }
           clear.hidden = false;
           if (pagination) pagination.hidden = true;
