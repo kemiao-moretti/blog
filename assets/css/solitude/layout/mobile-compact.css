@@ -110,11 +110,6 @@
     box-sizing: border-box;
   }
 
-  #nav #toggle-menu > a {
-    position: relative;
-    top: -2px;
-  }
-
   #nav #nav-right .nav-button > a i,
   #nav #toggle-menu > a i,
   #nav #mobile-nav-group-toggle i {
@@ -196,7 +191,6 @@
     align-items: center;
     justify-content: center;
     line-height: 1;
-    transform: translateY(-1px);
   }
 
   #console .console-content {

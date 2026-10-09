@@ -32,6 +32,31 @@ const closePersistentOverlays = () => {
   document.documentElement.classList.remove("search-open");
 };
 
+/** 切页后新 header 落地时立即同步导航状态（nav-at-top/nav-fixed），
+ * 避免移动端「回到顶部」按钮在 scrollFn 重新注册前的空窗期闪现占位。
+ * 与 main.ts scrollFn 的 updateHeaderAndRightside 等价，此处只负责 class。 */
+const syncNavHeaderState = () => {
+  const $header = document.getElementById("page-header");
+  if (!$header) return;
+  const $rightside = document.getElementById("rightside");
+  const currentTop = window.scrollY || document.documentElement.scrollTop;
+  const isAtTop = currentTop <= 0;
+  $header.classList.toggle("nav-at-top", isAtTop);
+  if (isAtTop) {
+    $header.classList.remove("nav-fixed", "nav-visible");
+    if ($rightside) {
+      $rightside.style.opacity = "";
+      $rightside.style.transform = "";
+    }
+  } else {
+    $header.classList.add("nav-fixed", "nav-visible");
+    if ($rightside) {
+      $rightside.style.opacity = "1";
+      $rightside.style.transform = "translateX(-58px)";
+    }
+  }
+};
+
 const initSwup = () => {
   const SwupCtor = (window as any).Swup;
   if (!SwupCtor || Solitude.swup) return;
@@ -70,6 +95,12 @@ const initSwup = () => {
     if (window.globalFn) (window.globalFn as any).pjax = {};
   });
 
+  // 新内容 DOM 落地即同步导航态：header 刚被替换时 scrollFn 尚未重注册，
+  // 若不在此处立即把 nav-at-top 加回，移动端「回到顶部」会闪现占位（issue 1）。
+  swup.hooks.on("content:replace", () => {
+    syncNavHeaderState();
+  });
+
   // 内容已替换并可见：初始化新页（对应旧 pjax:complete）
   swup.hooks.on("page:view", async () => {
     try {
@@ -77,6 +108,7 @@ const initSwup = () => {
     } catch (error) {
       console.debug("Solitude page refresh kept the new page despite an optional module failure.", error);
     }
+    syncNavHeaderState();
     rerunPjaxScripts();
     if (Solitude.config.lazyload.enable) window.lazyLoadInstance?.update?.();
     document.dispatchEvent(new Event("resize", { bubbles: true }));
