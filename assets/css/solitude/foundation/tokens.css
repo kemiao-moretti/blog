@@ -117,7 +117,7 @@
   --efu-card-bg-op: var(--efu-white-op);
   --efu-card-bg-none: rgba(29,27,38,0);
   --efu-shadow-lightblack: 0 5px 12px -5px rgba(102,68,68,0);
-  --efu-shadow-light2black: 0 5px 12px -5px rgba(102,68,68,0);
+  --efu-shadow-light2black: var(--efu-shadow-lightblack);
   --efu-card-border: #3d3d3f;
   --efu-shadow-border: 0 8px 16px -4px rgba(0,0,0,0.314);
   --efu-shadow-glass: 0 5px 100px -5px rgba(0,0,0,0.55);
@@ -168,7 +168,7 @@
   --efu-card-bg-op: var(--efu-black-op);
   --efu-card-bg-none: rgba(255,255,255,0);
   --efu-shadow-lightblack: 0 5px 12px -5px rgba(102,68,68,0);
-  --efu-shadow-light2black: 0 5px 12px -5px rgba(102,68,68,0);
+  --efu-shadow-light2black: var(--efu-shadow-lightblack);
   --efu-card-border: #e3e8f7;
   --efu-shadow-border: 0 8px 16px -4px rgba(44,45,48,0.047);
   --efu-shadow-glass: 0 5px 100px -5px rgba(140,140,140,0.55);

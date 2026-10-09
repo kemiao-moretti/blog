@@ -567,7 +567,6 @@ body[data-type=links] .article-container .site-card-group .site-card:focus-withi
   transform: scale(1);
   filter: brightness(0.3);
   border-radius: 12px;
-  background: var(--efu-lighttext);
   background: var(--efu-main);
 }
 

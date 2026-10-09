@@ -1100,9 +1100,6 @@ body.reward-dialog-lock { overflow: hidden; }
   #about-page .about-profile-list { margin-top: 1rem; }
   #about-page .about-profile-list div { padding: .58rem .65rem; }
   #about-page .about-profile-list dd { font-size: .76rem; }
-}
-
-@media (max-width: 768px) {
   #about-page .about-row--author-box { gap: 0; padding: 4px 0 20px; }
   #about-page .about-row--author-box .author-box-avatar { width: 112px !important; }
   #about-page .author-box-side { display: none; }

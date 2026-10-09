@@ -874,16 +874,6 @@
   transform-origin: center center;
 }
 
-#nav-totop #percent {
-  font-size: 12px;
-  border-radius: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: 0.3s;
-  white-space: nowrap;
-}
-
 .nav-fixed #nav-totop #percent,
 .page #nav-totop #percent {
   font-size: 12px;

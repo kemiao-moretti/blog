@@ -587,7 +587,6 @@
 
 #category #category-bar {
   padding: 0.4rem 0.6rem;
-  border: none;
   height: auto;
   border: var(--style-border);
   box-shadow: none;

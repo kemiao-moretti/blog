@@ -54,8 +54,8 @@ body[data-type="music"] .page .layout#content-inner {
   height: 200%;
   content: "";
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(200px);
-  -webkit-backdrop-filter: blur(200px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   transform: translateZ(0);
 }
 

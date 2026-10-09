@@ -21,16 +21,13 @@
   }
 }
 
-.layout.hide-aside > div:first-child {
+.layout.hide-aside > div:first-child,
+.hide-aside .layout > div:first-child {
   width: 100%;
 }
 
 .layout > div:first-child {
   width: calc(100% - 300px);
-}
-
-.hide-aside .layout > div:first-child {
-  width: 100%;
 }
 
 @media screen and (max-width: 1200px) {

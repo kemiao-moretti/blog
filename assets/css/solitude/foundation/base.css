@@ -189,10 +189,6 @@ input {
   overflow: visible;
 }
 
-input::placeholder {
-  color: var(--efu-gray);
-}
-
 button,
 select {
   text-transform: none;
