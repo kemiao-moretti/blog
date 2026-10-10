@@ -21,7 +21,7 @@
 {{ if and $cfg.typeit ($.Scratch.Get "need_typeit") }}<script defer src="{{ $cfg.cdn.typeit }}"></script>{{ end }}
 {{ if eq $cfg.lightbox "fancybox" }}<script defer src="{{ $cfg.cdn.fancyapps_js }}"></script>{{ end }}
 {{ if and $cfg.search.enable (eq $cfg.search.type "algolia") }}<script src="{{ $cfg.cdn.algoliasearch }}"></script><script src="{{ $cfg.cdn.instantsearch }}"></script>{{ end }}
-{{ if or $cfg.capsule.enable $cfg.music.enable }}<script>window.meting_api={{ $cfg.meting_api | jsonify | safeJS }};</script><script defer src="{{ $cfg.cdn.aplayer_js }}"></script><script defer src="{{ $cfg.cdn.meting_js }}"></script>{{ end }}
+{{ if or $cfg.capsule.enable $cfg.music.enable }}<script>window.meting_api = "{{ $cfg.meting_api | safeJS }}";</script><script defer src="{{ $cfg.cdn.aplayer_js }}"></script><script defer src="{{ $cfg.cdn.meting_js }}"></script>{{ end }}
 {{/* ColorThief **不按页门控**：虽然只有 3 个有封面的文章页用它取封面主色，
      但 main.ts:1053 在 APlayer 的 loadeddata 事件里还会走音乐路径 coverColor(true)（从专辑封面取色），
      而 capsule.enable 是全局开启、播放器 dock 每页都在 → 一旦该页没有 ColorThief，
