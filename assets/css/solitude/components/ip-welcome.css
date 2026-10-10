@@ -78,6 +78,32 @@
   text-align: left;
 }
 
+/* ---------- 未获 Cookie 同意：只显示站内兜底文案 + 就地改选入口，不发任何外部请求 ---------- */
+.ip-welcome-tip-text--consent {
+  border-left-color: var(--efu-secondtext);
+  color: var(--efu-secondtext);
+  font-size: 0.72rem;
+}
+
+.ip-welcome-consent-action {
+  margin-top: 6px;
+  padding: 0;
+  color: var(--efu-theme);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.ip-welcome-consent-action:hover,
+.ip-welcome-consent-action:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
 /* ---------- 加载态：呼吸动画 ---------- */
 .ip-welcome-content[aria-busy="true"] .ip-welcome-greet {
   opacity: 0.7;

@@ -5,6 +5,9 @@
   role="dialog"
   aria-labelledby="cookie-consent-title"
   aria-describedby="cookie-consent-description"
+  data-label-current="{{ i18n "cookieConsentCurrent" }}"
+  data-label-accepted="{{ i18n "cookieConsentAccept" }}"
+  data-label-rejected="{{ i18n "cookieConsentReject" }}"
   hidden
 >
   <div class="cookie-consent__mark" aria-hidden="true">
@@ -16,6 +19,8 @@
       {{ i18n "cookieConsentDescription" }}
       <a class="cookie-consent__link" href="{{ $privacy }}" data-no-pjax>{{ i18n "cookieConsentPrivacy" }}</a>
     </p>
+    {{- /* 重开弹窗时回显上次选择；首次展示（尚未选择）时保持隐藏。 */ -}}
+    <p class="cookie-consent__current" data-consent-current hidden></p>
   </div>
   <div class="cookie-consent__actions">
     <button id="cookie-consent-reject" class="cookie-consent__button cookie-consent__button--secondary" type="button">

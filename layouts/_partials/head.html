@@ -39,3 +39,4 @@
 {{ partial "config.html" . }}
 {{ range $cfg.verify_site }}{{ . | safeHTML }}{{ end }}
 {{ range $cfg.extends.head }}{{ . | safeHTML }}{{ end }}
+{{ partial "consent-bootstrap.html" . }}

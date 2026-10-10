@@ -100,3 +100,15 @@
   .privacy-section__heading h2 { font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) { .privacy-nav a, .privacy-contact-card { transition: none; } }
+
+/* 07 你的选择：Cookie 选择面板（回显当前状态 + 重开弹窗改选）。 */
+.privacy-consent-panel { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; padding: 14px; border: 1px solid var(--privacy-border); background: var(--efu-secondbg); }
+.privacy-consent-panel__body { display: flex; flex: 1 1 240px; align-items: center; gap: 12px; min-width: 0; }
+.privacy-consent-panel__body > i { flex: none; color: var(--privacy-accent); font-size: 18px; }
+.privacy-consent-panel__body strong { display: block; color: var(--privacy-ink); font-size: 14px; }
+.privacy-consent-panel__body p { margin: 3px 0 0; color: var(--privacy-muted); font-size: 12px; }
+.privacy-consent-panel__button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; color: var(--privacy-ink); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--privacy-surface); border: 1px solid var(--privacy-accent); transition: color var(--efu-motion-fast, .2s ease), background-color var(--efu-motion-fast, .2s ease), transform var(--efu-motion-fast, .2s ease); }
+.privacy-consent-panel__button:hover, .privacy-consent-panel__button:focus-visible { color: var(--privacy-accent); background: var(--privacy-accent-soft); transform: translateY(-1px); }
+.privacy-consent-panel__button i { color: var(--privacy-accent); }
+@media screen and (max-width: 700px) { .privacy-consent-panel__button { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .privacy-consent-panel__button { transition: none; } }

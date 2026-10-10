@@ -80,9 +80,10 @@
           <table>
             <thead><tr><th>类别</th><th>用途</th><th>是否必要</th></tr></thead>
             <tbody>
-              <tr><td><strong>同意状态</strong></td><td><code>solitude_cookie_consent</code> 保存你选择“接受全部”或“拒绝非必要”的结果，保存期限为一年。</td><td>必要</td></tr>
-              <tr><td><strong>主题偏好</strong></td><td>记住明暗模式等界面设置，避免每次访问重新调整。</td><td>功能需要</td></tr>
-              <tr><td><strong>统计状态</strong></td><td>Umami 可能使用其自身机制记录匿名访问统计，具体以 Umami 服务端实现为准。</td><td>非必要</td></tr>
+              <tr><td><strong>同意状态</strong></td><td><code>solitude_cookie_consent</code> 保存你选择“接受全部”或“拒绝非必要”的结果，保存期限为一年。这是本站唯一写入的 Cookie。</td><td>必要</td></tr>
+              <tr><td><strong>界面偏好</strong></td><td>浏览器本地存储，例如 <code>theme</code>（明暗模式）、<code>keyboard</code>（快捷键开关）、<code>aside-status</code>、<code>translate-chn-cht</code>、<code>meowloge:read-posts</code>（文章已读标记），只用于记住你的界面设置，不会发送给第三方。</td><td>功能需要</td></tr>
+              <tr><td><strong>统计状态</strong></td><td>Umami 的访问记录（<code>umami</code> 开头的本地存储与 Cookie）。只有在你选择“接受全部”后统计脚本才会加载；选择“拒绝非必要”时脚本不会被创建，已存在的记录也会在本地被清除。</td><td>非必要</td></tr>
+              <tr><td><strong>访客定位缓存</strong></td><td><code>meowloge-ip-welcome-v1</code> 保存侧栏欢迎卡片用到的访客大致位置，默认缓存 24 小时。同样只有在“接受全部”后才会发起请求并写入。</td><td>非必要</td></tr>
             </tbody>
           </table>
         </div>
@@ -99,9 +100,9 @@
           <dl class="privacy-definition-list">
             <div><dt>统计服务地址</dt><dd><a href="{{ $umamiEndpoint }}" target="_blank" rel="noopener noreferrer">{{ $umamiEndpoint }}</a></dd></div>
             <div><dt>网站标识</dt><dd><code>{{ $umamiWebsiteID }}</code></dd></div>
-            <div><dt>脚本加载方式</dt><dd>站点页面通过 `defer` 加载 Umami 脚本，不阻塞页面主体渲染。</dd></div>
+            <div><dt>脚本加载方式</dt><dd>按你的 Cookie 选择加载：选择“接受全部”后统计脚本才会被创建并加载（异步，不阻塞页面渲染）；选择“拒绝非必要”则脚本节点根本不会被创建，也就不会发出任何统计请求。</dd></div>
           </dl>
-          <p>Umami 统计不是本站 Cookie 同意记录本身。你可以拒绝非必要 Cookie，并通过浏览器的内容拦截、Do Not Track 或脚本控制功能进一步限制统计请求。统计服务端对请求信息的保存和处理以其实际配置及适用政策为准。</p>
+          <p>你的选择会被本站严格执行，而不是只记录在 Cookie 里：在 Cookie 弹窗中选择“拒绝非必要”后，页面不会创建 Umami 脚本、不会发出统计请求，并会清除本机已存在的统计记录。你也可以通过浏览器的内容拦截、Do Not Track 或脚本控制功能进一步限制统计。统计服务端对请求信息的保存和处理以其实际配置及适用政策为准。</p>
         {{ else }}
           <p>本站当前没有启用 Umami 或其他站点统计脚本。</p>
         {{ end }}
@@ -113,6 +114,7 @@
         <ul class="privacy-bullet-list">
           <li><strong>资源 CDN：</strong>用于加载字体图标、前端库、代码高亮或页面功能脚本。</li>
           <li><strong>媒体平台：</strong>当你主动播放嵌入的音频、视频或查看外部图片时，对应平台可能处理播放或访问数据。</li>
+          <li><strong>访客定位：</strong>侧栏欢迎卡片会请求第三方 IP 查询接口（如 <code>60s-api</code>、<code>ipapi.co</code>）来推测你所在的大致城市。该请求只在你选择“接受全部”后才会发出，选择“拒绝非必要”时不会请求任何定位接口。</li>
           <li><strong>评论服务：</strong>{{ $commentLabel }}{{ if eq $commentProvider "artalk" }}，当前服务地址为 <a href="{{ $cfg.artalk.server }}" target="_blank" rel="noopener noreferrer">{{ $cfg.artalk.server }}</a>。{{ end }}</li>
         </ul>
         <p>第三方服务有独立的隐私政策和数据处理规则。本站无法控制其服务端的保存期限和处理范围，建议你在使用对应功能前查看相关说明。</p>
@@ -133,11 +135,30 @@
       <section id="privacy-rights" class="privacy-section">
         <div class="privacy-section__heading"><span>07</span><h2>你的选择与权利</h2></div>
         <ul class="privacy-bullet-list">
-          <li>你可以在 Cookie 弹窗中接受全部或拒绝非必要 Cookie。</li>
+          <li>你可以在 Cookie 弹窗中接受全部或拒绝非必要 Cookie，也可以随时用下面的按钮改选。</li>
+          <li>选择“拒绝非必要”后，统计脚本与访客定位请求都不会发出，本机已有的相关记录也会被清除。</li>
           <li>你可以通过浏览器设置清除 Cookie、本地存储和缓存。</li>
           <li>你可以使用内容拦截或浏览器隐私功能限制统计脚本和第三方资源。</li>
           <li>如果你曾主动提交信息，可以联系站长询问、更正或请求删除相关内容。</li>
         </ul>
+        <div
+          class="privacy-consent-panel"
+          data-consent-panel
+          data-label-none="{{ i18n "cookieConsentNone" }}"
+          data-label-accepted="{{ i18n "cookieConsentAccept" }}"
+          data-label-rejected="{{ i18n "cookieConsentReject" }}"
+        >
+          <div class="privacy-consent-panel__body">
+            <i class="solitude fas fa-cookie-bite" aria-hidden="true"></i>
+            <div>
+              <strong>{{ i18n "cookieConsentTitle" }}</strong>
+              <p data-consent-state>{{ i18n "cookieConsentNone" }}</p>
+            </div>
+          </div>
+          <button type="button" class="privacy-consent-panel__button" data-consent-reopen>
+            <i class="solitude fas fa-sliders" aria-hidden="true"></i>{{ i18n "cookieConsentReopen" }}
+          </button>
+        </div>
         <div class="privacy-note"><i class="solitude fas fa-circle-info" aria-hidden="true"></i><p>限制第三方资源可能导致评论、统计、音乐或部分页面功能无法使用，但不影响本站核心文章内容的阅读。</p></div>
       </section>
 

@@ -191,13 +191,17 @@ ipWelcomeFrom: {other: 'Welcome, friend from'}
 ipWelcomeFriend: {other: ' '}
 ipWelcomeDistance: {other: "%s km from the author"}
 ipWelcomeUnknownPlace: {other: somewhere far away}
+ipWelcomeConsentBlocked: {other: Visitor location is off per your cookie choice}
 
 # Cookie consent
 cookieConsentTitle: {other: Cookie notice}
-cookieConsentDescription: {other: This site uses essential cookies to save theme preferences and basic feature states. You can accept or reject non-essential cookies.}
+cookieConsentDescription: {other: Essential cookies keep your theme preferences and basic feature states. Non-essential cookies are used only for visit analytics and visitor location. You can accept or reject the non-essential ones.}
 cookieConsentPrivacy: {other: Privacy details}
 cookieConsentReject: {other: Reject non-essential}
 cookieConsentAccept: {other: Accept all}
+cookieConsentCurrent: {other: 'Current choice: '}
+cookieConsentNone: {other: Not chosen yet}
+cookieConsentReopen: {other: Change cookie choice}
 
 # Post reward
 postRewardButton: {other: Tip}

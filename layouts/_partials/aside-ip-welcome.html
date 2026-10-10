@@ -20,6 +20,8 @@
     data-ip-apis="{{ delimit ($cfg.ipApis | default (slice "https://api.ipify.org?format=json" "https://icanhazip.com/")) "," }}"
     data-fallback-api="{{ $cfg.fallbackApi | default "https://ipapi.co/%s/json/" }}"
     data-tips="{{ $cfg.tips | default dict | jsonify }}"
+    data-consent-blocked="{{ i18n "ipWelcomeConsentBlocked" }}"
+    data-consent-reopen-label="{{ i18n "cookieConsentReopen" }}"
     aria-live="polite"
     aria-busy="true"
   >

@@ -191,13 +191,17 @@ ipWelcomeFrom: {other: 歡迎來自}
 ipWelcomeFriend: {other: 的朋友}
 ipWelcomeDistance: {other: 距站長約 %s 公里}
 ipWelcomeUnknownPlace: {other: 遠方}
+ipWelcomeConsentBlocked: {other: 訪客定位已依你的 Cookie 選擇關閉}
 
 # Cookie 同意彈窗
 cookieConsentTitle: {other: Cookie 使用說明}
-cookieConsentDescription: {other: 本站會使用必要的 Cookie 儲存主題偏好和基本功能狀態。你可以選擇接受或拒絕非必要 Cookie。}
+cookieConsentDescription: {other: 本站用必要的 Cookie 儲存主題偏好和基礎功能狀態；非必要 Cookie 只用於訪問統計與訪客定位。你可以選擇接受或拒絕非必要 Cookie。}
 cookieConsentPrivacy: {other: 了解隱私說明}
 cookieConsentReject: {other: 拒絕非必要}
 cookieConsentAccept: {other: 接受全部}
+cookieConsentCurrent: {other: 目前選擇：}
+cookieConsentNone: {other: 尚未選擇}
+cookieConsentReopen: {other: 更改 Cookie 選擇}
 
 # 文末打賞
 postRewardButton: {other: 贊助}

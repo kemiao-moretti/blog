@@ -185,10 +185,14 @@ clockWeek7: {other: Sáb}
 
 # Consentimiento de cookies
 cookieConsentTitle: {other: Aviso de cookies}
-cookieConsentDescription: {other: Este sitio utiliza cookies esenciales para guardar las preferencias del tema y el estado de las funciones básicas. Puedes aceptar o rechazar las cookies no esenciales.}
+cookieConsentDescription: {other: Las cookies esenciales guardan tus preferencias de tema y el estado de funciones básicas; las no esenciales se usan solo para estadísticas de visitas y ubicación del visitante. Puedes aceptar o rechazar las no esenciales.}
 cookieConsentPrivacy: {other: Detalles de privacidad}
 cookieConsentReject: {other: Rechazar no esenciales}
 cookieConsentAccept: {other: Aceptar todas}
+cookieConsentCurrent: {other: 'Elección actual: '}
+cookieConsentNone: {other: Sin elegir todavía}
+cookieConsentReopen: {other: Cambiar elección de cookies}
+ipWelcomeConsentBlocked: {other: La ubicación del visitante está desactivada según tu elección de cookies}
 
 # Apoyo al artículo
 postRewardButton: {other: Apoyar}

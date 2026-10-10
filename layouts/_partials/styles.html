@@ -69,3 +69,19 @@
     {{ end }}
   {{ end }}
 {{ end }}
+{{/* ===== 站点层页级覆盖：沿用同一套页型键，加载 assets/css/custom/pages/<键>.css =====
+     站点覆盖层的规则必须最后生效，所以这一段排在 css/custom.css 之后。
+     文件缺失即整段跳过；站点的 @import 由 css.Build 在构建期内联，
+     因此每个页型最多只多出这一个 <link>，不会变成多请求。 */}}
+{{ with $pageCSS }}
+  {{ with resources.Get (printf "css/custom/pages/%s.css" .) }}
+    {{ $pageOpts := dict "externals" (index $options "externals") "minify" (not hugo.IsDevelopment) "sourceMap" (cond hugo.IsDevelopment "linked" "none") "target" (index $options "target") "vars" (index $options "vars") }}
+    {{ with . | css.Build $pageOpts }}
+      {{ if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ .RelPermalink }}" data-solitude-custom-page="{{ $pageCSS }}">
+      {{ else }}
+        {{ with . | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous" data-solitude-custom-page="{{ $pageCSS }}">{{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}

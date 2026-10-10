@@ -42,6 +42,8 @@
 .cookie-consent__content { min-width: 0; }
 .cookie-consent__title { margin: 0 0 4px; color: var(--cookie-consent-text); font-size: 15px; font-weight: 700; }
 .cookie-consent__description { margin: 0; color: var(--cookie-consent-muted); font-size: 13px; line-height: 1.65; }
+/* 重开弹窗时回显上次选择；首次展示时带 hidden。 */
+.cookie-consent__current { margin: 6px 0 0; color: var(--cookie-consent-accent); font-size: 12px; font-weight: 700; }
 .cookie-consent__link { color: var(--cookie-consent-text); font-weight: 700; text-decoration: underline; text-decoration-color: var(--cookie-consent-accent); text-underline-offset: 3px; }
 .cookie-consent__link:hover { color: var(--cookie-consent-accent); }
 .cookie-consent__link:focus-visible { outline: 2px solid var(--cookie-consent-accent); outline-offset: 3px; }

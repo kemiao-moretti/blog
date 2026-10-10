@@ -1,0 +1,124 @@
+{{- /*
+  Cookie 同意引导（<head> 内联，必须渲染在 extends.head 之后、且保持同步执行）。
+
+  为什么必须是同步内联脚本：extends.head 里的 Umami 等非必要脚本以
+  `type="text/plain"` 声明（浏览器不执行、不发请求）。是否把它复活成真实
+  `<script>`，必须在文档解析阶段就决定 —— 这段逻辑一旦推到 body 末尾的
+  module bundle，deferred 脚本按文档顺序执行会让统计先于判定跑完，
+  「拒绝」就成了假功能。
+
+  契约来源：hugo.yaml -> params.solitude.cookie_consent（与 assets/ts/core/consent.ts 共用）。
+  对外 API：window.SolitudeConsent = { config, state, read, write, allowed, activate, refresh }
+*/ -}}
+{{- $cc := site.Params.solitude.cookie_consent | default dict -}}
+{{- $contract := dict
+  "cookie" ($cc.cookie | default "solitude_cookie_consent")
+  "version" ($cc.version | default "v1")
+  "maxAge" (int ($cc.max_age | default 31536000))
+  "categories" ($cc.categories | default (slice "analytics" "optional"))
+-}}
+<script>
+  (function () {
+    var CONFIG = {{ $contract | jsonify | safeJS }};
+    var NAME = CONFIG.cookie;
+    var PREFIX = CONFIG.version + ":";
+    var CATEGORIES = CONFIG.categories || [];
+
+    function read() {
+      var items = document.cookie ? document.cookie.split(";") : [];
+      for (var i = 0; i < items.length; i += 1) {
+        var item = items[i].replace(/^\s+/, "");
+        if (item.indexOf(NAME + "=") !== 0) continue;
+        var value = item.slice(NAME.length + 1);
+        try {
+          value = decodeURIComponent(value);
+        } catch (error) {
+          /* 保留原值继续比对 */
+        }
+        if (value === PREFIX + "accepted" || value === PREFIX + "rejected") {
+          return value.slice(PREFIX.length);
+        }
+        return null;
+      }
+      return null;
+    }
+
+    function write(state) {
+      var secure = location.protocol === "https:" ? "; Secure" : "";
+      document.cookie =
+        NAME +
+        "=" +
+        encodeURIComponent(PREFIX + state) +
+        "; Max-Age=" +
+        CONFIG.maxAge +
+        "; Path=/; SameSite=Lax" +
+        secure;
+      api.state = state;
+      return state;
+    }
+
+    function allowed(category) {
+      if (api.state === undefined) api.state = read();
+      if (api.state !== "accepted") return false;
+      if (!category) return true;
+      return CATEGORIES.indexOf(category) !== -1;
+    }
+
+    /** 把已授权的惰性脚本复活成真实脚本；未授权时什么都不创建，请求也就不会发出。 */
+    function activate(category) {
+      if (api.state === undefined) api.state = read();
+      var nodes = document.querySelectorAll('script[type="text/plain"][data-consent-src]');
+      for (var i = 0; i < nodes.length; i += 1) {
+        var node = nodes[i];
+        var kind = node.getAttribute("data-consent") || "optional";
+        if (category && kind !== category) continue;
+        if (!allowed(kind)) continue;
+        if (node.getAttribute("data-consent-loaded") === "1") continue;
+        node.setAttribute("data-consent-loaded", "1");
+
+        var script = document.createElement("script");
+        script.async = false;
+        script.src = node.getAttribute("data-consent-src");
+        /* data-consent-attr-foo="bar" → 真实脚本上的 foo="bar"（避免在 HTML 属性里塞 JSON）。 */
+        var attrs = node.attributes;
+        for (var j = 0; j < attrs.length; j += 1) {
+          var attr = attrs[j];
+          if (attr.name.indexOf("data-consent-attr-") !== 0) continue;
+          script.setAttribute(attr.name.slice("data-consent-attr-".length), attr.value);
+        }
+        document.head.appendChild(script);
+      }
+      document.dispatchEvent(
+        new CustomEvent("solitude:consent", { detail: { state: api.state, category: category || null } }),
+      );
+    }
+
+    var api = {
+      config: CONFIG,
+      state: undefined,
+      read: read,
+      write: write,
+      allowed: allowed,
+      activate: activate,
+      refresh: function () {
+        api.state = read();
+        return api.state;
+      },
+    };
+    api.state = read();
+    window.SolitudeConsent = api;
+
+    /* 已是 accepted 的访客在这里就能拿到统计脚本，延迟与改造前一致；
+       body 里（extends.body）可能还有惰性脚本，DOMContentLoaded 再补一次，重复调用安全。 */
+    if (api.state === "accepted") {
+      api.activate(null);
+      document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+          api.activate(null);
+        },
+        { once: true },
+      );
+    }
+  })();
+</script>

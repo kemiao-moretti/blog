@@ -9,9 +9,13 @@
  *
  * 隐私：位置只用于本地展示与距离计算，页面不输出完整 IP；
  *       结果存 localStorage（默认 24h），避免每次刷新都请求外部接口。
+ *       属于「非必要」功能：必须先在 Cookie 弹窗里选择「接受全部」才会发起任何请求，
+ *       拒绝时卡片退化为兜底欢迎语并给出改选入口（分类 optional，见 core/consent.ts）。
  * 挂载点：aside-ip-welcome.html 注入 data-* 配置。
  * 颜色与尺寸全部交给 token，明暗与多端由 CSS 负责。
  */
+
+import { hasConsent } from "./core/consent";
 
 interface IpWelcomeConfig {
   lang: string;
@@ -414,6 +418,39 @@ function renderFallback(cfg: IpWelcomeConfig): void {
   root.setAttribute("aria-busy", "false");
 }
 
+/** 恢复加载态：从「未授权」切到「已授权」时，先把误导性的关闭提示换成定位中。 */
+function renderLoading(cfg: IpWelcomeConfig): void {
+  const root = document.getElementById(ROOT_ID);
+  if (!root) return;
+  const greet = root.querySelector<HTMLElement>("#ip-welcome-greet");
+  const place = root.querySelector<HTMLElement>("#ip-welcome-place");
+  const dist = root.querySelector<HTMLElement>("#ip-welcome-dist");
+  const tip = root.querySelector<HTMLElement>("#ip-welcome-tip");
+  if (greet) greet.textContent = cfg.loading;
+  if (place) place.innerHTML = "";
+  if (dist) dist.innerHTML = "";
+  if (tip) tip.innerHTML = "";
+  root.setAttribute("aria-busy", "true");
+}
+
+/**
+ * 未获授权的兜底渲染：只显示站内兜底欢迎语，不发任何外部请求，
+ * 并给出「更改 Cookie 选择」入口，让访客能就地改选而不必清 Cookie。
+ */
+function renderConsentBlocked(cfg: IpWelcomeConfig): void {
+  renderFallback(cfg);
+  const root = document.getElementById(ROOT_ID);
+  const tip = root?.querySelector<HTMLElement>("#ip-welcome-tip");
+  if (!root || !tip) return;
+  root.dataset.ipConsentBlocked = "1";
+  const note = root.dataset.consentBlocked || "";
+  if (!note) return;
+  const action = root.dataset.consentReopenLabel || "";
+  tip.innerHTML =
+    `<span class="ip-welcome-tip-text ip-welcome-tip-text--consent">${esc(note)}</span>` +
+    (action ? `<button type="button" class="ip-welcome-consent-action" data-consent-reopen>${esc(action)}</button>` : "");
+}
+
 function render(cfg: IpWelcomeConfig, loc: Located): void {
   const root = document.getElementById(ROOT_ID);
   if (!root) return;
@@ -484,9 +521,22 @@ async function locate(cfg: IpWelcomeConfig): Promise<Located | null> {
 
 async function initIpWelcome(): Promise<void> {
   const root = document.getElementById(ROOT_ID);
-  if (!root || root.dataset.ipInit === "1") return;
-  root.dataset.ipInit = "1";
+  if (!root) return;
   const cfg = readConfig(root);
+
+  /* 非必要功能：未获同意前（含「还没选」）不发起任何外部请求。 */
+  if (!hasConsent("optional")) {
+    root.dataset.ipInit = "";
+    renderConsentBlocked(cfg);
+    return;
+  }
+  if (root.dataset.ipInit === "1") return;
+  root.dataset.ipInit = "1";
+  if (root.dataset.ipConsentBlocked === "1") {
+    root.dataset.ipConsentBlocked = "";
+    renderLoading(cfg);
+  }
+
   try {
     const loc = await locate(cfg);
     if (loc) render(cfg, loc);
@@ -496,5 +546,7 @@ async function initIpWelcome(): Promise<void> {
   }
 }
 
+/* 权限变化后重新判定：接受则立即定位，改选为拒绝则收起已展示的位置。 */
+document.addEventListener("solitude:consent", () => void initIpWelcome());
 void initIpWelcome();
 document.addEventListener("solitude:afterNavigate", () => void initIpWelcome());
