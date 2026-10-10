@@ -29,21 +29,21 @@
 @import "./components/cookie-consent.css" layer(solitude.components);
 @import "./components/ai-summary.css" layer(solitude.components);
 
-@import "./shortcodes/text-status.css" layer(solitude.shortcodes);
-@import "./shortcodes/chat.css" layer(solitude.shortcodes);
-@import "./shortcodes/disclosure.css" layer(solitude.shortcodes);
-@import "./shortcodes/actions.css" layer(solitude.shortcodes);
-@import "./shortcodes/media.css" layer(solitude.shortcodes);
-@import "./shortcodes/collections.css" layer(solitude.shortcodes);
-@import "./shortcodes/responsive.css" layer(solitude.shortcodes);
+/* shortcodes/* 已整体移出核心包：改由 features/shortcodes.css 打包，
+   只在**正文里真的渲染出短代码**的页面加载（实测全站 40 页只有 2 页需要，其余省掉约 45 KB）。
+   它们仍带 layer(solitude.shortcodes)；层序由本文件顶部声明表决定，与加载顺序无关，故层叠结果不变。 */
 
 @import "./integrations/hugo.css" layer(solitude.integrations);
+/* integrations/syntax.css 保留在核心包：曾尝试按「正文是否含代码块」拆出，
+   但 changelog 这类列表页的代码块来自子页面正文（{{ $entry.Content }}），head 阶段无法可靠预测，
+   拆出去会漏加载导致掉样式；它只有 5.1 KB，留在核心包更划算。判定与验证记录见 perf 方案文档。 */
 @import "./integrations/syntax.css" layer(solitude.integrations);
 @import "./integrations/search.css" layer(solitude.integrations);
 /* Comment providers ship unlayered vendor CSS at runtime. Keep our scoped
-   compatibility rules unlayered as well so the Hexo theme styles can win. */
-@import "./integrations/comments.css";
-@import "./integrations/artalk.css";
+   compatibility rules unlayered as well so the Hexo theme styles can win.
+   integrations/comments.css 与 artalk.css 已移出核心包：改由 features/comments.css 打包，
+   只在渲染出评论容器的页面加载。它们仍保持**未分层**；与 core 中其余未分层文件
+   （overrides / music-dock / paper-reward）经逐对校验零选择器重合，故移出后顺序变化不影响生效值。 */
 /* APlayer ships unlayered vendor CSS, so the scoped capsule compatibility
    rules must also remain unlayered to override its fixed player geometry. */
 @import "./integrations/music-dock.css";

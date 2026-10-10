@@ -922,11 +922,14 @@ const initializeEnvelope = async (comments: NormalizedComment[]) => {
 };
 
 const initializeValineEffects = async () => {
+  const wantsBarrage = barragePending();
+  const wantsEnvelope = envelopePending();
+  if (!wantsBarrage && !wantsEnvelope) return;
   try {
-    const comments = await fetchPageComments(location.pathname);
+    const comments = wantsBarrage || wantsEnvelope ? await fetchPageComments(location.pathname) : [];
     await Promise.all([
-      initializePageBarrage(comments),
-      initializeEnvelope(comments),
+      wantsBarrage ? initializePageBarrage(comments) : undefined,
+      wantsEnvelope ? initializeEnvelope(comments) : undefined,
     ]);
   } catch {
     const barrage = document.querySelector(".comment-barrage");
@@ -937,13 +940,33 @@ const initializeValineEffects = async () => {
 };
 
 // Artalk：文章页热评弹幕用当前页评论；留言板信封弹幕用全站最新评论（对齐 hexo artalk.pug）。
+/* 弹幕/信封的**容器与初始化状态前置判断**。
+   注意：这两个判断以前写在 `initializePageBarrage` / `initializeEnvelope` 内部（在数据拉取**之后**才执行），
+   于是没有对应容器的页面也照样把数据拉下来再丢掉。这里把判断提前，容器不存在或已初始化时**一个请求都不发**；
+   容器存在时的行为与原来完全一致。 */
+const barragePending = () => {
+  if (!commentBarrageEnabled()) return false;
+  const container = document.querySelector(".comment-barrage");
+  return Boolean(container) && container.getAttribute("data-barrage-init") !== "true";
+};
+
+const envelopePending = () => {
+  const container = document.getElementById("barrage");
+  return Boolean(container) && container.dataset.envelopeInit !== "true";
+};
+
 const initializeArtalkEffects = async () => {
+  const wantsBarrage = barragePending();
+  const wantsEnvelope = envelopePending();
+  if (!wantsBarrage && !wantsEnvelope) return;
   try {
-    const pageComments = fetchPageComments(location.pathname);
-    const envelopeComments = fetchArtalkEnvelopeComments();
     await Promise.all([
-      initializePageBarrage(await pageComments),
-      initializeEnvelope(await envelopeComments),
+      wantsBarrage
+        ? fetchPageComments(location.pathname).then((comments) => initializePageBarrage(comments))
+        : undefined,
+      wantsEnvelope
+        ? fetchArtalkEnvelopeComments().then((comments) => initializeEnvelope(comments))
+        : undefined,
     ]);
   } catch {
     const barrage = document.querySelector(".comment-barrage");

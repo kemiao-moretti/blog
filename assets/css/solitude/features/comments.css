@@ -1,0 +1,13 @@
+/* 评论区样式（按页加载）。
+ *
+ * 这两个文件在 core.css 里是**未分层**（没有 layer()）—— 未分层规则优先于任何 @layer，
+ * 所以拆分时必须保持「不带 layer()」，否则评论样式会突然输给其它分层规则。
+ *
+ * 顺序安全性：已用工具逐对校验，comments.css / artalk.css 与 core 中其余未分层文件
+ * （overrides / music-dock / paper-reward）**零选择器重合**，因此它们从 core 中移出、
+ * 改到 core 之后加载，不会改变任何一条声明的最终生效值。
+ *
+ * 加载条件见 layouts/_partials/styles.html：仅当该页真的渲染出评论容器时才引入。
+ */
+@import "../integrations/comments.css";
+@import "../integrations/artalk.css";

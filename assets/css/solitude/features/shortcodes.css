@@ -1,0 +1,20 @@
+/* 短代码样式（按页加载）。
+ *
+ * 源文件原属 core.css 的 layer(solitude.shortcodes)，顺序为：
+ *   text-status → chat → disclosure → actions → media → collections → responsive
+ * 这里保持**完全相同的顺序与 layer()**：@layer 的先后由 core.css 顶部的声明表决定、
+ * 与文件加载顺序无关，所以单独打包后层序不变；包内顺序则决定同层内后写覆盖前写的部分，不能重排。
+ *
+ * 可拆依据：这 7 个文件的选择器只服务短代码渲染出的元素（`solitude-tag` 及其 tag-* 系列、
+ * `tab-*`、`repo-*`、`chat-*`），实测全站 40 页里只有 2 页真的渲染短代码，
+ * 其余 38 页此前一直在下载这 ~45 KB（minified）。
+ *
+ * 加载条件见 layouts/_partials/styles.html：正文渲染结果里出现短代码专属元素标记时才引入。
+ */
+@import "../shortcodes/text-status.css" layer(solitude.shortcodes);
+@import "../shortcodes/chat.css" layer(solitude.shortcodes);
+@import "../shortcodes/disclosure.css" layer(solitude.shortcodes);
+@import "../shortcodes/actions.css" layer(solitude.shortcodes);
+@import "../shortcodes/media.css" layer(solitude.shortcodes);
+@import "../shortcodes/collections.css" layer(solitude.shortcodes);
+@import "../shortcodes/responsive.css" layer(solitude.shortcodes);

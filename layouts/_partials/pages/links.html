@@ -27,6 +27,9 @@
       <div class="banners-title-small">{{ .Params.description | default "友情链接" }}</div>
       <div class="banners-title-big">{{ .Title }}</div>
     </div>
+    {{/* 友链页的 .banners-title-small 由 main.ts 的 homeTypeit() 驱动打字机效果，需要 TypeIt 库；
+         这里登记需求，scripts.html 才会为这一页加载 typeit（其余不用的页面不再下载 11.9 KB）。 */}}
+    {{ $.Scratch.Set "need_typeit" true }}
     <div class="banner-button-group">
       <button class="banner-button secondary" type="button" data-solitude-action="travelling">
         <i class="solitude fas fa-tower-broadcast" aria-hidden="true"></i>

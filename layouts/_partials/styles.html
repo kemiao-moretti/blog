@@ -59,6 +59,60 @@
     {{ end }}
   {{ end }}
 {{ end }}
+{{/* ===== 按内容加载「特性包」（features/*.css）=====
+     这些样式原本都在核心包里、每个页面都要下载，但只有特定页面真正用得上：
+       features/comments.css   ← 渲染出评论容器的页面（与 _partials/comments.html 同一判据）
+       features/shortcodes.css ← 正文里渲染出短代码的页面（全站只有 2 页）
+     判定说明：Hugo 对 .Content 是**惰性求值** —— `{{ $_ := .Content }}` 不会触发渲染，
+     正文里的短代码/高亮结果拿不到；必须用「消费该值」的写法（`{{ with .Content }}` 赋值）才会真正渲染。
+     渲染结果按页缓存，后续正文处复用，不会重复渲染。
+     顺序说明：必须在 css/custom.css 之前输出，站点覆盖层才能继续最后生效。 */}}
+{{- $featureFiles := slice -}}
+{{/* 评论容器的**精确**出现条件（与模板一致，逐处核对过）：
+     - posts/page.html 与 page.html：kind=page 时 include comments.html，但 tags/categories 概览页除外；
+     - section.html：**只对** shuoshuo / message / kit 三种类型 include；
+     - home / 404 / 归档等：根本不 include。
+     再叠加 comments.html 自身的 `$cfg.comment.use` 与 `.Params.comment != false`。
+     之前只写后两条，会把 home/links/music/404 也算进来（它们其实没有评论容器）。
+
+     注：这里**不做** syntax（代码高亮）的按内容加载。试过用 `.Content` 里是否含 <pre>/highlight 判定，
+     但 changelog 这类列表页的代码块来自 `{{ $entry.Content }}`（子页面正文），head 阶段无法可靠预测，
+     会漏加载导致掉样式；syntax.css 仅 5.1 KB，留在核心包更稳妥（判定与验证记录见 perf 方案文档）。 */}}
+{{- $special := lower (or .Params.type .Layout) -}}
+{{- $commentsIncluded := or
+      (and .IsPage (not (in (slice "tags" "categories") $special)))
+      (and .IsSection (in (slice "shuoshuo" "message" "kit") $special)) -}}
+{{- if and $cfg.comment.use $commentsIncluded (ne .Params.comment false) -}}
+  {{- $featureFiles = $featureFiles | append "comments" -}}
+{{- end -}}
+{{/* 短代码样式（60.8 KB 源 / 约 45 KB min）：只有**正文里真的渲染出短代码**的页面才需要。
+     全站 40 页里只有 2 页用到，其余 38 页可以完全省掉这个包。
+     判定用渲染输出里的短代码专属元素标记，且必须按 `class="…"` 元素语法匹配 ——
+     直接搜字符串会把 `data-solitude-tag-runtime`（脚本属性）也算进去，导致每页都命中（实测踩过）。
+     三个标记覆盖全部带样式的短代码：
+       solitude-tag    绝大多数短代码的包装类
+       tab-item-content / repo-card   tab 与 github/gitee/gitlab/gitea 两类不套 solitude-tag 的
+     先用 .Content 触发渲染：Hugo 对 .Content 惰性求值，不消费该值就不会渲染，标记也就读不到。 */}}
+{{- $rendered := "" -}}
+{{- with .Content }}{{ $rendered = . }}{{ end -}}
+{{- if and (ne $rendered "") (or
+      (strings.Contains $rendered "class=\"solitude-tag")
+      (strings.Contains $rendered "tab-item-content")
+      (strings.Contains $rendered "repo-card")) -}}
+  {{- $featureFiles = $featureFiles | append "shortcodes" -}}
+{{- end -}}
+{{- range $featureFiles }}
+  {{- with resources.Get (printf "css/solitude/features/%s.css" .) }}
+    {{- $featureOpts := dict "externals" (index $options "externals") "minify" (not hugo.IsDevelopment) "sourceMap" (cond hugo.IsDevelopment "linked" "none") "target" (index $options "target") "vars" (index $options "vars") }}
+    {{- with . | css.Build $featureOpts }}
+      {{- if hugo.IsDevelopment }}
+        <link rel="stylesheet" href="{{ .RelPermalink }}" data-solitude-feature="{{ .Name }}">
+      {{- else }}
+        {{- with . | fingerprint }}<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous" data-solitude-feature="{{ .Name }}">{{ end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
 {{ with resources.Get "css/custom.css" }}
   {{ $customOptions := merge $options (dict "targetPath" "css/custom.css") }}
   {{ with . | css.Build $customOptions }}
