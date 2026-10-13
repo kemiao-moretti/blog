@@ -5,16 +5,21 @@ on:
     tags: ['v*']
   workflow_dispatch:
     inputs:
-      tag:
-        description: '要发布的版本 tag（如 v1.1.0），须已推送到仓库'
+      version:
+        description: '版本号，如 1.1.0 或 v1.1.0（自动创建并推送 tag 后发布）'
         required: true
+        type: string
+      branch:
+        description: '基于哪个分支的最新提交打 tag'
+        required: false
+        default: 'mogai-theme'
         type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  group: release-${{ github.event.inputs.version || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -26,21 +31,47 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-          ref: ${{ github.event.inputs.tag || github.ref }}
+          ref: ${{ github.event.inputs.branch || github.ref }}
 
       - name: Resolve version
         id: version
         shell: bash
         run: |
-          TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VER="${{ github.event.inputs.version }}"
+            VER="${VER#v}"
+            if ! [[ "$VER" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+              echo "::error::版本号格式不合法（应为 1.1.0 或 v1.1.0）：$VER"
+              exit 1
+            fi
+            if git rev-parse -q --verify "refs/tags/v${VER}" >/dev/null 2>&1; then
+              echo "::error::tag v${VER} 已存在，请换一个版本号；或删除旧 tag 后重试"
+              exit 1
+            fi
+          else
+            VER="${{ github.ref_name }}"
+            VER="${VER#v}"
+          fi
+          echo "tag=v${VER}" >> "$GITHUB_OUTPUT"
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git tag "v${{ steps.version.outputs.version }}"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            "refs/tags/v${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Package theme source
         shell: bash
         run: |
           set -euo pipefail
-          TAG="${{ steps.version.outputs.tag }}"
+          TAG="v${{ steps.version.outputs.version }}"
           VER="${{ steps.version.outputs.version }}"
           DIR="solitude-${VER}"
           mkdir -p "$RUNNER_TEMP/pkg" "$RUNNER_TEMP/release"
@@ -55,7 +86,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TAG="${{ steps.version.outputs.tag }}"
+          TAG="v${{ steps.version.outputs.version }}"
           PREV_TAG="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
           {
             echo "## 更新内容"
@@ -73,7 +104,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TAG="${{ steps.version.outputs.tag }}"
+          TAG="v${{ steps.version.outputs.version }}"
           VER="${{ steps.version.outputs.version }}"
           gh release create "$TAG" \
             "$RUNNER_TEMP/release/solitude-${VER}.tar.gz" \
