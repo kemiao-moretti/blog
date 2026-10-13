@@ -107,11 +107,19 @@ const requestArtalkConf = () => {
 const artalkAvatarUrl = async (emailEncrypted = "") => {
   const fallback = runtimeConfig().default_avatar || "/img/default_avatar.avif";
   if (!emailEncrypted) return fallback;
+  const siteGravatar = (artalkConfig().option?.gravatar || {}) as {
+    mirror?: string;
+    params?: string;
+  };
   const conf = await requestArtalkConf();
   const mirror = String(
-    conf?.frontend_conf?.gravatar?.mirror || "https://cn.cravatar.com/avatar/"
+    siteGravatar.mirror ||
+      conf?.frontend_conf?.gravatar?.mirror ||
+      "https://weavatar.com/avatar/"
   ).replace(/\/$/, "");
-  const params = String(conf?.frontend_conf?.gravatar?.params || "d=mp&s=240");
+  const params = String(
+    siteGravatar.params || conf?.frontend_conf?.gravatar?.params || "d=mp&s=240"
+  );
   return `${mirror}/${emailEncrypted}?${params}`;
 };
 
