@@ -50,6 +50,13 @@
 @import "./integrations/rightside.css" layer(solitude.integrations);
 @import "./integrations/right-menu.css" layer(solitude.integrations);
 
+/* 分类条（首页 + 归档页共用）：原先放在 pages/home.css，而页级 CSS 只在对应页型加载，
+   于是 /archives/ 这类共用同一套标记的页面整条掉样式。组件是跨页的，故下沉到核心包。
+   源文件（pages/home.css）是**未分层**的，按「特性包」约定这里也保持未分层，以维持首页
+   原有优先级；并已逐对核验它与 core 中其余未分层文件（overrides / music-dock /
+   paper-reward）零选择器重合，故加载位置变化不影响生效值。 */
+@import "./components/category-bar.css";
+
 /* Unlayered rules intentionally outrank theme layers and external vendor CSS. */
 @import "./integrations/overrides.css";
 @import "./integrations/paper-reward.css";

@@ -1,4 +1,75 @@
 /* Taxonomy, archive, and error-page presentation. */
+
+/* 分类/标签概览页的列表容器（/tags/、/categories/ 两个页型共用，见
+   _partials/pages/{tags,categories}.html 的 .category-lists > .tag-cloud-list）。
+   这组规则原先写在 pages/home.css 里，而 home.css 只在首页加载 ——
+   概览页因此拿不到 .category-lists 的上下内边距（>768px 少 20/30px）。
+   现归入本文件（概览页本来就加载它，零额外字节）。
+   注：其中 `ul` / `.category-title` 相关规则在当前模板下匹配不到元素
+   （模板渲染的是 .tag-cloud-list），保留以便日后换回列表式排版。 */
+#page .category-lists {
+  padding: 1rem 0 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+  #page .category-lists {
+    padding: 0;
+  }
+}
+
+#page .category-lists ul {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  margin-top: 0.4rem;
+  padding: 0 0 0 1rem;
+  list-style: none;
+  counter-reset: li 0;
+}
+
+#page .category-lists ul ul {
+  padding-left: 0.2rem;
+}
+
+#page .category-lists ul li {
+  position: relative;
+  margin: 0.3rem 0;
+  padding: 4px 16px;
+  width: 200px;
+  border-radius: 12px;
+  background: var(--efu-card-bg);
+  border: var(--style-border-always);
+}
+
+#page .category-lists ul li::before {
+  display: none;
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  transition: all 0.3s ease-out 0s;
+  top: 0.7em;
+  width: 0.43em;
+  height: 0.43em;
+  border: 0.215em solid #307af6;
+  border-radius: 0.43em;
+  background: 0 0;
+  content: "";
+}
+
+#page .category-lists ul li:hover::before {
+  border-color: #ff7242;
+}
+
+#page .category-lists .category-title {
+  font-size: 2.57em;
+}
+
+@media screen and (max-width: 768px) {
+  #page .category-lists .category-title {
+    font-size: 2em;
+  }
+}
+
 #page .category-lists .tag-cloud-list {
   gap: 1rem;
 }
@@ -617,24 +688,4 @@ span.tagsPageCount {
   .archive-page-section-pagination button {
     transition: none;
   }
-}
-
-body[data-type=music] #page-header #nav a {
-  color: var(--efu-white);
-}
-
-body[data-type=music] #page-header.not-top-img #nav .back-home-button {
-  color: var(--efu-white);
-}
-
-body[data-type=music] #page-header #nav #nav-right .nav-button a.console_switchbutton label i {
-  background: var(--efu-white);
-}
-
-body[data-type=music] #page-header #nav #nav-right .nav-button a.console_switchbutton:hover label i {
-  background: var(--efu-card-bg);
-}
-
-body[data-type=music] .page .layout#content-inner {
-  background: none;
 }
