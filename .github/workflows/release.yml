@@ -1,0 +1,83 @@
+name: Release Theme
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要发布的版本 tag（如 v1.1.0），须已推送到仓库'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Package theme source
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.version.outputs.tag }}"
+          VER="${{ steps.version.outputs.version }}"
+          DIR="solitude-${VER}"
+          mkdir -p "$RUNNER_TEMP/pkg" "$RUNNER_TEMP/release"
+          git archive --format=tar --prefix="${DIR}/" "$TAG" | tar -x -C "$RUNNER_TEMP/pkg"
+          rm -rf "$RUNNER_TEMP/pkg/${DIR}/.github"
+          (cd "$RUNNER_TEMP/pkg" \
+            && tar -czf "$RUNNER_TEMP/release/${DIR}.tar.gz" "${DIR}" \
+            && zip -qr "$RUNNER_TEMP/release/${DIR}.zip" "${DIR}")
+          ls -lh "$RUNNER_TEMP/release"
+
+      - name: Generate changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.version.outputs.tag }}"
+          PREV_TAG="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          {
+            echo "## 更新内容"
+            echo ""
+            if [ -n "$PREV_TAG" ]; then
+              git log --oneline --no-decorate "${PREV_TAG}..${TAG}"
+            else
+              git log --oneline --no-decorate -30 "${TAG}"
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.version.outputs.tag }}"
+          VER="${{ steps.version.outputs.version }}"
+          gh release create "$TAG" \
+            "$RUNNER_TEMP/release/solitude-${VER}.tar.gz" \
+            "$RUNNER_TEMP/release/solitude-${VER}.zip" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Solitude ${VER}" \
+            --notes-file "$RUNNER_TEMP/notes.md"
