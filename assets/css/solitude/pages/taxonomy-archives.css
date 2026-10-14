@@ -102,13 +102,15 @@
 #page .category-lists .tag-cloud-list a:focus-visible {
   background: var(--efu-main) !important;
   box-shadow: var(--efu-shadow-blue);
-  color: var(--efu-white) !important;
+  /* 实心强调底上的文字走纸张 accent-ink（明暗两套对强调底均 ≥4.5:1），
+     白字在深色亮绿底上仅 ≈1.9:1。 */
+  color: var(--paper-nav-active-text, var(--efu-white)) !important;
   border: var(--style-border-hover);
 }
 
 #page .category-lists .tag-cloud-list a:hover span.tagsPageCount,
 #page .category-lists .tag-cloud-list a:focus-visible span.tagsPageCount {
-  color: var(--efu-lighttext);
+  color: var(--paper-accent-strong, var(--efu-lighttext));
 }
 
 #page .category-lists .tag-cloud-list a:hover span.tags-punctuation,

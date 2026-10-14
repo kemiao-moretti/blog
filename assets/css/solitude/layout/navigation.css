@@ -1179,8 +1179,12 @@
 }
 
 @media screen and (min-width: 768px) {
+  /* 本文件整体在 layer(solitude.layout) 内，层内 !important 会压过一切层外 !important，
+     导致站点纸张配色的导航 hover/active 文字色无法生效（深色下黑字配深绿底不可读）。
+     层内与本规则竞争的规则取的都是同一令牌，去掉 !important 不改变层内结果，
+     仅把最终决定权交还给站点层。 */
   .page .menus_item:hover > a.site-page {
-    color: var(--efu-nav-hover-text) !important;
+    color: var(--efu-nav-hover-text);
     background: var(--efu-main);
     box-shadow: var(--efu-shadow-main);
   }

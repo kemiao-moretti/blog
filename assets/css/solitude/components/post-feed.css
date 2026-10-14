@@ -397,12 +397,15 @@
   #sidebar #sidebar-menus .menus_items li .site-page {
     font-weight: 400;
   }
+  /* 此处 !important 在 layer(solitude.components) 内会压过站点层的悬停底色，
+     实心强调底配站点的亮色文字在明暗两套下都不可读；改用纸张令牌兜底，
+     与站点 category-pagination.css 的悬停配色（soft 底 + strong 字）保持一致。 */
   #sidebar #sidebar-menus .menus_items li .site-page:hover {
-    background: var(--efu-main) !important;
-    color: var(--efu-white);
+    background: var(--paper-accent-soft, var(--efu-main)) !important;
+    color: var(--paper-accent-strong, var(--efu-white));
   }
   #sidebar #sidebar-menus .menus_items li .site-page span:hover {
-    color: var(--efu-white);
+    color: var(--paper-accent-strong, var(--efu-white));
   }
 }
 
