@@ -1034,21 +1034,32 @@ const initializeArtalkEffects = async () => {
 const counterCacheKey = (kind: "count" | "pv", path: string) =>
   `artalk-hugo-counter:${kind}:v${aggregateCacheVersion}:${location.host}:${path}`;
 
-const fetchArtalkPageStat = async (
+// single-flight 在途表：solitude:ready 事件与 runtime-ready 微任务兜底会同 tick
+// 双触发 initializeComments，两个调用方共享同一 Promise，避免 counters 并发双发。
+const pageStatRequests = new Map<string, Promise<number>>();
+
+const fetchArtalkPageStat = (
   kind: "count" | "pv",
   apiPath: "page_comment" | "page_pv"
-) => {
+): Promise<number> => {
   const path = location.pathname;
   const cacheKey = counterCacheKey(kind, path);
-  const cached = Solitude.saveToLocal.get<number>(cacheKey);
-  if (typeof cached === "number") return cached;
-  const response = await requestArtalk(`stats/${apiPath}`, {
-    site_name: artalkConfig().site,
-    page_keys: path,
-  });
-  const value = Number(response.data?.[path] ?? 0);
-  Solitude.saveToLocal.set(cacheKey, value, 0.02);
-  return value;
+  const inflight = pageStatRequests.get(cacheKey);
+  if (inflight) return inflight;
+  const request = (async () => {
+    const cached = Solitude.saveToLocal.get<number>(cacheKey);
+    if (typeof cached === "number") return cached;
+    const response = await requestArtalk(`stats/${apiPath}`, {
+      site_name: artalkConfig().site,
+      page_keys: path,
+    });
+    const value = Number(response.data?.[path] ?? 0);
+    Solitude.saveToLocal.set(cacheKey, value, 0.02);
+    return value;
+  })();
+  pageStatRequests.set(cacheKey, request);
+  void request.catch(() => undefined).then(() => pageStatRequests.delete(cacheKey));
+  return request;
 };
 
 const initializeArtalkCounters = async () => {
