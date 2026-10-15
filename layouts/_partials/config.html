@@ -15,6 +15,18 @@
   {{ end }}
 {{ end }}
 {{ $threshold := int ($cfg.page.links.async_threshold | default 200) }}
+{{/* 说说页数据源全局预热配置：API 地址原本只在说说页容器的 data-* 属性里，
+     其他页面读不到，全局保活无法拼出请求 URL。这里按 shuoshuo.html 同样的
+     fallback 逻辑解析出「当前启用源」的 API（tg 源额外带投票服务），注入 #site-config。 */}}
+{{ $shuoshuo := $cfg.shuoshuo }}
+{{ $shuoshuoSource := $shuoshuo.source | default "ech0" }}
+{{ $shuoshuoApi := $shuoshuo.api }}
+{{ $shuoshuoVote := "" }}
+{{ if eq $shuoshuoSource "memos" }}{{ with $shuoshuo.memos.api }}{{ $shuoshuoApi = . }}{{ end }}{{ end }}
+{{ if eq $shuoshuoSource "tg" }}
+  {{ with $shuoshuo.tg.api }}{{ $shuoshuoApi = . }}{{ end }}
+  {{ with $shuoshuo.tg.vote }}{{ if .enable }}{{ $shuoshuoVote = .api }}{{ end }}{{ end }}
+{{ end }}
 {{ $rightMenuPageType := lower (.Params.type | default "") }}
 {{ $rightMenuPageLayout := lower (.Layout | default "") }}
 {{ $rightMenuPageKind := lower (.Kind | default "") }}
@@ -47,6 +59,7 @@
   "covercolor" $cfg.post.covercolor
   "comment" (dict "avatar" $cfg.comment.avatar "commentBarrage" $cfg.comment.commentBarrage)
   "comment_runtime" (dict "routes" $commentRoutes "default_avatar" ("/img/default_avatar.avif" | relURL) "barrage_script" ("/js/third_party/barrage.min.js" | relURL) "envelope_script" ("/js/third_party/envelope.min.js" | relURL))
+  "shuoshuo_warmup" (cond ($cfg.shuoshuo.enable | default false) (dict "api" $shuoshuoApi "source" $shuoshuoSource "vote" $shuoshuoVote) false)
   "lightbox" $cfg.lightbox
   "right_menu" (cond $rightMenuEnabled $rightMenu false)
   "translate" (cond $cfg.translate.enable $cfg.translate false)

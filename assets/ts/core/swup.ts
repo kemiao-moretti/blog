@@ -1,5 +1,14 @@
 import { Solitude } from "./api";
 
+/** 在 Swup 切页开始时提前连接 Artalk，让 TLS 建连与新页面请求并行。 */
+const warmArtalkConnection = () => {
+  const use = String(Solitude.config.comment?.use || "").toLowerCase();
+  if (!use.includes("artalk")) return;
+  const server = String(Solitude.config.artalk?.server || "").replace(/\/$/, "");
+  if (!/^https?:\/\//.test(server)) return;
+  fetch(`${server}/api/v2/conf`).catch(() => undefined);
+};
+
 /** 重跑 script[data-pjax]：切页后让以 data-pjax 标记的脚本重新执行（如 giscus 评论）。 */
 const rerunPjaxScripts = () => {
   document.querySelectorAll<HTMLScriptElement>("script[data-pjax]").forEach((item) => {
@@ -88,6 +97,7 @@ const initSwup = () => {
 
   // 导航开始：清理旧页（对应旧 pjax:send）
   swup.hooks.on("visit:start", () => {
+    warmArtalkConnection();
     closePersistentOverlays();
     document.dispatchEvent(new CustomEvent("solitude:beforeNavigate"));
     Solitude.disposePage?.();

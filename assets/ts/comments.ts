@@ -1125,6 +1125,84 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
   }
 };
 
+// --- Artalk / 说说页数据源 空闲期预热与连接保活 ---
+// 背景：artalk.518339.xyz 与说说页三个数据源（tg / memos / ech0）的自托管服务
+// TLS 建连实测约 5-7 秒（服务端链路问题，客户端无法根治），而 Swup 切页后的
+// 初始化是串行请求。在浏览器空闲时提前建连，并周期性发最轻量的 GET 请求
+// 保持连接不断，用户切页时复用热连接，握手从感知路径上消失。
+// 保活间隔取 45s：实测 120s 间隔下连接仍会被服务端/代理的空闲超时掐掉，
+// 导致切页时再次付出 5 秒握手；45s 足够短且各探测请求响应仅几百字节。
+const KEEPALIVE_INTERVAL = 45_000;
+let artalkWarmupStarted = false;
+let shuoshuoWarmupStarted = false;
+let artalkKeepaliveTimer: number | undefined;
+let shuoshuoKeepaliveTimer: number | undefined;
+
+const artalkWarmRequest = () => {
+  if (!artalkReady()) return;
+  void requestArtalk("conf", {}).catch(() => undefined);
+};
+
+// 说说页数据源保活探测 URL：与 shuoshuo.html / config.html 的源 fallback 逻辑
+// 保持一致（config.html 已把「当前启用源」的最终 api 解析进 shuoshuo_warmup.api）。
+// 只按源选一个最轻的 GET，不预载任何数据——说说页有自己的 localStorage 缓存与页内预热。
+const shuoshuoWarmUrls = (): string[] => {
+  const warmup = (Solitude.config as any).shuoshuo_warmup as
+    | { api?: string; source?: string; vote?: string }
+    | false
+    | undefined;
+  if (!warmup || !warmup.api) return [];
+  const api = String(warmup.api).replace(/\/$/, "");
+  const source = String(warmup.source || "ech0");
+  const probe =
+    source === "tg"
+      ? `${api}/api/v1/messages?limit=1`
+      : source === "memos"
+        ? `${api}/api/v1/memos?pageSize=1`
+        : `${api}/api/tags`;
+  const urls = [probe];
+  // tg 源的投票服务是另一个域名，同样养一条热连接
+  const vote = String(warmup.vote || "");
+  if (vote) urls.push(`${vote.replace(/\/$/, "")}/api/vote/info?id=`);
+  return urls;
+};
+
+const shuoshuoWarmRequest = () => {
+  shuoshuoWarmUrls().forEach((url) => void fetch(url).catch(() => undefined));
+};
+
+// 通用的「空闲期启动 + 周期保活」调度器：幂等（started 标记防重复），
+// requestIdleCallback 不可用时回退 setTimeout(1s)。
+const scheduleKeepalive = (
+  request: () => void,
+  alreadyStarted: boolean
+): { started: boolean; timer?: number } => {
+  if (alreadyStarted) return { started: true };
+  const run = () => {
+    request();
+    return window.setInterval(request, KEEPALIVE_INTERVAL);
+  };
+  let timer: number | undefined;
+  if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(() => { timer = run(); }, { timeout: 3000 });
+  } else {
+    window.setTimeout(() => { timer = run(); }, 1000);
+  }
+  return { started: true, timer };
+};
+
+const scheduleArtalkWarmup = () => {
+  const state = scheduleKeepalive(artalkWarmRequest, artalkWarmupStarted);
+  artalkWarmupStarted = state.started;
+  if (state.timer) artalkKeepaliveTimer = state.timer;
+};
+
+const scheduleShuoshuoWarmup = () => {
+  const state = scheduleKeepalive(shuoshuoWarmRequest, shuoshuoWarmupStarted);
+  shuoshuoWarmupStarted = state.started;
+  if (state.timer) shuoshuoKeepaliveTimer = state.timer;
+};
+
 const initializeComments = () => {
   const enabled = providers();
   if (!enabled.length) return;
@@ -1134,6 +1212,13 @@ const initializeComments = () => {
     )
   );
   const provider = activeProvider();
+
+  // 空闲期预热：Artalk 服务端 TLS 建连约 5 秒，是评论加载的最大瓶颈。
+  // 首次进站后等浏览器空闲时提前加载 SDK 并建立连接，之后每次 Swup 切页
+  // 都能复用热连接，评论区不再被握手串行拖住。
+  if (provider === "artalk") scheduleArtalkWarmup();
+  // 说说页数据源（tg/memos/ech0）同理：只要站点启用了说说页就预热当前源的连接。
+  if ((Solitude.config as any).shuoshuo_warmup) scheduleShuoshuoWarmup();
 
   // 聚合功能：访问任意页面都加载（最新评论 / 评论总数 / 文章卡参与者 / Artalk 计数与弹幕）。
   // 各函数内部自带容器存在检查，无目标 DOM 时直接返回；数据请求有模块级 Promise + localStorage
