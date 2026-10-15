@@ -474,24 +474,49 @@ const fetchValinePostCardComments = (paths: string[]) => {
   return request;
 };
 
-const fetchArtalkPostCardComments = async (paths: string[]) => {
+// 文章卡参与者：与 Valine 版同款的三重防护——请求内 single-flight（postCardRequests）、
+// localStorage 缓存（postCardCacheKey）、结果按卡片路径集签名。Artalk v2 comments
+// 接口只支持单 page_key，按路径逐个请求后再合并；去重与缓存使二次切页零请求。
+const fetchArtalkPostCardComments = (paths: string[]) => {
   const routes = runtimeConfig().routes || {};
   const allowedPaths = [...new Set(paths)]
     .filter((path) => Boolean(routes[path]))
     .sort();
-  if (!allowedPaths.length) return [];
-  const results = await Promise.all(
-    allowedPaths.map((path) =>
-      requestArtalk("comments", {
-        site_name: artalkConfig().site,
-        page_key: path,
-        limit: 200,
-      })
-        .then((response) => (response.comments || []) as ArtalkComment[])
-        .catch(() => [] as ArtalkComment[])
-    )
+  if (!allowedPaths.length) return Promise.resolve([]);
+  const signature = stableSignature(allowedPaths.join("|"));
+  const activeRequest = postCardRequests.get(signature);
+  if (activeRequest) return activeRequest;
+  const cached = Solitude.saveToLocal.get<NormalizedComment[]>(
+    postCardCacheKey(signature)
   );
-  return normalizeArtalkRecords(results.flat());
+  if (cached) {
+    const result = Promise.resolve(
+      cached.filter((comment) => allowedPaths.includes(comment.url))
+    );
+    postCardRequests.set(signature, result);
+    return result;
+  }
+
+  const request = (async () => {
+    const results = await Promise.all(
+      allowedPaths.map((path) =>
+        requestArtalk("comments", {
+          site_name: artalkConfig().site,
+          page_key: path,
+          limit: 200,
+        })
+          .then((response) => (response.comments || []) as ArtalkComment[])
+          .catch(() => [] as ArtalkComment[])
+      )
+    );
+    const result = await normalizeArtalkRecords(results.flat());
+    Solitude.saveToLocal.set(postCardCacheKey(signature), result, cacheTtl());
+    return result;
+  })();
+
+  postCardRequests.set(signature, request);
+  void request.catch(() => postCardRequests.delete(signature));
+  return request;
 };
 
 const fetchPostCardComments = (paths: string[]) =>
@@ -533,11 +558,29 @@ const fetchValineAggregateCount = () => {
   return countRequest;
 };
 
-const fetchArtalkAggregateCount = async () => {
-  const response = await requestArtalk("stats/site_comment", {
-    site_name: artalkConfig().site,
+// 侧栏评论总数：single-flight + localStorage 缓存（对齐 Valine 版 fetchValineAggregateCount，
+// 避免 swup 每次切页都打一次 stats/site_comment）。
+const fetchArtalkAggregateCount = () => {
+  if (countRequest) return countRequest;
+  const cached = Solitude.saveToLocal.get<number>(countCacheKey());
+  if (typeof cached === "number") {
+    countRequest = Promise.resolve(cached);
+    return countRequest;
+  }
+  countRequest = (async () => {
+    const response = await requestArtalk("stats/site_comment", {
+      site_name: artalkConfig().site,
+    });
+    const count = Number(response.data ?? 0);
+    // count 为 0 时也缓存：空站反复回源没有意义（与 Valine 版的「>0 才缓存」不同，
+    // Artalk 的 site_comment 是全站精确计数，不存在 Valine 分块求和可能漏算 0 的问题）。
+    Solitude.saveToLocal.set(countCacheKey(), count, cacheTtl());
+    return count;
+  })().catch((error) => {
+    countRequest = null;
+    throw error;
   });
-  return Number(response.data ?? 0);
+  return countRequest;
 };
 
 const fetchAggregateCount = () =>
@@ -986,31 +1029,46 @@ const initializeArtalkEffects = async () => {
 
 // 文章页 meta 区的评论数与 PV：Valine 由 LeanCloud SDK 自动填充，
 // Artalk 则通过 stats 接口拉取后回填到相同的 DOM 位置。
-const initializeArtalkCounters = async () => {
+// 每个页面键独立短 TTL 缓存（0.02 天 ≈ 29 分钟，与信封弹幕一致）：
+// swup 切页来回时命中缓存不发请求；TTL 短，新评论/新 PV 延迟可接受。
+const counterCacheKey = (kind: "count" | "pv", path: string) =>
+  `artalk-hugo-counter:${kind}:v${aggregateCacheVersion}:${location.host}:${path}`;
+
+const fetchArtalkPageStat = async (
+  kind: "count" | "pv",
+  apiPath: "page_comment" | "page_pv"
+) => {
   const path = location.pathname;
+  const cacheKey = counterCacheKey(kind, path);
+  const cached = Solitude.saveToLocal.get<number>(cacheKey);
+  if (typeof cached === "number") return cached;
+  const response = await requestArtalk(`stats/${apiPath}`, {
+    site_name: artalkConfig().site,
+    page_keys: path,
+  });
+  const value = Number(response.data?.[path] ?? 0);
+  Solitude.saveToLocal.set(cacheKey, value, 0.02);
+  return value;
+};
+
+const initializeArtalkCounters = async () => {
   const countTarget = document.querySelector(".post-meta-commentcount .comment-count");
   const pvTarget = document.querySelector(".leancloud-visitors-count");
   const requests: Promise<void>[] = [];
   if (Solitude.config.comment?.count && countTarget) {
     requests.push(
-      requestArtalk("stats/page_comment", {
-        site_name: artalkConfig().site,
-        page_keys: path,
-      })
-        .then((response) => {
-          countTarget.textContent = String(Number(response.data?.[path] ?? 0));
+      fetchArtalkPageStat("count", "page_comment")
+        .then((value) => {
+          countTarget.textContent = String(value);
         })
         .catch(() => undefined)
     );
   }
   if (Solitude.config.comment?.pv !== false && pvTarget && artalkConfig().pv !== false) {
     requests.push(
-      requestArtalk("stats/page_pv", {
-        site_name: artalkConfig().site,
-        page_keys: path,
-      })
-        .then((response) => {
-          pvTarget.textContent = String(Number(response.data?.[path] ?? 0));
+      fetchArtalkPageStat("pv", "page_pv")
+        .then((value) => {
+          pvTarget.textContent = String(value);
         })
         .catch(() => undefined)
     );
@@ -1088,6 +1146,48 @@ const initializeValine = () => {
   Solitude.onPageCleanup?.(() => observer.disconnect());
 };
 
+const mountArtalk = async (mount: HTMLElement) => {
+  if (mount.dataset.solitudeInitialized === "true") return;
+  mount.dataset.solitudeInitialized = "true";
+  const cdn = Solitude.config.cdn || {};
+  if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css).catch(() => undefined);
+  applyArtalkDarkMode();
+  await Solitude.loadScript(cdn.artalk);
+  const config = artalkConfig();
+  const artalkInit = (window as any).Artalk?.init?.({
+    el: "#artalk-wrap",
+    server: config.server,
+    site: config.site,
+    placeholder: config.placeholder || undefined,
+    ...(config.option || {}),
+  });
+  await Promise.resolve(artalkInit).catch(() => undefined);
+  watchArtalkDarkMode();
+};
+
+// 评论区本体懒加载（与 Valine 版 initializeValine 同款）：comment.lazyload 开启时
+// 用 IntersectionObserver（rootMargin 200px）等 #artalk-wrap 临近视口再加载 CSS+SDK，
+// 长文章首屏完全不碰 Artalk 资源。注意 swup 切页后 #artalk-wrap 是新 DOM，
+// 每次初始化都要重新创建观察器（onPageCleanup 负责断开旧页的）。
+const initializeArtalk = () => {
+  const mount = document.getElementById("artalk-wrap");
+  if (!mount) return;
+  if (!Solitude.config.comment?.lazyload || !("IntersectionObserver" in window)) {
+    void mountArtalk(mount);
+    return;
+  }
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      void mountArtalk(mount);
+    },
+    { rootMargin: "200px 0px" }
+  );
+  observer.observe(mount);
+  Solitude.onPageCleanup?.(() => observer.disconnect());
+};
+
 const initializeOtherProviders = async (enabled: CommentProvider[]) => {
   const cdn = Solitude.config.cdn || {};
   if (enabled.includes("twikoo") && document.getElementById("twikoo")) {
@@ -1106,22 +1206,7 @@ const initializeOtherProviders = async (enabled: CommentProvider[]) => {
     });
   }
   if (enabled.includes("artalk") && document.getElementById("artalk-wrap")) {
-    const mount = document.getElementById("artalk-wrap") as HTMLElement;
-    if (mount.dataset.solitudeInitialized === "true") return;
-    mount.dataset.solitudeInitialized = "true";
-    if (cdn.artalk_css) await Solitude.loadStyle(cdn.artalk_css).catch(() => undefined);
-    applyArtalkDarkMode();
-    await Solitude.loadScript(cdn.artalk);
-    const config = artalkConfig();
-    const artalkInit = (window as any).Artalk?.init?.({
-      el: "#artalk-wrap",
-      server: config.server,
-      site: config.site,
-      placeholder: config.placeholder || undefined,
-      ...(config.option || {}),
-    });
-    await Promise.resolve(artalkInit).catch(() => undefined);
-    watchArtalkDarkMode();
+    await initializeArtalk();
   }
 };
 
