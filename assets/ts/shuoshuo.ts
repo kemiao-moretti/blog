@@ -635,14 +635,25 @@ const buildSmartGallery = (rawUrls: string[]) => {
 
   const createLink = (url: string) => {
     const link = document.createElement("a");
-    link.className = "shuoshuo-image";
+    link.className = "shuoshuo-image is-loading";
     link.href = url;
     link.setAttribute("data-fancybox", "shuoshuo-gallery");
     const img = document.createElement("img");
     img.src = url;
     img.alt = "";
     img.loading = "lazy";
-    img.addEventListener("error", () => link.classList.add("is-broken"), { once: true });
+    // 占位：图片加载完成（或失败）前显示 shimmer 骨架，结束后撤除，
+    // 避免「数据先到、图片后到」期间格子空一块造成布局跳动观感。
+    const settle = (broken: boolean) => {
+      link.classList.remove("is-loading");
+      if (broken) link.classList.add("is-broken");
+    };
+    if (img.complete && img.naturalWidth > 0) {
+      settle(false);
+    } else {
+      img.addEventListener("load", () => settle(false), { once: true });
+      img.addEventListener("error", () => settle(true), { once: true });
+    }
     link.append(img);
     return link;
   };

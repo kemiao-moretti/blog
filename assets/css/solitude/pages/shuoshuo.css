@@ -248,6 +248,42 @@
   overflow: hidden;
 }
 
+/* 图片加载占位：shimmer 骨架，load/error 后由 TS 移除 is-loading。
+   图片本身 lazy 加载，未进入视口/未下载完成前格子保持骨架态而非空白。 */
+.shuoshuo-image.is-loading {
+  background: var(--efu-secondbg);
+}
+
+.shuoshuo-image.is-loading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--efu-secondbg-bg, rgba(128, 128, 128, 0.14)) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: shuoshuo-image-shimmer 1.4s ease-in-out infinite;
+}
+
+.shuoshuo-image.is-loading img {
+  opacity: 0;
+}
+
+@keyframes shuoshuo-image-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shuoshuo-image.is-loading::before {
+    animation: none;
+  }
+}
+
 .shuoshuo-image img {
   width: 100%;
   height: 100%;
