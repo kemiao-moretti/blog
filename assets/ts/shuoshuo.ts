@@ -925,7 +925,45 @@ const fetchMemosAll = async (config: PageConfig): Promise<MemosItem[]> => {
 /* ---------------- Tg 数据 ---------------- */
 
 const tgCacheKey = (config: PageConfig) =>
-  `solitude-shuoshuo:tg:v1:${config.api}:${config.tgChannel}:${config.tgLimit}`;
+  `solitude-shuoshuo:tg:v2:${config.api}:${config.tgChannel}:${config.tgLimit}`;
+
+// 请求超时 + 慢请求告警（对齐 astro-koharu moments/runtime.ts：8s 超时、>2s warn）。
+const tgFetch = async (url: string, timeoutMs = 8000) => {
+  const startedAt = performance.now();
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+    const durationMs = Math.round(performance.now() - startedAt);
+    if (durationMs > 2000) console.warn(`[shuoshuo] slow tg request: ${new URL(url).pathname} (${durationMs}ms)`);
+    return response;
+  } catch (error) {
+    const durationMs = Math.round(performance.now() - startedAt);
+    console.warn(`[shuoshuo] tg request failed: ${new URL(url).pathname} (${durationMs}ms)`);
+    throw error;
+  }
+};
+
+// 读缓存：不过期才返回 fresh；过期数据单独返回（SWR 降级用）。
+const readTgCache = (config: PageConfig): { fresh: TgMessage[] | null; stale: TgMessage[] | null } => {
+  try {
+    const raw = localStorage.getItem(tgCacheKey(config));
+    if (!raw) return { fresh: null, stale: null };
+    const cached = JSON.parse(raw) as { time: number; data: TgMessage[] };
+    const items = Array.isArray(cached?.data) ? cached.data : null;
+    if (!items) return { fresh: null, stale: null };
+    const fresh = Date.now() - cached.time < config.cacheMinutes * 60 * 1000;
+    return { fresh: fresh ? items : null, stale: items };
+  } catch {
+    return { fresh: null, stale: null };
+  }
+};
+
+const writeTgCache = (config: PageConfig, data: TgMessage[]) => {
+  try {
+    localStorage.setItem(tgCacheKey(config), JSON.stringify({ time: Date.now(), data }));
+  } catch {
+    /* 隐私模式下 localStorage 不可用，忽略 */
+  }
+};
 
 // 游标分页全量拉取：koharu-suite 每条返回 nextCursor，空串即末页。
 // 全量拉取后在前端做本地数字分页切片（与 memos 一致，复用主题分页 UI）。
@@ -937,7 +975,7 @@ const fetchTgAll = async (config: PageConfig): Promise<TgMessage[]> => {
     const params = new URLSearchParams({ limit: "100" });
     if (config.tgChannel) params.set("channel", config.tgChannel);
     if (cursor) params.set("cursor", cursor);
-    const response = await fetch(`${config.api}/api/v1/messages?${params.toString()}`);
+    const response = await tgFetch(`${config.api}/api/v1/messages?${params.toString()}`);
     if (!response.ok) throw new Error(`Tg 请求失败：HTTP ${response.status}`);
     const payload = await response.json();
     const pageItems = (payload?.items || []) as TgMessage[];
@@ -952,6 +990,17 @@ const fetchTgAll = async (config: PageConfig): Promise<TgMessage[]> => {
   return items;
 };
 
+// tg 秒开（移植自 astro-koharu moments 的 maxAge+SWR 思路，客户端等价实现）：
+// 新鲜缓存 → 直接用；过期 stale → 也先返回（SWR，渲染不被网络阻塞），后台刷新由
+// initShuoshuo 的 loadTg 负责；完全无缓存才同步回源。
+const loadTgAll = async (config: PageConfig): Promise<TgMessage[]> => {
+  const cached = readTgCache(config);
+  if (cached.fresh || cached.stale) return (cached.fresh || cached.stale)!;
+  const data = await fetchTgAll(config);
+  if (data.length) writeTgCache(config, data);
+  return data;
+};
+
 const searchTg = async (config: PageConfig, query: string): Promise<TgMessage[]> => {
   const params = new URLSearchParams({
     q: query,
@@ -959,7 +1008,7 @@ const searchTg = async (config: PageConfig, query: string): Promise<TgMessage[]>
     sort: "newest",
   });
   if (config.tgChannel) params.set("channel", config.tgChannel);
-  const response = await fetch(`${config.api}/api/v1/search/messages?${params.toString()}`);
+  const response = await tgFetch(`${config.api}/api/v1/search/messages?${params.toString()}`);
   if (!response.ok) throw new Error(`Tg 搜索失败：HTTP ${response.status}`);
   const payload = await response.json();
   return (payload?.items || []).map((entry: { message?: TgMessage }) => entry.message).filter(Boolean) as TgMessage[];
@@ -1196,8 +1245,31 @@ const initShuoshuo = async () => {
     return memosPromise;
   };
   let tgPromise: Promise<TgMessage[]> | null = null;
+  // tg SWR：缓存命中（含过期 stale）先 resolve 立即渲染；后台 revalidate，
+  // 拉到新数据时写缓存并触发一次重渲染（stale 情况才需要）。
   const loadTg = () => {
-    if (!tgPromise) tgPromise = fetchTgAll(config);
+    if (!tgPromise) {
+      tgPromise = loadTgAll(config).then((items) => {
+        const cached = readTgCache(config);
+        if (!cached.fresh) {
+          // 走的是网络路径（无缓存或 stale 兜底）：后台刷新
+          void fetchTgAll(config)
+            .then((latest) => {
+              writeTgCache(config, latest);
+              tgPromise = null;
+              if (JSON.stringify(latest) !== JSON.stringify(items)) void render();
+            })
+            .catch(() => {
+              /* 刷新失败：保留当前展示的（可能是 stale 的）数据 */
+              tgPromise = null;
+            });
+        }
+        return items;
+      }).catch((error) => {
+        tgPromise = null;
+        throw error;
+      });
+    }
     return tgPromise;
   };
   let ech0Promise: Promise<{ items: EchoItem[]; total: number }> | null = null;
@@ -1446,6 +1518,12 @@ const initShuoshuo = async () => {
       window.lazyLoadInstance?.update?.();
     } catch (error) {
       console.error("[shuoshuo]", error);
+      // tg SWR 降级：后台 revalidate 失败时列表里已有 stale 数据在展示，
+      // 只在列表为空（首次加载就失败）时才显示错误态，不把旧内容整页替换掉。
+      if (config.source === "tg" && list.childElementCount > 0) {
+        Solitude.snackbarShow?.("说说数据刷新失败，当前展示缓存版本", false, 2000);
+        return;
+      }
       setStatus('<span>说说加载失败，请稍后重试</span>', "error");
       if (pagination) pagination.hidden = true;
     }
