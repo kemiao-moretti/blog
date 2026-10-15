@@ -998,12 +998,12 @@ const initializeValineEffects = async () => {
 const barragePending = () => {
   if (!commentBarrageEnabled()) return false;
   const container = document.querySelector(".comment-barrage");
-  return Boolean(container) && container.getAttribute("data-barrage-init") !== "true";
+  return container !== null && container.getAttribute("data-barrage-init") !== "true";
 };
 
 const envelopePending = () => {
   const container = document.getElementById("barrage");
-  return Boolean(container) && container.dataset.envelopeInit !== "true";
+  return container !== null && container.dataset.envelopeInit !== "true";
 };
 
 const initializeArtalkEffects = async () => {
